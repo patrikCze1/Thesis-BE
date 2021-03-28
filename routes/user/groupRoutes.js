@@ -1,0 +1,40 @@
+const express = require("express");
+const router = express.Router();
+const db = require("../../models");
+const Group = db.Group;
+
+router.get("/", async (req, res) => {
+  try {
+    const groups = await Group.findAll();
+    res.json(groups);
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+router.get("/:id", async (req, res) => {
+  try {
+    const group = await Group.findByPk(req.params.id);
+    res.json(group);
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+router.post("/", async (req, res) => {
+  if (!req.body.name) {
+    res.status(400).send({
+      message: "name is required",
+    });
+    return;
+  }
+
+  const data = {
+    name: req.body.name,
+  };
+
+  const newGroup = await Group.create(data);
+  res.send(newGroup);
+});
+
+module.exports = router;
