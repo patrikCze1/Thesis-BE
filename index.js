@@ -2,8 +2,7 @@ const express = require('express');
 require('dotenv/config');
 const app = express();
 const cors = require('cors');
-const Sequelize = require("sequelize");
-const db = require("./models/index");
+const sequelize = require("./models/index");
 const projectRoutes = require('./routes/project/projectRoutes');
 const taskRoutes = require('./routes/project/taskRoutes.js');
 const taskCommentRoutes = require('./routes/project/taskCommentRoutes.js');
@@ -11,8 +10,9 @@ const taskChangeLogRoutes = require('./routes/project/taskChangeLogRoutes.js');
 const userRoutes = require('./routes/user/userRoutes.js');
 const authRoutes = require('./routes/auth/authRoutes.js');
 const groupRoutes = require('./routes/user/groupRoutes.js');
+const todoRoutes = require('./routes/todo/todoRoutes.js');
 
-db.sequelize.sync();
+sequelize.sync();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -28,6 +28,7 @@ app.use('/tasks', taskChangeLogRoutes);
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/groups', groupRoutes);
+app.use('/todos', todoRoutes)
 
 app.get('/', (req, res) => {
     res.send('Api index');

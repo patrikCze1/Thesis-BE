@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../../models");
-const userRepo = require("../../repo/userRepo.js");
-const User = db.User;
+const User = require("../../models/modelHelper");
 const { generateToken, generateRefreshToken, isRefreshTokenValid, decodeToken } = require("../../auth/auth");
 const bcrypt = require("bcrypt");
 
@@ -43,8 +41,8 @@ router.post("/login", async (req, res) => {
     const match = await bcrypt.compare(req.body.password, user.password);
 
     if (match) {
-      const token = generateToken(user.id);
-      const refreshToken = generateRefreshToken(user.id);
+      const token = generateToken(user);
+      const refreshToken = generateRefreshToken(user);
       
       res
         // .cookie("auth-token", token, { secure: true, httpOnly: true })

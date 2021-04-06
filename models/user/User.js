@@ -1,12 +1,12 @@
-module.exports = (sequelize, DataTypes, Model) => {
-  class User extends Model {
-    static associate(models) {
-      // define association here
-    }
-  }
-  User.init(
-    {
-      id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  sequelize.define('User', {
+      id: { 
+        type: DataTypes.INTEGER, 
+        primaryKey: true, 
+        autoIncrement: true 
+      },
       username: {
         type: DataTypes.STRING,
       },
@@ -16,15 +16,15 @@ module.exports = (sequelize, DataTypes, Model) => {
       email: {
         type: DataTypes.STRING,
       },
-    },
-    { 
-      sequelize,
-      modelName: "User",
-
-      //   freezeTableName: true,
-      // tableName: 'my_very_custom_table_name'
+      firstName: {
+        type: DataTypes.STRING,
+      },
+      surname: {
+        type: DataTypes.STRING,
+      },
+      position: {
+        type: DataTypes.STRING,
+      }
     }
   );
-
-  return User;
 };

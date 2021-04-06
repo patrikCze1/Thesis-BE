@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../../models");
+const User = require("../../models/modelHelper");
 const userRepo = require("../../repo/userRepo.js");
-const User = db.User;
+
 const {
   authenticateToken,
   decodeToken,
@@ -14,6 +14,15 @@ router.get("/private", authenticateToken, async (req, res) => {
   const token = req.header("auth-token");
   const id = decodeToken(token);
   res.send(id);
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const removedUser = await User.remove({ id: req.params.id });
+    res.json(removedUser);
+  } catch (error) {
+    res.json({ message: error });
+  }
 });
 
 module.exports = router;

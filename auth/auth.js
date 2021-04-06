@@ -3,17 +3,17 @@ require("dotenv/config");
 
 let refreshTokens = {};
 
-const generateToken = (userId) => {
-  return jwt.sign({ userId: userId }, process.env.TOKEN_SECRET, {
+const generateToken = (user) => {
+  return jwt.sign({ user: user }, process.env.TOKEN_SECRET, {
     expiresIn: parseInt(process.env.TOKEN_SECRET_EXPIRATION),
   });
 };
 
-const generateRefreshToken = (userId) => {
-  const token = jwt.sign({ userId: userId }, process.env.REFRESH_TOKEN, {
+const generateRefreshToken = (user) => {
+  const token = jwt.sign({ user: user }, process.env.REFRESH_TOKEN, {
     expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
   });
-  refreshTokens[userId] = token;
+  refreshTokens[user.id] = token;
   return token;
 };
 
@@ -47,7 +47,7 @@ const getUser = () => {
     if (token == null) return res.sendStatus(401);
 
     const data = jwt.decode(token, process.env.TOKEN_SECRET);
-    return data.userId;
+    return data;
   } catch (error) {
     return null;
   }

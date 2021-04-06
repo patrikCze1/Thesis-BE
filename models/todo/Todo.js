@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("Project", {
+  sequelize.define("Todo", {
     id: { 
       type: DataTypes.INTEGER, 
       primaryKey: true, 
@@ -10,6 +10,9 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+    },
+    completed: {
+      type: DataTypes.BOOLEAN,
     },
   });
 };

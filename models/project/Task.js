@@ -1,24 +1,31 @@
-module.exports = (sequelize, DataTypes, Model) => {
-  class Task extends Model {
-    static associate(models) {
-      // define association here
-    }
-  };
-  Task.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  sequelize.define('Task', {
+    id: {
+      type: DataTypes.INTEGER, 
+      primaryKey: true, 
+      autoIncrement: true 
+    },
     title: {
       type: DataTypes.STRING
     },
     description: {
-      type: DataTypes.STRING
+      type: DataTypes.TEXT
     },
     status: {
-      type: DataTypes.STRING//?classa?
+      type: DataTypes.STRING//?model?
     },
-  }, {
-    sequelize,
-    modelName: 'Task',
+    priority: {
+      type: DataTypes.INTEGER
+    },
+    deadline: {
+      type: DataTypes.DATE
+    },
+    solver_id: {
+      type: DataTypes.INTEGER
+    }
+    //begin / hours
+    //subTask
   });
-
-  return Task;
 };

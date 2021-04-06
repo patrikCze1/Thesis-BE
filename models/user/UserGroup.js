@@ -1,21 +1,19 @@
-module.exports = (sequelize, DataTypes) => {
-  return sequelize.define(
-    "UserGroup",
-    {
+const { DataTypes } = require('sequelize');
+
+module.exports = (sequelize) => {
+  sequelize.define("UserGroup", {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      group_id: {
+      GroupId: {
         type: DataTypes.INTEGER,
       },
-      user_id: {
+      UserId: {
         type: DataTypes.INTEGER,
       },
     },
-    {
-      // Other model options go here
-    }
+    { timestamps: false }
   );
 };

@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../../models");
-const TaskChangeLog = db.TaskChangeLog;
+const TaskChangeLog = require("../../models/modelHelper");
 
 router.get("/:taskId/change-logs/", async (req, res) => {
   try {
@@ -11,6 +10,23 @@ router.get("/:taskId/change-logs/", async (req, res) => {
       },
     });
     res.json(logs);
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+router.get("/:taskId/change-logs/:id", async (req, res) => {
+  try {
+    res.json(await TaskChangeLog.findByPk(req.params.id));
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    const removedRow = await Todo.remove({ id: req.params.id });
+    res.json(removedRow);
   } catch (error) {
     res.json({ message: error });
   }

@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../../models");
-const Task = db.Task;
-const Project = db.Project;
+const Task = require("../../models/modelHelper");
 
 router.get("/:projectId/tasks/", async (req, res) => {
   try {
@@ -18,7 +16,7 @@ router.get("/:projectId/tasks/", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/tasks/:id", async (req, res) => {
   try {
     const task = await Task.findByPk(req.params.id);
     res.json(task);
@@ -43,6 +41,31 @@ router.post("/:projectId/tasks/", async (req, res) => {
   try {
     const newItem = await Task.create(data);
     res.send(newItem);
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+router.patch("/tasks/:id", async (req, res) => {
+  try {
+    let task = await Task.findByPk(req.params.id);
+    
+    task.title = req.body.title;
+    task.description = req.body.description;
+    task.status = req.body.status;
+    await task.save();
+
+    res.json(task);
+  } catch (error) {
+    res.json({ message: error });
+  }
+  //console.log(task.changed())
+});
+
+router.delete("/tasks/:id", async (req, res) => {
+  try {
+    const removedTask = await Task.remove({ id: req.params.id });
+    res.json(removedTask);
   } catch (error) {
     res.json({ message: error });
   }
