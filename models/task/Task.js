@@ -8,24 +8,26 @@ module.exports = (sequelize) => {
       autoIncrement: true 
     },
     title: {
-      type: DataTypes.STRING
+      type: DataTypes.STRING,
     },
     description: {
-      type: DataTypes.TEXT
+      type: DataTypes.TEXT,
     },
     status: {
-      type: DataTypes.STRING//?model?
+      type: DataTypes.STRING,//?model?
     },
     priority: {
-      type: DataTypes.INTEGER
+      type: DataTypes.INTEGER,//?model?
     },
     deadline: {
-      type: DataTypes.DATE
+      type: DataTypes.DATE,
     },
-    solver_id: {
-      type: DataTypes.INTEGER
-    }
+    solverId: {
+      type: DataTypes.INTEGER,
+    },
+    createdById: {
+      type: DataTypes.INTEGER,
+    },
     //begin / hours
-    //subTask
   });
 };

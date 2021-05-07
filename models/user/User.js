@@ -8,23 +8,27 @@ module.exports = (sequelize) => {
         autoIncrement: true 
       },
       username: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
       },
       password: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(100),
       },
       email: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(50),
       },
       firstName: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(20),
       },
-      surname: {
-        type: DataTypes.STRING,
+      lastName: {
+        type: DataTypes.STRING(20),
       },
       position: {
-        type: DataTypes.STRING,
-      }
+        type: DataTypes.STRING(50),
+      },
+      sex: {
+        type: DataTypes.STRING(1),
+      },
+      //role
     }
   );
 };

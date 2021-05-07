@@ -16,13 +16,19 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
 
 const models = [
   require("./project/Project"),
-  require("./project/Task.js"), //TaskAttachment, TaskChecklist
-  require("./project/TaskComment.js"),
+  require("./task/Task.js"),
+  require("./task/TaskAttachment.js"),
+  require("./task/TaskComment.js"),
+  require("./task/TaskCommentAttachment.js"),
+  require("./task/TaskChangeLog.js"),
+  require("./task/TimeTrack.js"),
+  require("./task/SubTask.js"),
   require("./todo/Todo.js"),
-  require("./project/TaskChangeLog.js"),
   require("./user/User.js"),//PersonalInfo
   require("./user/Group.js"),
   require("./user/UserGroup.js"),
+  require("./notification/Notification.js"),
+  require("./notification/TaskNotification.js"),
 ];
 
 //Note, Notification, Role
@@ -32,21 +38,66 @@ for (const model of models) {
 }
 
 // Relations
-const {Project, Task, TaskComment, TaskChangeLog, User, Group, Todo, UserGroup} = sequelize.models;
+const {
+  Project, 
+  Task, 
+  TaskAttachment, 
+  TaskComment, 
+  TaskCommentAttachment, 
+  TaskChangeLog, 
+  User, 
+  Group, 
+  Todo, 
+  UserGroup, 
+  TimeTrack,
+  Notification,
+  TaskNotification,
+  SubTask,
+} = sequelize.models;
 
 Project.hasMany(Task);
 Task.belongsTo(Project);
-Task.hasMany(TaskComment);
+User.hasMany(Project, {foreignKey: 'createdById'});
+Project.belongsTo(User, {foreignKey: 'createdById'});
+
+TaskAttachment.belongsTo(Task);
+Task.hasMany(TaskAttachment);
 TaskComment.belongsTo(Task);
+Task.hasMany(TaskComment);
+TaskComment.hasMany(TaskCommentAttachment);
+TaskCommentAttachment.belongsTo(TaskComment);
 Task.hasMany(TaskChangeLog);
 TaskChangeLog.belongsTo(Task);
-User.hasMany(Task, {foreignKey: 'SolverId'});
-Task.belongsTo(User, {foreignKey: 'SolverId'});
+User.hasMany(Task, {foreignKey: 'solverId'});
+Task.belongsTo(User, {foreignKey: 'solverId'});
+User.hasMany(Task, {foreignKey: 'createdById'});
+Task.belongsTo(User, {foreignKey: 'createdById'});
+
+Task.hasMany(SubTask);
+SubTask.belongsTo(Task);
+User.hasMany(SubTask, {foreignKey: 'solvedById'});
+SubTask.belongsTo(User, {foreignKey: 'solvedById'});
 
 User.hasMany(TaskComment);
 TaskComment.belongsTo(User);
 User.hasMany(TaskChangeLog);
 TaskChangeLog.belongsTo(User);
+
+// time track
+User.hasMany(TimeTrack);
+TimeTrack.belongsTo(User);
+Task.hasMany(TimeTrack);
+TimeTrack.belongsTo(Task);
+
+//notification
+User.hasMany(Notification);
+Notification.belongsTo(User);
+
+Notification.hasOne(TaskNotification);
+TaskNotification.belongsTo(Notification);
+Task.hasMany(TaskNotification);
+TaskNotification.belongsTo(Task);
+TaskNotification.removeAttribute('id');
 
 User.hasMany(Todo);
 Todo.belongsTo(User);
@@ -55,8 +106,8 @@ const ProjectGroup = sequelize.define('ProjectGroup', {}, { timestamps: false })
 Project.belongsToMany(Group, { through: 'ProjectGroup' });
 Group.belongsToMany(Project, { through: 'ProjectGroup' });
 
-Project.belongsToMany(User, { through: 'ProjectUser' });
-User.belongsToMany(Project, { through: 'ProjectUser' });
+// Project.belongsToMany(User, { through: 'ProjectUser' });
+// User.belongsToMany(Project, { through: 'ProjectUser' });
 
 User.belongsToMany(Group, {
   through: {
@@ -66,7 +117,7 @@ User.belongsToMany(Group, {
       taggable: "user",
     },
   },
-  foreignKey: "UserId",
+  foreignKey: "userId",
 });
 
 Group.belongsToMany(User, {
@@ -77,7 +128,7 @@ Group.belongsToMany(User, {
       taggable: "group",
     },
   },
-  foreignKey: "GroupId",
+  foreignKey: "groupId",
   constraints: false,
 });
 

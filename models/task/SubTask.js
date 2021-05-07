@@ -1,23 +1,23 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("Project", {
-    id: { 
+  sequelize.define('SubTask', {
+    id: {
       type: DataTypes.INTEGER, 
       primaryKey: true, 
       autoIncrement: true 
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     completed: {
       type: DataTypes.BOOLEAN,
-      allowNull: false,
       defaultValue: false,
+      allowNull: false,
     },
-    createdById: {
-      type: DataTypes.INTEGER,
-    },
+    solvedById: {
+      type: DataTypes.INTEGER
+    }
   });
 };

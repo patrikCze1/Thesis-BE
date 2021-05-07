@@ -39,4 +39,4 @@ app.listen(port, () => {
     console.log(`listening on port ${port}...`)
 });
 
-//nodeamon index.js
+//nodemon index.js
