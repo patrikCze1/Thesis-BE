@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Todo = require("../../models/modelHelper");
+const { Todo } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
 
 router.get("/", async (req, res) => {

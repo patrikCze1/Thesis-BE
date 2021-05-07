@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const Group = require("../../models/modelHelper");
+const { Group } = require("../../models/modelHelper");
 
 router.get("/", async (req, res) => {
   try {

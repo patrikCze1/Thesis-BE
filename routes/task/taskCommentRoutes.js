@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const TaskComment = require("../../models/modelHelper");
+const { TaskComment, TaskCommentAttachment } = require("../../models/modelHelper");
 const {
   getUser
 } = require("../../auth/auth");
@@ -11,6 +11,7 @@ router.get("/:taskId/comments/", async (req, res) => {
       where: {
         TaskId: req.params.taskId,
       },
+      include: TaskCommentAttachment,
     });
     res.json(comments);
   } catch (error) {
@@ -25,6 +26,7 @@ router.get("/:taskId/comments/:id", async (req, res) => {
         TaskId: req.params.taskId,
         id: req.params.id,
       },
+      include: TaskCommentAttachment,
     });
     res.json(comment);
   } catch (error) {
@@ -39,6 +41,16 @@ router.post("/:taskId/comments/", async (req, res) => {
     });
     return;
   }
+
+  // send notification
+  // const newNotif = await Notification.create({
+  //   message: 'ahoj',
+  //   type: 1,
+  // });
+  // await TaskNotification.create({
+  //   TaskId: req.params.id,
+  //   NotificationId: newNotif.id,
+  // });
 
   const data = {
     text: req.body.text,
@@ -68,7 +80,18 @@ router.patch("/:taskId/comments/:id", async (req, res) => {
 });
 
 router.delete("/:taskId/comments/:id", async (req, res) => {
+  //todo remove all task comment attach
   try {
+    const attachments = await TaskCommentAttachment.findAll({
+      where: {
+        TaskCommentId: req.params.id,
+      },
+    });
+    attachments.forEach(attachment => {
+      //remove
+      //await TaskCommentAttachment.remove({ id: attachment.id });
+    });
+
     const removedRow = await TaskComment.remove({ id: req.params.id });
     res.json(removedRow);
   } catch (error) {

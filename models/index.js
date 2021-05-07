@@ -11,7 +11,7 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     acquire: 30000,
     idle: 10000,
   },
-  force: true,
+  // force: true,
 });
 
 const models = [
@@ -31,7 +31,7 @@ const models = [
   require("./notification/TaskNotification.js"),
 ];
 
-//Note, Notification, Role
+//Note, Role
 
 for (const model of models) {
 	model(sequelize);
@@ -55,19 +55,31 @@ const {
   SubTask,
 } = sequelize.models;
 
-Project.hasMany(Task);
+Project.hasMany(Task, {
+  onDelete: 'CASCADE',
+  foreignKey: { allowNull: false }
+});
 Task.belongsTo(Project);
 User.hasMany(Project, {foreignKey: 'createdById'});
 Project.belongsTo(User, {foreignKey: 'createdById'});
 
-TaskAttachment.belongsTo(Task);
+TaskAttachment.belongsTo(Task, {
+  onDelete: 'CASCADE',
+  foreignKey: { allowNull: false }
+});
 Task.hasMany(TaskAttachment);
-TaskComment.belongsTo(Task);
+TaskComment.belongsTo(Task, {
+  onDelete: 'CASCADE',
+  foreignKey: { allowNull: false }
+});
 Task.hasMany(TaskComment);
 TaskComment.hasMany(TaskCommentAttachment);
 TaskCommentAttachment.belongsTo(TaskComment);
 Task.hasMany(TaskChangeLog);
-TaskChangeLog.belongsTo(Task);
+TaskChangeLog.belongsTo(Task, {
+  onDelete: 'CASCADE',
+  foreignKey: { allowNull: false }
+});
 User.hasMany(Task, {foreignKey: 'solverId'});
 Task.belongsTo(User, {foreignKey: 'solverId'});
 User.hasMany(Task, {foreignKey: 'createdById'});

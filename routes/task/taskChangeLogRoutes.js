@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const TaskChangeLog = require("../../models/modelHelper");
+const { TaskChangeLog } = require("../../models/modelHelper");
 
 router.get("/:taskId/change-logs/", async (req, res) => {
   try {

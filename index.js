@@ -4,13 +4,16 @@ const app = express();
 const cors = require('cors');
 const sequelize = require("./models/index");
 const projectRoutes = require('./routes/project/projectRoutes');
-const taskRoutes = require('./routes/project/taskRoutes.js');
-const taskCommentRoutes = require('./routes/project/taskCommentRoutes.js');
-const taskChangeLogRoutes = require('./routes/project/taskChangeLogRoutes.js');
+const taskRoutes = require('./routes/task/taskRoutes.js');
+const taskAttachmentRoutes = require('./routes/task/taskAttachmentRoutes.js');
+const taskCommentRoutes = require('./routes/task/taskCommentRoutes.js');
+const taskChangeLogRoutes = require('./routes/task/taskChangeLogRoutes.js');
+const timeTrackRoutes = require('./routes/task/timeTrackRoutes.js');
 const userRoutes = require('./routes/user/userRoutes.js');
 const authRoutes = require('./routes/auth/authRoutes.js');
 const groupRoutes = require('./routes/user/groupRoutes.js');
 const todoRoutes = require('./routes/todo/todoRoutes.js');
+const notificationRoutes = require('./routes/notification/notificationRoutes.js');
 
 sequelize.sync();
 
@@ -23,12 +26,15 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use('/projects', projectRoutes);
 app.use('/projects', taskRoutes);
+app.use('/tasks', taskAttachmentRoutes);
 app.use('/tasks', taskCommentRoutes);
 app.use('/tasks', taskChangeLogRoutes);
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/groups', groupRoutes);
-app.use('/todos', todoRoutes)
+app.use('/todos', todoRoutes);
+app.use('/tracks', timeTrackRoutes);
+app.use('/', notificationRoutes);
 
 app.get('/', (req, res) => {
     res.send('Api index');
@@ -40,3 +46,4 @@ app.listen(port, () => {
 });
 
 //nodemon index.js
+//socket, pwa, 

@@ -1,10 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const Task = require("../../models/modelHelper");
+const {
+  Task,
+  TaskAttachment,
+  Notification,
+  TaskNotification,
+} = require("../../models/modelHelper");
 
 router.get("/:projectId/tasks/", async (req, res) => {
   try {
-    // const project = await Project.findByPk(req.params.projectId);
     const tasks = await Task.findAll({
       where: {
         ProjectId: req.params.projectId,
@@ -16,9 +20,38 @@ router.get("/:projectId/tasks/", async (req, res) => {
   }
 });
 
-router.get("/tasks/:id", async (req, res) => {
+router.get("/:projectId/tasks/:id", async (req, res) => {
   try {
-    const task = await Task.findByPk(req.params.id);
+    const userId = 1; // todo
+    const notifications = await Notification.findAll({
+      where: {
+        seen: 0,
+        UserId: userId,
+      },
+      include: [
+        {
+          model: TaskNotification,
+          where: {
+            TaskId: req.params.id,
+          },
+        },
+      ],
+    });
+
+    notifications.forEach(async notification => {
+      notification.seen = true;
+      await notification.save();
+    });
+    
+  } catch (error) {
+    
+  }
+
+  try {
+    const task = await Task.findByPk(req.params.id, {
+      include: TaskAttachment,
+    });
+
     res.json(task);
   } catch (error) {
     res.json({ message: error });
@@ -40,7 +73,7 @@ router.post("/:projectId/tasks/", async (req, res) => {
 
   try {
     const newItem = await Task.create(data);
-    res.send(newItem);
+    res.json(newItem);
   } catch (error) {
     res.json({ message: error });
   }
@@ -49,7 +82,7 @@ router.post("/:projectId/tasks/", async (req, res) => {
 router.patch("/tasks/:id", async (req, res) => {
   try {
     let task = await Task.findByPk(req.params.id);
-    
+
     task.title = req.body.title;
     task.description = req.body.description;
     task.status = req.body.status;

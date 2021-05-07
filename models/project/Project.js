@@ -19,5 +19,6 @@ module.exports = (sequelize) => {
     createdById: {
       type: DataTypes.INTEGER,
     },
+    //budget - time,price
   });
 };

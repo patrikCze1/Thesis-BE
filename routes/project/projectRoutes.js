@@ -1,7 +1,7 @@
 const { request } = require("express");
 const express = require("express");
 const router = express.Router();
-const Project = require("../../models/modelHelper");
+const { Project } = require("../../models/modelHelper");
 
 router.get('/', async (req, res) => {
   try {
@@ -53,6 +53,7 @@ router.patch("/:id", async (req, res) => {
 });
 
 router.delete("/:id", async (req, res) => {
+  //todo remove all task attach and comment attach
   try {
     const removedProject = await Project.remove({ id: req.params.id });
     res.json(removedProject);
