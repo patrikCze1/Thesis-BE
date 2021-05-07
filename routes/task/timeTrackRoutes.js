@@ -1,80 +1,64 @@
 const express = require("express");
 const router = express.Router();
-const { Task, TaskAttachment } = require("../../models/modelHelper");
+const { TimeTrack } = require("../../models/modelHelper");
 
-router.get("/:projectId/tasks/", async (req, res) => {
+router.get("/", async (req, res) => {
   try {
-    // const project = await Project.findByPk(req.params.projectId);
-    const tasks = await Task.findAll({
-      where: {
-        ProjectId: req.params.projectId,
-      },
-    });
-    res.json(tasks);
+    const items = await TimeTrack.findAll();
+    res.json(items);
   } catch (error) {
     res.json({ message: error });
   }
 });
 
-router.get("/:projectId/tasks/:id", async (req, res) => {
+router.get("/:id", async (req, res) => {
   try {
-    const task = await Task.findByPk(req.params.id);
-    const attachments = await TaskAttachment.findAll({
-      where: {
-        TaskId: req.params.id,
-      },
-    });
-
-    res.json({
-      task,
-      attachments,
-    });
+    const record = await TimeTrack.findByPk(req.params.id);
+    res.json(record);
   } catch (error) {
     res.json({ message: error });
   }
 });
 
-router.post("/:projectId/tasks/", async (req, res) => {
-  if (!req.body.title) {
-    res.status(400).send({
-      message: "title is required",
-    });
-    return;
-  }
+router.post("/", async (req, res) => {
+  //todo validate
 
   const data = {
-    title: req.body.title,
-    ProjectId: req.params.projectId,
+    name: req.body.name,
+    beginAt: req.params.beginAt,
+    endAt: req.params.endAt,
+    userId: req.params.userId,
+    taskId: req.params.taskId,
   };
 
   try {
-    const newItem = await Task.create(data);
+    const newItem = await TimeTrack.create(data);
     res.send(newItem);
   } catch (error) {
     res.json({ message: error });
   }
 });
 
-router.patch("/tasks/:id", async (req, res) => {
+router.patch("/:id", async (req, res) => {
   try {
-    let task = await Task.findByPk(req.params.id);
+    let track = await TimeTrack.findByPk(req.params.id);
     
-    task.title = req.body.title;
-    task.description = req.body.description;
-    task.status = req.body.status;
-    await task.save();
+    track.name = req.body.name;
+    track.beginAt = req.params.beginAt;
+    track.endAt = req.params.endAt;
+    track.taskId = req.params.taskId;
+    await track.save();
 
-    res.json(task);
+    res.json(track);
   } catch (error) {
     res.json({ message: error });
   }
-  //console.log(task.changed())
 });
 
-router.delete("/tasks/:id", async (req, res) => {
+router.delete("/:id", async (req, res) => {
   try {
-    const removedTask = await Task.remove({ id: req.params.id });
-    res.json(removedTask);
+    const removedRecord = await TimeTrack.remove({ id: req.params.id });
+    res.json(removedRecord);
   } catch (error) {
     res.json({ message: error });
   }
