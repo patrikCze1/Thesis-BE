@@ -17,16 +17,10 @@ module.exports = (sequelize) => {
     },
     solverId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: sequelize.models.User,
-      }
     },
     taskId: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      references: {
-        model: sequelize.models.Task,
-      }
     },
     createdAt: {
       type: DataTypes.DATE,

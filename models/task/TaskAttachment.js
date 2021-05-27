@@ -17,9 +17,7 @@ module.exports = (sequelize) => {
       },
       taskId: {
         type: DataTypes.INTEGER,
-        references: {
-          model: sequelize.models.Task,
-        }
+        allowNull: false
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -31,7 +29,7 @@ module.exports = (sequelize) => {
       },
     }, {
       associate: function(models) {
-        TaskAttachment.belongsTo(models.Task, { onDelete: 'CASCADE', foreignKey: { allowNull: false } });
+        TaskAttachment.belongsTo(models.Task, {foreignKey: 'taskId',  onDelete: 'CASCADE' });
       }
     }
   );

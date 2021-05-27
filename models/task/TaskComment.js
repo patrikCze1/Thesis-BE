@@ -14,16 +14,10 @@ module.exports = (sequelize) => {
       userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: sequelize.models.User,
-        }
       },
       taskId: {
         type: DataTypes.INTEGER,
         allowNull: false,
-        references: {
-          model: sequelize.models.Task,
-        }
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -35,9 +29,9 @@ module.exports = (sequelize) => {
       },
     }, {
       associate: function(models) {
-        TaskComment.belongsTo(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId', });
-        TaskComment.hasMany(models.TaskCommentAttachment);
         TaskComment.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
+        TaskComment.belongsTo(models.Task, {foreignKey: 'taskId', onDelete: 'CASCADE'});
+        TaskComment.hasMany(models.TaskCommentAttachment, {foreignKey: 'commentId'});
       }
     }
   );

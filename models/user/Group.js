@@ -1,5 +1,4 @@
 const { DataTypes } = require("sequelize");
-const { Group } = require("../modelHelper");
 
 module.exports = (sequelize) => {
   const Group = sequelize.define("Group", {

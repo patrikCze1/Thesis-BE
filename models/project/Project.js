@@ -18,15 +18,9 @@ module.exports = (sequelize) => {
     },
     createdById: {
       type: DataTypes.INTEGER,
-      references: {
-        model: sequelize.models.User,
-      }
     },
     clientId: {
       type: DataTypes.INTEGER,
-      references: {
-        model: sequelize.models.Client,
-      }
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -41,7 +35,7 @@ module.exports = (sequelize) => {
 
   Project.associate = function(models) {
     Project.belongsTo(models.Client, {foreignKey: 'clientId'});
-    Project.hasMany(models.Task, { onDelete: 'CASCADE', foreignKey: { allowNull: false } });
+    Project.hasMany(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId' });
     Project.belongsTo(models.User, {foreignKey: 'createdById'});
   };
 

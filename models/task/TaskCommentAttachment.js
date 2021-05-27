@@ -15,6 +15,10 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      commentId: { 
+        type: DataTypes.INTEGER, 
+        allowNull: false,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
@@ -25,7 +29,7 @@ module.exports = (sequelize) => {
       },
     }, {
       associate: function(models) {
-        TaskCommentAttachment.belongsTo(models.TaskComment);
+        TaskCommentAttachment.belongsTo(models.TaskComment, { onDelete: 'CASCADE', foreignKey: 'commentId' });
       }
     }
   );

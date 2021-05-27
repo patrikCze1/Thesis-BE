@@ -1,8 +1,8 @@
 const { DataTypes, Model } = require('sequelize');
 
 module.exports = (sequelize) => {
-  class Task extends Model {}
-  Task.init({
+  // class Task extends Model {}
+  const Task = sequelize.define("Task", {
     id: {
       type: DataTypes.INTEGER, 
       primaryKey: true, 
@@ -32,29 +32,17 @@ module.exports = (sequelize) => {
     },
     solverId: {
       type: DataTypes.INTEGER,
-      // references: {
-      //   model: sequelize.models.User,
-      // }
     },
     createdById: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      // references: {
-      //   model: sequelize.models.User,
-      // }
     },
-    // projectId: {
-    //   type: DataTypes.INTEGER,
-    //   allowNull: false,
-    //   // references: {
-    //   //   model: sequelize.models.Project,
-    //   // }
-    // },
+    projectId: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     parentId: {
       type: DataTypes.INTEGER,
-      // references: {
-      //   model: sequelize.models.Task,
-      // }
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -67,21 +55,18 @@ module.exports = (sequelize) => {
     //begin / hours
     //budget - time,price
     //muted, favourites...
-  }, {
-    sequelize,
   });
 
   Task.associate = function(models) {
     Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'user'});
     Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
-    Task.hasMany(Task, { onDelete: 'CASCADE',  foreignKey: 'parentId',  as: 'subTask' });
-    Task.hasMany(models.TaskAttachment);
-    Task.hasMany(models.TaskComment);
-    Task.hasMany(models.TaskChangeLog);
-    Task.hasMany(models.TaskCheck);
-    Task.hasMany(models.TimeTrack);
-    console.log(models);
+    Task.hasMany(Task, {foreignKey: 'parentId',  as: 'subTask', onDelete: 'CASCADE' });
+    Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskComment, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskCheck, {foreignKey: 'taskId'});
+    Task.hasMany(models.TimeTrack, {foreignKey: 'taskId'});
   }
 
   return Task;

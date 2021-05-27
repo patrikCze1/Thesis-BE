@@ -11,39 +11,56 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     acquire: 30000,
     idle: 10000,
   }, 
-  force: true,
+  // force: true,
 });
 
-const models = {
-  User: require("./user/User.js"),
-  Group: require("./user/Group.js"),
-  UserGroup: require("./user/UserGroup.js"),
-  Client: require("./project/Client"),
-  Project: require("./project/Project"),
-  Task: require("./task/Task.js"),
-  TaskAttachment: require("./task/TaskAttachment.js"),
-  TaskComment: require("./task/TaskComment.js"),
-  TaskCommentAttachment: require("./task/TaskCommentAttachment.js"),
-  TaskChangeLog: require("./task/TaskChangeLog.js"),
-  TaskCheck: require("./task/TaskCheck.js"),
-  TimeTrack: require("./task/TimeTrack.js"),
-  Todo: require("./todo/Todo.js"),
-  Notification: require("./notification/Notification.js"),
-  TaskNotification: require("./notification/TaskNotification.js"),
-};
-
-Object.values(models).forEach(model => model(sequelize));
-Object.values(models)
-  .filter(model => typeof model.associate === "function")
-  .forEach(model => model(sequelize));
+// const models = [
+//   User: require("./user/User.js"),
+//   Group: require("./user/Group.js"),
+//   UserGroup: require("./user/UserGroup.js"),
+//   Client: require("./project/Client"),
+//   Project: require("./project/Project"),
+//   Task: require("./task/Task.js"),
+//   TaskAttachment: require("./task/TaskAttachment.js"),
+//   TaskComment: require("./task/TaskComment.js"),
+//   TaskCommentAttachment: require("./task/TaskCommentAttachment.js"),
+//   TaskChangeLog: require("./task/TaskChangeLog.js"),
+//   TaskCheck: require("./task/TaskCheck.js"),
+//   TimeTrack: require("./task/TimeTrack.js"),
+//   Todo: require("./todo/Todo.js"),
+//   Notification: require("./notification/Notification.js"),
+//   TaskNotification: require("./notification/TaskNotification.js"),
+// ];
+const models = [
+  require("./user/User.js"),
+  require("./user/Group.js"),
+  require("./user/UserGroup.js"),
+  require("./project/Client"),
+  require("./project/Project"),
+  require("./task/Task.js"),
+  require("./task/TaskAttachment.js"),
+  require("./task/TaskComment.js"),
+  require("./task/TaskCommentAttachment.js"),
+  require("./task/TaskChangeLog.js"),
+  require("./task/TaskCheck.js"),
+  require("./task/TimeTrack.js"),
+  require("./todo/Todo.js"),
+  require("./notification/Notification.js"),
+  require("./notification/TaskNotification.js"),
+];
 
 //Note, Role
-// console.log(models)
-// for (const model of models) {
-//   model(sequelize);
-// 	console.log(model.associate())
-// }
 
+for (const model of models) {
+  model(sequelize);
+}
+
+Object.keys(sequelize.models).forEach(key => {
+	if (sequelize.models[key].hasOwnProperty('associate')) {
+		sequelize.models[key].associate(sequelize.models);
+	}
+});
+console.log(sequelize.models)
 // Relations
 const {
   Project, 
@@ -120,14 +137,14 @@ const {
 // TimeTrack.belongsTo(Task, {as: 'task'});
 
 //notification
-User.hasMany(Notification);
-Notification.belongsTo(User, {as: 'user'});
+// User.hasMany(Notification);
+// Notification.belongsTo(User, {as: 'user'});
 
-Notification.hasOne(TaskNotification);
-TaskNotification.belongsTo(Notification, {as: 'notification'});
-Task.hasMany(TaskNotification);
-TaskNotification.belongsTo(Task, {as: 'task'});
-TaskNotification.removeAttribute('id');
+// Notification.hasOne(TaskNotification);
+// TaskNotification.belongsTo(Notification, {as: 'notification'});
+// Task.hasMany(TaskNotification);
+// TaskNotification.belongsTo(Task, {as: 'task'});
+// TaskNotification.removeAttribute('id');
 
 // User.hasMany(Todo);
 // Todo.belongsTo(User, {as: 'user'});
