@@ -5,6 +5,7 @@ const {
   TaskAttachment,
   Notification,
   TaskNotification,
+  User
 } = require("../../models/modelHelper");
 
 router.get("/:projectId/tasks/", async (req, res) => {
@@ -16,45 +17,49 @@ router.get("/:projectId/tasks/", async (req, res) => {
     });
     res.json(tasks);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
 router.get("/:projectId/tasks/:id", async (req, res) => {
-  try {
-    const userId = 1; // todo
-    const notifications = await Notification.findAll({
-      where: {
-        seen: 0,
-        UserId: userId,
-      },
-      include: [
-        {
-          model: TaskNotification,
-          where: {
-            TaskId: req.params.id,
-          },
-        },
-      ],
-    });
+  // try {
+  //   const userId = 1; // todo
+  //   const notifications = await Notification.findAll({
+  //     where: {
+  //       seen: 0,
+  //       UserId: userId,
+  //     },
+  //     include: [
+  //       {
+  //         model: TaskNotification,
+  //         where: {
+  //           TaskId: req.params.id,
+  //         },
+  //       },
+  //     ],
+  //   });
 
-    notifications.forEach(async notification => {
-      notification.seen = true;
-      await notification.save();
-    });
+  //   notifications.forEach(async notification => {
+  //     notification.seen = true;
+  //     await notification.save();
+  //   });
     
-  } catch (error) {
+  // } catch (error) {
     
-  }
+  // }
 
   try {
     const task = await Task.findByPk(req.params.id, {
-      include: TaskAttachment,
+      include: [
+        {model: TaskAttachment}, 
+        {model: User, as: 'user'},
+        {model: User, as: 'solver'},
+      ],
     });
 
     res.json(task);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -75,7 +80,7 @@ router.post("/:projectId/tasks/", async (req, res) => {
     const newItem = await Task.create(data);
     res.json(newItem);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -90,7 +95,7 @@ router.patch("/tasks/:id", async (req, res) => {
 
     res.json(task);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
   //console.log(task.changed())
 });
@@ -100,7 +105,7 @@ router.delete("/tasks/:id", async (req, res) => {
     const removedTask = await Task.remove({ id: req.params.id });
     res.json(removedTask);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 

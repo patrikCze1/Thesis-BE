@@ -4,6 +4,7 @@ const app = express();
 const cors = require('cors');
 const sequelize = require("./models/index");
 const projectRoutes = require('./routes/project/projectRoutes');
+const clientRoutes = require('./routes/project/clientRoutes');
 const taskRoutes = require('./routes/task/taskRoutes.js');
 const taskAttachmentRoutes = require('./routes/task/taskAttachmentRoutes.js');
 const taskCommentRoutes = require('./routes/task/taskCommentRoutes.js');
@@ -25,6 +26,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 app.use('/projects', projectRoutes);
+app.use('/clients', clientRoutes);
 app.use('/projects', taskRoutes);
 app.use('/tasks', taskAttachmentRoutes);
 app.use('/tasks', taskCommentRoutes);

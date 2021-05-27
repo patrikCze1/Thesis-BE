@@ -1,25 +1,24 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Todo = sequelize.define("Todo", {
+  const Client = sequelize.define("Client", {
     id: { 
       type: DataTypes.INTEGER, 
       primaryKey: true, 
       autoIncrement: true 
     },
     name: {
-      type: DataTypes.STRING,
+      type: DataTypes.STRING(100),
       allowNull: false,
     },
-    completed: {
-      type: DataTypes.BOOLEAN,
+    emails: {
+      type: DataTypes.JSON,
     },
-    userId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-      references: {
-        model: sequelize.models.User,
-      }
+    phones: {
+      type: DataTypes.JSON,
+    },
+    webpage: {
+      type: DataTypes.STRING(100),
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -31,9 +30,9 @@ module.exports = (sequelize) => {
     },
   });
 
-  Todo.associate = function(models) {
-    Todo.belongsTo(models.User, {as: 'user'});
-  }
-  
-  return Todo;
+  Client.associate = function(models) {
+    Client.hasMany(models.Project, { onDelete: 'CASCADE', foreignKey: 'clientId', as: 'project', });
+  };
+
+  return Client;
 };

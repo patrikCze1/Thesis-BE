@@ -7,7 +7,7 @@ router.get("/", async (req, res) => {
     const groups = await Group.findAll();
     res.json(groups);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
     const group = await Group.findByPk(req.params.id);
     res.json(group);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 

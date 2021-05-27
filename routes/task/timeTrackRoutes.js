@@ -7,7 +7,7 @@ router.get("/", async (req, res) => {
     const items = await TimeTrack.findAll();
     res.json(items);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -16,7 +16,7 @@ router.get("/:id", async (req, res) => {
     const record = await TimeTrack.findByPk(req.params.id);
     res.json(record);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -35,7 +35,7 @@ router.post("/", async (req, res) => {
     const newItem = await TimeTrack.create(data);
     res.send(newItem);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -51,7 +51,7 @@ router.patch("/:id", async (req, res) => {
 
     res.json(track);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -60,7 +60,7 @@ router.delete("/:id", async (req, res) => {
     const removedRecord = await TimeTrack.remove({ id: req.params.id });
     res.json(removedRecord);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 

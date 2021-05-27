@@ -1,8 +1,10 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("TaskNotification", {
+  const TaskNotification = sequelize.define("TaskNotification", {
     },
     { timestamps: false }
   );
+
+  return TaskNotification;
 };

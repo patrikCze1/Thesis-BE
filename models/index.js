@@ -10,109 +10,127 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     min: 0,
     acquire: 30000,
     idle: 10000,
-  },
-  // force: true,
+  }, 
+  force: true,
 });
 
-const models = [
-  require("./project/Project"),
-  require("./task/Task.js"),
-  require("./task/TaskAttachment.js"),
-  require("./task/TaskComment.js"),
-  require("./task/TaskCommentAttachment.js"),
-  require("./task/TaskChangeLog.js"),
-  require("./task/TimeTrack.js"),
-  require("./task/SubTask.js"),
-  require("./todo/Todo.js"),
-  require("./user/User.js"),//PersonalInfo
-  require("./user/Group.js"),
-  require("./user/UserGroup.js"),
-  require("./notification/Notification.js"),
-  require("./notification/TaskNotification.js"),
-];
+const models = {
+  User: require("./user/User.js"),
+  Group: require("./user/Group.js"),
+  UserGroup: require("./user/UserGroup.js"),
+  Client: require("./project/Client"),
+  Project: require("./project/Project"),
+  Task: require("./task/Task.js"),
+  TaskAttachment: require("./task/TaskAttachment.js"),
+  TaskComment: require("./task/TaskComment.js"),
+  TaskCommentAttachment: require("./task/TaskCommentAttachment.js"),
+  TaskChangeLog: require("./task/TaskChangeLog.js"),
+  TaskCheck: require("./task/TaskCheck.js"),
+  TimeTrack: require("./task/TimeTrack.js"),
+  Todo: require("./todo/Todo.js"),
+  Notification: require("./notification/Notification.js"),
+  TaskNotification: require("./notification/TaskNotification.js"),
+};
+
+Object.values(models).forEach(model => model(sequelize));
+Object.values(models)
+  .filter(model => typeof model.associate === "function")
+  .forEach(model => model(sequelize));
 
 //Note, Role
-
-for (const model of models) {
-	model(sequelize);
-}
+// console.log(models)
+// for (const model of models) {
+//   model(sequelize);
+// 	console.log(model.associate())
+// }
 
 // Relations
 const {
   Project, 
+  Client,
   Task, 
   TaskAttachment, 
   TaskComment, 
   TaskCommentAttachment, 
   TaskChangeLog, 
-  User, 
+  TaskCheck, 
+  User,
   Group, 
   Todo, 
   UserGroup, 
   TimeTrack,
   Notification,
   TaskNotification,
-  SubTask,
 } = sequelize.models;
+//todo ROLE...
 
-Project.hasMany(Task, {
-  onDelete: 'CASCADE',
-  foreignKey: { allowNull: false }
-});
-Task.belongsTo(Project);
-User.hasMany(Project, {foreignKey: 'createdById'});
-Project.belongsTo(User, {foreignKey: 'createdById'});
+// Client.hasMany(Project, {
+//   onDelete: 'CASCADE',
+//   foreignKey: 'clientId',
+// });
+// Project.belongsTo(Client, {foreignKey: 'clientId'});
+// Project.hasMany(Task, {
+//   onDelete: 'CASCADE',
+//   foreignKey: { allowNull: false }
+// });
+// Task.belongsTo(Project);
+// User.hasMany(Project, {foreignKey: 'createdById'});
+// Project.belongsTo(User, {foreignKey: 'createdById'});
+// Task.hasMany(Task, {
+//   onDelete: 'CASCADE', 
+//   foreignKey: 'parent', 
+//   as: 'subTask'
+// });
 
-TaskAttachment.belongsTo(Task, {
-  onDelete: 'CASCADE',
-  foreignKey: { allowNull: false }
-});
-Task.hasMany(TaskAttachment);
-TaskComment.belongsTo(Task, {
-  onDelete: 'CASCADE',
-  foreignKey: { allowNull: false }
-});
-Task.hasMany(TaskComment);
-TaskComment.hasMany(TaskCommentAttachment);
-TaskCommentAttachment.belongsTo(TaskComment);
-Task.hasMany(TaskChangeLog);
-TaskChangeLog.belongsTo(Task, {
-  onDelete: 'CASCADE',
-  foreignKey: { allowNull: false }
-});
-User.hasMany(Task, {foreignKey: 'solverId'});
-Task.belongsTo(User, {foreignKey: 'solverId'});
-User.hasMany(Task, {foreignKey: 'createdById'});
-Task.belongsTo(User, {foreignKey: 'createdById'});
+// TaskAttachment.belongsTo(Task, {
+//   onDelete: 'CASCADE',
+//   foreignKey: { allowNull: false }
+// });
+// Task.hasMany(TaskAttachment);
+// TaskComment.belongsTo(Task, {
+//   onDelete: 'CASCADE',
+//   foreignKey: 'taskId',
+// });
+// Task.hasMany(TaskComment);
+// TaskComment.hasMany(TaskCommentAttachment);
+// TaskCommentAttachment.belongsTo(TaskComment);
+// Task.hasMany(TaskChangeLog);
+// TaskChangeLog.belongsTo(Task, {
+//   onDelete: 'CASCADE',
+//   foreignKey: 'taskId',
+// });
+// Task.hasMany(TaskCheck);
+// TaskCheck.belongsTo(Task, {foreignKey: 'taskId', as: 'task'});
+// User.hasMany(Task, {foreignKey: 'solverId'});
+// Task.belongsTo(User, {foreignKey: 'solverId', as: 'solver'});
+// User.hasMany(Task, {foreignKey: 'createdById'});
+// Task.belongsTo(User, {foreignKey: 'createdById', as: 'user'});
+// User.hasMany(TaskCheck, {foreignKey: 'solverId'});
+// TaskCheck.belongsTo(User, {foreignKey: 'solverId', as: 'solver'});
 
-Task.hasMany(SubTask);
-SubTask.belongsTo(Task);
-User.hasMany(SubTask, {foreignKey: 'solvedById'});
-SubTask.belongsTo(User, {foreignKey: 'solvedById'});
-
-User.hasMany(TaskComment);
-TaskComment.belongsTo(User);
-User.hasMany(TaskChangeLog);
-TaskChangeLog.belongsTo(User);
+// User.hasMany(TaskComment);
+// TaskComment.belongsTo(User, {foreignKey: 'userId', as: 'user'});
+// User.hasMany(TaskChangeLog);
+// TaskChangeLog.belongsTo(User, {foreignKey: 'userId', as: 'user'});
 
 // time track
-User.hasMany(TimeTrack);
-TimeTrack.belongsTo(User);
-Task.hasMany(TimeTrack);
-TimeTrack.belongsTo(Task);
+// User.hasMany(TimeTrack);
+// TimeTrack.belongsTo(User, {as: 'user'});
+// Task.hasMany(TimeTrack);
+// TimeTrack.belongsTo(Task, {as: 'task'});
 
 //notification
 User.hasMany(Notification);
-Notification.belongsTo(User);
+Notification.belongsTo(User, {as: 'user'});
 
 Notification.hasOne(TaskNotification);
-TaskNotification.belongsTo(Notification);
+TaskNotification.belongsTo(Notification, {as: 'notification'});
 Task.hasMany(TaskNotification);
-TaskNotification.belongsTo(Task);
+TaskNotification.belongsTo(Task, {as: 'task'});
 TaskNotification.removeAttribute('id');
 
-User.hasMany(Todo);
-Todo.belongsTo(User);
+// User.hasMany(Todo);
+// Todo.belongsTo(User, {as: 'user'});
 
 const ProjectGroup = sequelize.define('ProjectGroup', {}, { timestamps: false });
 Project.belongsToMany(Group, { through: 'ProjectGroup' });

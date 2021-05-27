@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("TaskAttachment", {
+  const TaskAttachment = sequelize.define("TaskAttachment", {
       id: { 
         type: DataTypes.INTEGER, 
         primaryKey: true, 
@@ -15,6 +15,26 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      taskId: {
+        type: DataTypes.INTEGER,
+        references: {
+          model: sequelize.models.Task,
+        }
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+          type: DataTypes.DATE,
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+      },
+    }, {
+      associate: function(models) {
+        TaskAttachment.belongsTo(models.Task, { onDelete: 'CASCADE', foreignKey: { allowNull: false } });
+      }
     }
   );
+  
+  return TaskAttachment;
 };

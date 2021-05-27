@@ -12,7 +12,7 @@ router.get("/", async (req, res) => {
     });
     res.json(todos);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -21,7 +21,7 @@ router.get("/:id", async (req, res) => {
     const todo = await Todo.findByPk(req.params.id);
     res.json(todo);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -42,7 +42,7 @@ router.post("/", async (req, res) => {
     const newItem = await Todo.create(data);
     res.send(newItem);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -56,7 +56,7 @@ router.patch("/:id", async (req, res) => {
 
     res.json(todo);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -65,7 +65,7 @@ router.delete("/:id", async (req, res) => {
     const removedRow = await Todo.remove({ id: req.params.id });
     res.json(removedRow);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 

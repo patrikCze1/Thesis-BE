@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("TimeTrack", {
+  const TimeTrack = sequelize.define("TimeTrack", {
       id: { 
         type: DataTypes.INTEGER, 
         primaryKey: true, 
@@ -16,8 +16,29 @@ module.exports = (sequelize) => {
       },
       endAt: {
         type: DataTypes.DATE,
-        allowNull: false,
       },
+      userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: sequelize.models.User,
+        }
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+          type: DataTypes.DATE,
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+      },
+    }, {
+      associate: function (models) {
+        TimeTrack.belongsTo(models.User, {as: 'user'});
+        TimeTrack.belongsTo(models.Task, {as: 'task'});
+      }
     }
   );
+
+  return TimeTrack;
 };

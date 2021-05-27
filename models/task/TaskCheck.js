@@ -1,24 +1,31 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  const Todo = sequelize.define("Todo", {
-    id: { 
+  const TaskCheck = sequelize.define('TaskCheck', {
+    id: {
       type: DataTypes.INTEGER, 
       primaryKey: true, 
       autoIncrement: true 
     },
-    name: {
+    title: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     completed: {
       type: DataTypes.BOOLEAN,
+      allowNull: false,
     },
-    userId: {
+    solverId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: sequelize.models.User,
+      }
+    },
+    taskId: {
       type: DataTypes.INTEGER,
       allowNull: false,
       references: {
-        model: sequelize.models.User,
+        model: sequelize.models.Task,
       }
     },
     createdAt: {
@@ -31,9 +38,10 @@ module.exports = (sequelize) => {
     },
   });
 
-  Todo.associate = function(models) {
-    Todo.belongsTo(models.User, {as: 'user'});
+  TaskCheck.associate = function(models) {
+    TaskCheck.belongsTo(sequelize.models.Task, {foreignKey: 'taskId', as: 'task'});
+    TaskCheck.belongsTo(sequelize.models.User, {foreignKey: 'solverId', as: 'solver'});
   }
   
-  return Todo;
+  return TaskCheck;
 };

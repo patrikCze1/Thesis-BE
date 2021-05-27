@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { TaskComment, TaskCommentAttachment } = require("../../models/modelHelper");
+const { TaskComment, TaskCommentAttachment, User } = require("../../models/modelHelper");
 const {
   getUser
 } = require("../../auth/auth");
@@ -11,11 +11,22 @@ router.get("/:taskId/comments/", async (req, res) => {
       where: {
         TaskId: req.params.taskId,
       },
-      include: TaskCommentAttachment,
+      include: [
+        {model: TaskCommentAttachment},
+        {model: User, as: 'user'},
+      ],
+      limit: req.query.limit ? parseInt(req.query.limit) : null,
+      offset: req.query.page ? parseInt(req.query.page) : 1,
+      order: [
+        [
+          "createdAt",
+          "DESC",
+        ],
+      ],
     });
     res.json(comments);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -43,14 +54,15 @@ router.post("/:taskId/comments/", async (req, res) => {
   }
 
   // send notification
-  // const newNotif = await Notification.create({
-  //   message: 'ahoj',
-  //   type: 1,
-  // });
-  // await TaskNotification.create({
-  //   TaskId: req.params.id,
-  //   NotificationId: newNotif.id,
-  // });
+  // todo pokud jsem nevypl odesilani
+  const newNotif = await Notification.create({
+    message: 'ahoj',
+    type: 1,
+  });
+  await TaskNotification.create({
+    TaskId: req.params.id,
+    NotificationId: newNotif.id,
+  });
 
   const data = {
     text: req.body.text,
@@ -62,7 +74,7 @@ router.post("/:taskId/comments/", async (req, res) => {
     const newItem = await TaskComment.create(data);
     res.send(newItem);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -75,7 +87,7 @@ router.patch("/:taskId/comments/:id", async (req, res) => {
 
     res.json(taskComment);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 
@@ -95,7 +107,7 @@ router.delete("/:taskId/comments/:id", async (req, res) => {
     const removedRow = await TaskComment.remove({ id: req.params.id });
     res.json(removedRow);
   } catch (error) {
-    res.json({ message: error });
+    res.json({ message: error.message });
   }
 });
 

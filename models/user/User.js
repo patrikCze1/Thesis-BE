@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define('User', {
+  const User = sequelize.define('User', {
       id: { 
         type: DataTypes.INTEGER, 
         primaryKey: true, 
@@ -16,6 +16,9 @@ module.exports = (sequelize) => {
       email: {
         type: DataTypes.STRING(50),
       },
+      phone: {
+        type: DataTypes.STRING(16),
+      },
       firstName: {
         type: DataTypes.STRING(20),
       },
@@ -28,7 +31,32 @@ module.exports = (sequelize) => {
       sex: {
         type: DataTypes.STRING(1),
       },
+      active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+          type: DataTypes.DATE,
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+      },
       //role
     }
   );
+
+  User.associate = function (models) {console.log(models);
+    User.hasMany(models.Task, { foreignKey: 'createdById', as: 'user', });
+    User.hasMany(models.Project, {foreignKey: 'createdById'});
+    User.hasMany(models.Task, {foreignKey: 'solverId'});
+    User.hasMany(models.TaskCheck, {foreignKey: 'solverId'});
+    User.hasMany(models.TaskComment);
+    User.hasMany(models.TaskChangeLog);
+    User.hasMany(models.TimeTrack);
+    User.hasMany(models.Todo);
+  }
+
+  return User;
 };

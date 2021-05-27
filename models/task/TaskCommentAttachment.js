@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  sequelize.define("TaskCommentAttachment", {
+  const TaskCommentAttachment = sequelize.define("TaskCommentAttachment", {
       id: { 
         type: DataTypes.INTEGER, 
         primaryKey: true, 
@@ -15,6 +15,20 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+          type: DataTypes.DATE,
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+      },
+    }, {
+      associate: function(models) {
+        TaskCommentAttachment.belongsTo(models.TaskComment);
+      }
     }
   );
+  
+  return TaskCommentAttachment;
 };
