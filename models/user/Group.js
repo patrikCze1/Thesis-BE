@@ -21,5 +21,20 @@ module.exports = (sequelize) => {
     },
   });
 
+  Group.associate = function(models) {
+    Group.belongsToMany(models.User, {
+      through: {
+        model: models.UserGroup,
+        unique: false,
+        scope: {
+          taggable: "group",
+        },
+      },
+      foreignKey: "groupId",
+      constraints: false,
+    });
+    Group.belongsToMany(models.Project, { through: models.ProjectGroup, foreignKey: "groupId", });
+  }
+
   return Group;
 };

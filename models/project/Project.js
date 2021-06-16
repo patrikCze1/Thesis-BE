@@ -37,6 +37,8 @@ module.exports = (sequelize) => {
     Project.belongsTo(models.Client, {foreignKey: 'clientId'});
     Project.hasMany(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId' });
     Project.belongsTo(models.User, {foreignKey: 'createdById'});
+    Project.belongsToMany(models.User, { through: 'ProjectUser' });
+    Project.belongsToMany(models.Group, { through: models.ProjectGroup, foreignKey: "projectId" });
   };
 
   return Project;

@@ -23,5 +23,10 @@ module.exports = (sequelize) => {
       //url?
     }
   );
+
+  Notification.associate = function (models) {
+    Notification.belongsTo(models.User, {as: 'user'});
+    Notification.hasOne(models.TaskNotification, {foreignKey: 'notificationId'});
+  }
   return Notification;
 };

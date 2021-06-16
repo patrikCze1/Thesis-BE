@@ -67,6 +67,7 @@ module.exports = (sequelize) => {
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskCheck, {foreignKey: 'taskId'});
     Task.hasMany(models.TimeTrack, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskNotification, {foreignKey: 'taskId'});
   }
 
   return Task;

@@ -56,6 +56,18 @@ module.exports = (sequelize) => {
     User.hasMany(models.TaskChangeLog, {foreignKey: 'userId'});
     User.hasMany(models.TimeTrack, {foreignKey: 'userId'});
     User.hasMany(models.Todo, {foreignKey: 'userId'});
+    User.hasMany(models.Notification, {foreignKey: 'userId'});
+    User.belongsToMany(models.Group, {
+      through: {
+        model: models.UserGroup,
+        unique: false,
+        scope: {
+          taggable: "user",
+        },
+      },
+      foreignKey: "userId",
+    });
+    User.belongsToMany(models.Project, { through: 'ProjectUser' });
   }
 
   return User;
