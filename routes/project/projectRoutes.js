@@ -1,13 +1,29 @@
-const { request } = require("express");
 const express = require("express");
 const router = express.Router();
-const { Project } = require("../../models/modelHelper");
+const { Project, User, ProjectUser, ProjectGroup, Group } = require("../../models/modelHelper");
+const { getUser } = require("../../auth/auth");
 
 router.get('/', async (req, res) => {
+  const user = getUser(req, res);
+  
   try {
     const projects = await Project.findAll({
+      where: {
+        '$User.id$': user.id,
+      },
+      include: [
+        // {model: ProjectGroup },
+        // {model: Group },
+        // {model: ProjectUser },
+        {
+          model: User,
+          as: 'user',
+          // through: { where: { userId: user.id } },
+          // userId: user.id,
+        },
+      ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 1,
+      offset: req.query.page ? parseInt(req.query.page) : 0,
       order: [
         [
           req.query.orderBy ? req.query.orderBy : 'name', 

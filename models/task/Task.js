@@ -61,7 +61,7 @@ module.exports = (sequelize) => {
     Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'user'});
     Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
-    Task.hasMany(Task, {foreignKey: 'parentId',  as: 'subTask', onDelete: 'CASCADE' });
+    Task.hasMany(models.Task, {foreignKey: 'parentId',  as: 'subTask', onDelete: 'SET NULL' });
     Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskComment, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});

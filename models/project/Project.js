@@ -36,8 +36,8 @@ module.exports = (sequelize) => {
   Project.associate = function(models) {
     Project.belongsTo(models.Client, {foreignKey: 'clientId'});
     Project.hasMany(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId' });
-    Project.belongsTo(models.User, {foreignKey: 'createdById'});
-    Project.belongsToMany(models.User, { through: 'ProjectUser' });
+    Project.belongsTo(models.User, {foreignKey: 'createdById', as: 'creator'});
+    Project.belongsToMany(models.User, { through: models.ProjectUser, foreignKey: "projectId", as: 'user' });
     Project.belongsToMany(models.Group, { through: models.ProjectGroup, foreignKey: "projectId" });
   };
 

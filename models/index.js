@@ -11,7 +11,7 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     acquire: 30000,
     idle: 10000,
   }, 
-  force: true,
+  // force: true,
 });
 
 // const models = [
@@ -35,6 +35,7 @@ const models = [
   require("./user/User.js"),
   require("./user/Group.js"),
   require("./user/UserGroup.js"),
+  require("./user/relation/ProjectUser"),
   require("./project/Client"),
   require("./project/Project"),
   require("./project/ProjectGroup"),
@@ -61,29 +62,6 @@ Object.keys(sequelize.models).forEach(key => {
 	}
 });
 
-// const ProjectGroup = sequelize.define('ProjectGroup', {}, { timestamps: false });
-// sequelize.models.Project.belongsToMany(sequelize.models.Group, { through: 'ProjectGroup' });
-// sequelize.models.Group.belongsToMany(sequelize.models.Project, { through: 'ProjectGroup' });
-// console.log(sequelize.models)
-// Relations
-const {
-  Project, 
-  Client,
-  Task, 
-  TaskAttachment, 
-  TaskComment, 
-  TaskCommentAttachment, 
-  TaskChangeLog, 
-  TaskCheck, 
-  User,
-  Group, 
-  Todo, 
-  UserGroup, 
-  TimeTrack,
-  Notification,
-  TaskNotification,
-} = sequelize.models;
-//todo ROLE...
 
 // Client.hasMany(Project, {
 //   onDelete: 'CASCADE',

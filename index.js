@@ -48,4 +48,5 @@ app.listen(port, () => {
 });
 
 //nodemon index.js
-//socket, pwa, 
+//socket, pwa, graphql
+// todo auth routes

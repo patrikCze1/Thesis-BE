@@ -1,32 +1,32 @@
 const express = require("express");
 const router = express.Router();
-const User = require("../../models/modelHelper");
+const { User } = require("../../models/modelHelper");
 const { generateToken, generateRefreshToken, isRefreshTokenValid, decodeToken } = require("../../auth/auth");
 const bcrypt = require("bcrypt");
 
-router.post("/signup", async (req, res) => {
-  if (!req.body.username || !req.body.email || !req.body.password) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-    return;
-  }
+// router.post("/signup", async (req, res) => {
+//   if (!req.body.username || !req.body.email || !req.body.password) {
+//     res.status(400).send({
+//       message: "Content can not be empty!",
+//     });
+//     return;
+//   }
 
-  try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+//   try {
+//     const hashedPassword = await bcrypt.hash(req.body.password, 10);
 
-    const user = {
-      username: req.body.username,
-      password: hashedPassword,
-      email: req.body.email,
-    };
+//     const user = {
+//       username: req.body.username,
+//       password: hashedPassword,
+//       email: req.body.email,
+//     };
 
-    const savedUser = await User.create(user);
-    res.json(savedUser);
-  } catch (e) {
-    res.json({ message: "Error: " + e });
-  }
-});
+//     const savedUser = await User.create(user);
+//     res.json(savedUser);
+//   } catch (e) {
+//     res.json({ message: "Error: " + e });
+//   }
+// });
 
 router.post("/login", async (req, res) => {
   if (!req.body.email || !req.body.password) {
@@ -39,8 +39,8 @@ router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ where: { email: req.body.email } });
     const match = await bcrypt.compare(req.body.password, user.password);
-
-    if (match) {
+    
+    if (user && match) { // if ok return auth token
       const token = generateToken(user);
       const refreshToken = generateRefreshToken(user);
       
@@ -53,10 +53,12 @@ router.post("/login", async (req, res) => {
           tokenExpire: parseInt(process.env.TOKEN_SECRET_EXPIRATION),
         });
     } else {
+      res.status(401);
       res.send({ message: "Invalid Credentials" });
     }
   } catch (error) {
-    res.send(error);
+    res.status(500);
+    res.send({error: error.message});
   }
 });
 

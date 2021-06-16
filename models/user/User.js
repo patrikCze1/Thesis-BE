@@ -67,7 +67,16 @@ module.exports = (sequelize) => {
       },
       foreignKey: "userId",
     });
-    User.belongsToMany(models.Project, { through: 'ProjectUser' });
+    User.belongsToMany(models.Project, { 
+      through: {
+        model: models.ProjectUser,
+        unique: false,
+        scope: {
+          taggable: "user",
+        },
+      },
+      foreignKey: "userId",
+    });
   }
 
   return User;

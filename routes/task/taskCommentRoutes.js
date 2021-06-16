@@ -16,7 +16,7 @@ router.get("/:taskId/comments/", async (req, res) => {
         {model: User, as: 'user'},
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 1,
+      offset: req.query.page ? parseInt(req.query.page) : 0,
       order: [
         [
           "createdAt",

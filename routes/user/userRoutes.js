@@ -8,7 +8,7 @@ router.get("/", async (req, res) => {
   try {
     const items = await User.findAll({
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 1,
+      offset: req.query.page ? parseInt(req.query.page) : 0,
       order: [
         [
           req.query.orderBy ? req.query.orderBy : 'lastName', 
@@ -25,6 +25,7 @@ router.get("/", async (req, res) => {
 router.get("/private", authenticateToken, async (req, res) => {
   const token = req.header("auth-token");
   const id = decodeToken(token);
+  console.log('inside private');
   res.send(id);
 });
 

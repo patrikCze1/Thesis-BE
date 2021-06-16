@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 require("dotenv/config");
 
-let refreshTokens = {};
+let refreshTokens = {}; //todo je toto dobre?
 
 const generateToken = (user) => {
   return jwt.sign({ user: user }, process.env.TOKEN_SECRET, {
@@ -10,8 +10,11 @@ const generateToken = (user) => {
 };
 
 const generateRefreshToken = (user) => {
-  const token = jwt.sign({ user: user }, process.env.REFRESH_TOKEN, {
-    expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
+  const token = jwt.sign(
+    { user: user }, 
+    process.env.REFRESH_TOKEN, 
+    {
+      expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
   });
   refreshTokens[user.id] = token;
   return token;
@@ -26,7 +29,7 @@ const authenticateToken = function (req, res, next) {
     jwt.verify(token, process.env.TOKEN_SECRET);
     next();
   } catch (error) {
-    res.status(400).send("Invalid token");
+    res.status(401).send({ message: error.message });
   }
 };
 
@@ -41,7 +44,7 @@ const isRefreshTokenValid = (userId, token) => {
   return false;
 };
 
-const getUser = () => {
+const getUserToken = (req, res) => {
   try {
     const token = req.header("auth-token");
     if (token == null) return res.sendStatus(401);
@@ -49,6 +52,17 @@ const getUser = () => {
     const data = jwt.decode(token, process.env.TOKEN_SECRET);
     return data;
   } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const getUser = (req, res) => {
+  try {
+    const token = getUserToken(req, res);
+    return token.user;
+  } catch (error) {
+    console.log(error);
     return null;
   }
 };
@@ -60,6 +74,7 @@ module.exports = {
   generateRefreshToken,
   isRefreshTokenValid,
   getUser,
+  getUserToken,
 };
 
 //FE
