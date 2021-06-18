@@ -43,7 +43,7 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
       },
-      //role
+      //role, image???
     }
   );
 
@@ -61,22 +61,26 @@ module.exports = (sequelize) => {
       through: {
         model: models.UserGroup,
         unique: false,
-        scope: {
-          taggable: "user",
-        },
+        // scope: {
+        //   taggable: "groupUser",
+        // },
       },
       foreignKey: "userId",
+      as: 'groupUser',
     });
+    User.hasMany(models.UserGroup, {foreignKey: 'userId'});
     User.belongsToMany(models.Project, { 
       through: {
         model: models.ProjectUser,
         unique: false,
-        scope: {
-          taggable: "user",
-        },
+        // scope: {
+        //   taggable: "projectUser",
+        // },
       },
       foreignKey: "userId",
+      as: 'projectUser',
     });
+    User.hasMany(models.ProjectUser, {foreignKey: 'userId'});
   }
 
   return User;

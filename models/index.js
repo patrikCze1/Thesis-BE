@@ -14,27 +14,10 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
   // force: true,
 });
 
-// const models = [
-//   User: require("./user/User.js"),
-//   Group: require("./user/Group.js"),
-//   UserGroup: require("./user/UserGroup.js"),
-//   Client: require("./project/Client"),
-//   Project: require("./project/Project"),
-//   Task: require("./task/Task.js"),
-//   TaskAttachment: require("./task/TaskAttachment.js"),
-//   TaskComment: require("./task/TaskComment.js"),
-//   TaskCommentAttachment: require("./task/TaskCommentAttachment.js"),
-//   TaskChangeLog: require("./task/TaskChangeLog.js"),
-//   TaskCheck: require("./task/TaskCheck.js"),
-//   TimeTrack: require("./task/TimeTrack.js"),
-//   Todo: require("./todo/Todo.js"),
-//   Notification: require("./notification/Notification.js"),
-//   TaskNotification: require("./notification/TaskNotification.js"),
-// ];
 const models = [
   require("./user/User.js"),
   require("./user/Group.js"),
-  require("./user/UserGroup.js"),
+  require("./user/relation/UserGroup.js"),
   require("./user/relation/ProjectUser"),
   require("./project/Client"),
   require("./project/Project"),

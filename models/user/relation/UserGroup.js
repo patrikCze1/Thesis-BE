@@ -12,5 +12,10 @@ module.exports = (sequelize) => {
     { timestamps: false }
   );
 
+  // UserGroup.associate = function (models) {
+  //   UserGroup.belongsTo(models.User);
+  //   UserGroup.belongsTo(models.Group);
+  // }
+
   return UserGroup;
 };

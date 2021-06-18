@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { Project, User, ProjectUser, ProjectGroup, Group } = require("../../models/modelHelper");
+const { Op } = require("sequelize");
+const { Project, User, Group } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
 
 router.get('/', async (req, res) => {
@@ -8,17 +9,28 @@ router.get('/', async (req, res) => {
   
   try {
     const projects = await Project.findAll({
+      // attributes: { exclude: ['user'] },
       where: {
-        '$User.id$': user.id,
+        [Op.or]: [
+          { '$User.id$': user.id },
+          { '$group->groupUser.id$': user.id },
+        ],
       },
       include: [
-        // {model: ProjectGroup },
-        // {model: Group },
-        // {model: ProjectUser },
+        {
+          model: Group ,
+          as: 'group',
+          attributes: [],
+          include: {
+            model: User,
+            as: 'groupUser',
+            attributes: [],
+          }
+        },
         {
           model: User,
           as: 'user',
-          // through: { where: { userId: user.id } },
+          attributes: [], // dont select users fields
           // userId: user.id,
         },
       ],

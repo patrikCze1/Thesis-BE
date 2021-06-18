@@ -26,12 +26,13 @@ module.exports = (sequelize) => {
       through: {
         model: models.UserGroup,
         unique: false,
-        scope: {
-          taggable: "group",
-        },
+        // scope: {
+        //   taggable: "groupUser",
+        // },
       },
       foreignKey: "groupId",
       constraints: false,
+      as: 'groupUser',
     });
     Group.belongsToMany(models.Project, { through: models.ProjectGroup, foreignKey: "groupId", });
   }
