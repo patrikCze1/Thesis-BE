@@ -9,21 +9,28 @@ module.exports = (sequelize) => {
       },
       username: {
         type: DataTypes.STRING(20),
+        unique: true,
+        allowNull: false,
       },
       password: {
         type: DataTypes.STRING(100),
+        allowNull: false,
       },
       email: {
         type: DataTypes.STRING(50),
+        unique: true,
+        allowNull: false,
       },
       phone: {
         type: DataTypes.STRING(16),
       },
       firstName: {
         type: DataTypes.STRING(20),
+        allowNull: false,
       },
       lastName: {
         type: DataTypes.STRING(20),
+        allowNull: false,
       },
       position: {
         type: DataTypes.STRING(50),
@@ -34,6 +41,7 @@ module.exports = (sequelize) => {
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
+        allowNull: false,
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -41,7 +49,7 @@ module.exports = (sequelize) => {
       },
       updatedAt: {
           type: DataTypes.DATE,
-          defaultValue: sequelize.literal('CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP'),
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
       //role, image???
     }

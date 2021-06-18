@@ -20,6 +20,17 @@ module.exports = (sequelize) => {
         allowNull: false,
         defaultValue: false,
       },
+      userId: {
+        type: DataTypes.INTEGER,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
+      updatedAt: {
+          type: DataTypes.DATE,
+          defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      },
       //url?
     }
   );

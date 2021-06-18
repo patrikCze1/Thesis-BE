@@ -3,18 +3,19 @@ require('dotenv/config');
 const app = express();
 const cors = require('cors');
 const sequelize = require("./models/index");
-const projectRoutes = require('./routes/project/projectRoutes');
-const clientRoutes = require('./routes/project/clientRoutes');
-const taskRoutes = require('./routes/task/taskRoutes.js');
-const taskAttachmentRoutes = require('./routes/task/taskAttachmentRoutes.js');
-const taskCommentRoutes = require('./routes/task/taskCommentRoutes.js');
-const taskChangeLogRoutes = require('./routes/task/taskChangeLogRoutes.js');
-const timeTrackRoutes = require('./routes/task/timeTrackRoutes.js');
-const userRoutes = require('./routes/user/userRoutes.js');
-const authRoutes = require('./routes/auth/authRoutes.js');
-const groupRoutes = require('./routes/user/groupRoutes.js');
-const todoRoutes = require('./routes/todo/todoRoutes.js');
-const notificationRoutes = require('./routes/notification/notificationRoutes.js');
+const { 
+    projectRoutes, 
+    clientRoutes, 
+    taskRoutes, 
+    taskAttachmentRoutes, 
+    taskChangeLogRoutes, 
+    taskCommentRoutes, 
+    authRoutes, 
+    userRoutes, 
+    groupRoutes, 
+    todoRoutes, 
+    timeTrackRoutes, 
+    notificationRoutes }  = require('./routes');
 
 sequelize.sync();
 

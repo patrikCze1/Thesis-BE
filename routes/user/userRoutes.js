@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { User, TimeTrack } = require("../../models/modelHelper");
-
+const bcrypt = require("bcrypt");
 const { authenticateToken, decodeToken } = require("../../auth/auth");
 
 router.get("/", async (req, res) => {
@@ -43,18 +43,34 @@ router.get("/:userId/tracks", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  // if (!req.body.title) {
-  //   res.status(400).send({
-  //     message: "title is required",
-  //   });
-  //   return;
-  // }
-
-  const data = req.body.userData;
+  if (!req.body.username || !req.body.email || !req.body.password) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+    return;
+  }
 
   try {
-    const newItem = await User.create(data);
-    res.json(newItem);
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const data = req.body;
+    data.password = hashedPassword;
+    console.log(data);
+    const savedUser = await User.create(data);
+    console.log(savedUser.toJSON());
+    res.json(savedUser);
+  } catch (e) {
+    res.json({ message: e.message });
+  }
+});
+
+router.patch("/:id", async (req, res) => {
+  try {
+    let user = await User.findByPk(req.params.id);
+
+    user.username = req.body.username;
+    await user.save();
+
+    res.json(user);
   } catch (error) {
     res.json({ message: error.message });
   }
