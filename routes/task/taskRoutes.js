@@ -51,14 +51,15 @@ router.get("/:projectId/tasks/:id", async (req, res) => {
   try {
     const task = await Task.findByPk(req.params.id, {
       include: [
-        {model: TaskAttachment}, 
-        {model: User, as: 'user'},
-        {model: User, as: 'solver'},
+        { model: TaskAttachment }, 
+        { model: User, as: 'user' },
+        { model: User, as: 'solver' },
       ],
     });
 
     res.json(task);
   } catch (error) {
+    res.status(500);
     res.json({ message: error.message });
   }
 });

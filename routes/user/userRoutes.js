@@ -3,6 +3,7 @@ const router = express.Router();
 const { User, TimeTrack } = require("../../models/modelHelper");
 const bcrypt = require("bcrypt");
 const { authenticateToken, decodeToken } = require("../../auth/auth");
+const { validator } = require('../../service');
 
 router.get("/", async (req, res) => {
   try {
@@ -43,9 +44,11 @@ router.get("/:userId/tracks", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  if (!req.body.username || !req.body.email || !req.body.password) {
+  const requiredAttr = ['username', 'email', 'password'];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
     res.status(400).send({
-      message: "Content can not be empty!",
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
     });
     return;
   }
@@ -59,6 +62,7 @@ router.post("/", async (req, res) => {
     console.log(savedUser.toJSON());
     res.json(savedUser);
   } catch (e) {
+    res.status(500);
     res.json({ message: e.message });
   }
 });
