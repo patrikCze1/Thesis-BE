@@ -3,6 +3,7 @@ const router = express.Router();
 const { Op } = require("sequelize");
 const { Project, User, Group } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
+const { validator } = require('../../service');
 
 router.get('/', async (req, res) => {
   const user = getUser(req, res);
@@ -45,6 +46,7 @@ router.get('/', async (req, res) => {
     });
     res.json(projects);
   } catch (error) {
+    res.status(500);
     res.json({ message: error.message });
   }
 });
@@ -54,14 +56,17 @@ router.get("/:id", async (req, res) => {
     const project = await Project.findByPk(req.params.id);
     res.json(project);
   } catch (error) {
+    res.status(500);
     res.json({ message: error });
   }
 });
 
 router.post("/", async (req, res) => {
-  if (!req.body.name) {
+  const requiredAttr = ['name'];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
     res.status(400).send({
-      message: "name is required",
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
     });
     return;
   }
