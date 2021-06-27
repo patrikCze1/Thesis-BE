@@ -32,13 +32,13 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    }, {
-      associate: function (models) {
-        TimeTrack.belongsTo(models.User, {as: 'user'});
-        TimeTrack.belongsTo(models.Task, {as: 'task'});
-      }
     }
   );
+
+  TimeTrack.associate = (models) => {
+    TimeTrack.belongsTo(models.User, {as: 'user'});
+    TimeTrack.belongsTo(models.Task, {as: 'task'});
+  }
 
   return TimeTrack;
 };

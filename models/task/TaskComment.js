@@ -8,7 +8,7 @@ module.exports = (sequelize) => {
         autoIncrement: true 
       },
       text: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       userId: {
@@ -27,14 +27,14 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    }, {
-      associate: function(models) {
-        TaskComment.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
-        TaskComment.belongsTo(models.Task, {foreignKey: 'taskId', onDelete: 'CASCADE'});
-        TaskComment.hasMany(models.TaskCommentAttachment, {foreignKey: 'commentId'});
-      }
     }
   );
+
+  TaskComment.associate = (models) => {
+    TaskComment.belongsTo(models.User, {foreignKey: 'userId', as: 'taskCommentUser'});
+    TaskComment.belongsTo(models.Task, {foreignKey: 'taskId', onDelete: 'CASCADE', as: 'taskComments'});
+    TaskComment.hasMany(models.TaskCommentAttachment, {foreignKey: 'commentId', as: 'attachmetns'});
+  }
 
   return TaskComment;
 };

@@ -33,13 +33,13 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    }, {
-      associate: function(models) {
-        TaskChangeLog.belongsTo(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId', });
-        TaskChangeLog.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
-      }
     }
   );
+
+  TaskChangeLog.associate = function(models) {
+    TaskChangeLog.belongsTo(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId', });
+    TaskChangeLog.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
+  }
 
   return TaskChangeLog;
 };

@@ -56,11 +56,11 @@ module.exports = (sequelize) => {
   );
 
   User.associate = function (models) {
-    User.hasMany(models.Task, { foreignKey: 'createdById', as: 'user', });
+    User.hasMany(models.Task, { foreignKey: 'createdById', as: 'creator', });
     User.hasMany(models.Project, {foreignKey: 'createdById'});
     User.hasMany(models.Task, {foreignKey: 'solverId'});
     User.hasMany(models.TaskCheck, {foreignKey: 'solverId'});
-    User.hasMany(models.TaskComment, {foreignKey: 'userId'});
+    User.hasMany(models.TaskComment, {foreignKey: 'userId', as: 'taskCommentUser'});
     User.hasMany(models.TaskChangeLog, {foreignKey: 'userId'});
     User.hasMany(models.TimeTrack, {foreignKey: 'userId'});
     User.hasMany(models.Todo, {foreignKey: 'userId'});

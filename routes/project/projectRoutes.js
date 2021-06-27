@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
       },
       include: [
         {
-          model: Group ,
+          model: Group,
           as: 'group',
           attributes: [],
           include: {
@@ -32,7 +32,6 @@ router.get('/', async (req, res) => {
           model: User,
           as: 'user',
           attributes: [], // dont select users fields
-          // userId: user.id,
         },
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,

@@ -1,7 +1,6 @@
-const { DataTypes, Model } = require('sequelize');
+const { DataTypes } = require('sequelize');
 
 module.exports = (sequelize) => {
-  // class Task extends Model {}
   const Task = sequelize.define("Task", {
     id: {
       type: DataTypes.INTEGER, 
@@ -41,7 +40,7 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    parentId: {
+    parentId: { // parent task
       type: DataTypes.INTEGER,
     },
     createdAt: {
@@ -55,15 +54,16 @@ module.exports = (sequelize) => {
     //begin / hours
     //budget - time,price
     //muted, favourites...
+    // todo proverit taskId
   });
 
   Task.associate = function(models) {
-    Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'user'});
+    Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'creator'});
     Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
     Task.hasMany(models.Task, {foreignKey: 'parentId',  as: 'subTask', onDelete: 'SET NULL' });
     Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
-    Task.hasMany(models.TaskComment, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskComment, {foreignKey: 'taskId', as: 'taskComments'});
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskCheck, {foreignKey: 'taskId'});
     Task.hasMany(models.TimeTrack, {foreignKey: 'taskId'});

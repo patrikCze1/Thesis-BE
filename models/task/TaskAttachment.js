@@ -27,12 +27,12 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-    }, {
-      associate: function(models) {
-        TaskAttachment.belongsTo(models.Task, {foreignKey: 'taskId',  onDelete: 'CASCADE' });
-      }
     }
   );
+
+  TaskAttachment.associate = function(models) {
+    TaskAttachment.belongsTo(models.Task, {foreignKey: 'taskId',  onDelete: 'CASCADE' });
+  }
   
   return TaskAttachment;
 };

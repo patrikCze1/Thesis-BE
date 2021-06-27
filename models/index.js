@@ -15,23 +15,23 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
 });
 
 const models = [
-  require("./user/User.js"),
-  require("./user/Group.js"),
-  require("./user/relation/UserGroup.js"),
+  require("./user/User"),
+  require("./user/Group"),
+  require("./user/relation/UserGroup"),
   require("./user/relation/ProjectUser"),
   require("./project/Client"),
   require("./project/Project"),
   require("./project/ProjectGroup"),
-  require("./task/Task.js"),
-  require("./task/TaskAttachment.js"),
-  require("./task/TaskComment.js"),
-  require("./task/TaskCommentAttachment.js"),
-  require("./task/TaskChangeLog.js"),
-  require("./task/TaskCheck.js"),
-  require("./task/TimeTrack.js"),
-  require("./todo/Todo.js"),
-  require("./notification/Notification.js"),
-  require("./notification/TaskNotification.js"),
+  require("./task/Task"),
+  require("./task/TaskAttachment"),
+  require("./task/TaskComment"),
+  require("./task/TaskCommentAttachment"),
+  require("./task/TaskChangeLog"),
+  require("./task/TaskCheck"),
+  require("./task/TimeTrack"),
+  require("./todo/Todo"),
+  require("./notification/Notification"),
+  require("./notification/TaskNotification"),
 ];
 
 //Note, Role, Stage (kaban)

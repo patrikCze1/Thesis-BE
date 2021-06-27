@@ -5,15 +5,22 @@ const {
   TaskAttachment,
   Notification,
   TaskNotification,
-  User
+  User, TaskComment, TaskCommentAttachment, TaskCheck
 } = require("../../models/modelHelper");
 
+// todo check if user is in project?
 router.get("/:projectId/tasks/", async (req, res) => {
   try {
     const tasks = await Task.findAll({
       where: {
         ProjectId: req.params.projectId,
       },
+      include: [
+        {
+          model: User,
+          as: 'user',
+        },
+      ],
     });
     res.json(tasks);
   } catch (error) {
@@ -52,8 +59,18 @@ router.get("/:projectId/tasks/:id", async (req, res) => {
     const task = await Task.findByPk(req.params.id, {
       include: [
         { model: TaskAttachment }, 
-        { model: User, as: 'user' },
+        { model: Task, as: 'subTask' }, 
+        { model: User, as: 'creator' },
         { model: User, as: 'solver' },
+        {
+          model: TaskComment,
+          as: 'taskComments',
+          include: [
+            { model: User, as: 'taskCommentUser', required: true },
+            { model: TaskCommentAttachment, as: 'attachmetns', },
+          ],
+        },
+        { model: TaskCheck },
       ],
     });
 
