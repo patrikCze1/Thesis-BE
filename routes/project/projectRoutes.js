@@ -2,11 +2,11 @@ const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
 const { Project, User, Group, Client } = require("../../models/modelHelper");
-const { getUser } = require("../../auth/auth");
+const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require('../../service');
 const { projectRepo } = require('./../../repo');
 
-router.get('/', async (req, res) => {
+router.get('/', authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   
   try {
@@ -18,7 +18,7 @@ router.get('/', async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
@@ -39,7 +39,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   const requiredAttr = ['name'];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -57,7 +57,7 @@ router.post("/", async (req, res) => {
   res.send(newProject);
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     let project = await Project.findByPk(req.params.id);
     
@@ -73,7 +73,7 @@ router.patch("/:id", async (req, res) => {
   //console.log(project.changed())
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   //todo remove all task attach and comment attach
   try {
     const removedProject = await Project.remove({ id: req.params.id });

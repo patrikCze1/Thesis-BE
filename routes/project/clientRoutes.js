@@ -2,8 +2,9 @@ const express = require("express");
 const router = express.Router();
 const { Client } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
+const { authenticateToken } = require("../../auth/auth");
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const clients = await Client.findAll({
       where: {
@@ -22,20 +23,20 @@ router.get("/", async (req, res) => {
     });
     res.json(clients);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const client = await Client.findByPk(req.params.id);
     res.json(client);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   if (!req.body.name) {
     res.status(400).send({
       message: "name is required",
@@ -47,11 +48,15 @@ router.post("/", async (req, res) => {
     name: req.body.name,
   };
 
-  const newRecord = await Client.create(data);
-  res.send(newRecord);
+  try {
+    const newRecord = await Client.create(data);
+    res.send(newRecord);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     let client = await Client.findByPk(req.params.id);
 
@@ -60,16 +65,16 @@ router.patch("/:id", async (req, res) => {
 
     res.json(client);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const removedClient = await Client.remove({ id: req.params.id });
     res.json(removedClient);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

@@ -5,8 +5,9 @@ const {
   TaskNotification,
   Task,
 } = require("../../models/modelHelper");
+const { authenticateToken } = require("../../auth/auth");
 
-router.get("/users/:userId/notifications/", async (req, res) => {
+router.get("/users/:userId/notifications/", authenticateToken, async (req, res) => {
   try {
     const records = await Notification.findAll({
       where: {
@@ -16,7 +17,7 @@ router.get("/users/:userId/notifications/", async (req, res) => {
     });
     res.json(records);
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error });
   }
 });
 
@@ -43,13 +44,13 @@ router.get("/users/:userId/notifications/:id", async (req, res) => {
   }
 });
 
-router.delete("/users/:userId/notifications/:id", async (req, res) => {
-  try {
-    const removedRecord = await Notification.remove({ id: req.params.id });
-    res.json(removedRecord);
-  } catch (error) {
-    res.json({ message: error });
-  }
-});
+// router.delete("/users/:userId/notifications/:id", async (req, res) => {
+//   try {
+//     const removedRecord = await Notification.remove({ id: req.params.id });
+//     res.json(removedRecord);
+//   } catch (error) {
+//     res.json({ message: error });
+//   }
+// });
 
 module.exports = router;

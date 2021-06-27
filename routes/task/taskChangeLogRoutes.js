@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { TaskChangeLog, User } = require("../../models/modelHelper");
+const { authenticateToken } = require("../../auth/auth");
 
-router.get("/:taskId/change-logs/", async (req, res) => {
+router.get("/:taskId/change-logs/", authenticateToken, async (req, res) => {
   try {
     const logs = await TaskChangeLog.findAll({
       where: {
@@ -14,8 +15,7 @@ router.get("/:taskId/change-logs/", async (req, res) => {
     });
     res.json(logs);
   } catch (error) {
-    res.status(500);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

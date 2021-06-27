@@ -2,10 +2,10 @@ const express = require("express");
 const router = express.Router();
 const { User, TimeTrack } = require("../../models/modelHelper");
 const bcrypt = require("bcrypt");
-const { authenticateToken, decodeToken } = require("../../auth/auth");
+const { authenticateToken } = require("../../auth/auth");
 const { validator } = require('../../service');
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const items = await User.findAll({
       limit: req.query.limit ? parseInt(req.query.limit) : null,
@@ -19,18 +19,11 @@ router.get("/", async (req, res) => {
     });
     res.json(items);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.get("/private", authenticateToken, async (req, res) => {
-  const token = req.header("auth-token");
-  const id = decodeToken(token);
-  console.log('inside private');
-  res.send(id);
-});
-
-router.get("/:userId/tracks", async (req, res) => {
+router.get("/:userId/tracks", authenticateToken, async (req, res) => {
   try {
     const items = await TimeTrack.findAll({
       where: {
@@ -39,11 +32,11 @@ router.get("/:userId/tracks", async (req, res) => {
     });
     res.json(items);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   const requiredAttr = ['username', 'email', 'password'];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -63,11 +56,11 @@ router.post("/", async (req, res) => {
     res.json(savedUser);
   } catch (e) {
     res.status(500);
-    res.json({ message: e.message });
+    res.status(500).json({ message: e.message });
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     let user = await User.findByPk(req.params.id);
 
@@ -76,11 +69,11 @@ router.patch("/:id", async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   //nemazat jen deaktivovat
   try {
     let removedUser = await User.findByPk(req.params.id);
@@ -93,7 +86,7 @@ router.delete("/:id", async (req, res) => {
     // const removedUser = await User.remove({ id: req.params.id });
     // res.json(removedUser);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

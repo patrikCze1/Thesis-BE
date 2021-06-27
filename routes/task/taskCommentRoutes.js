@@ -2,53 +2,16 @@ const express = require("express");
 const router = express.Router();
 const { TaskComment, TaskCommentAttachment, User } = require("../../models/modelHelper");
 const {
-  getUser
+  getUser, authenticateToken
 } = require("../../auth/auth");
+const { validator } = require('../../service');
 
-router.get("/:taskId/comments/", async (req, res) => {
-  try {
-    const comments = await TaskComment.findAll({
-      where: {
-        TaskId: req.params.taskId,
-      },
-      include: [
-        {model: TaskCommentAttachment},
-        {model: User, as: 'user'},
-      ],
-      limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 0,
-      order: [
-        [
-          "createdAt",
-          "DESC",
-        ],
-      ],
-    });
-    res.json(comments);
-  } catch (error) {
-    res.json({ message: error.message });
-  }
-});
-
-router.get("/:taskId/comments/:id", async (req, res) => {
-  try {
-    const comment = await TaskComment.findByPk({
-      where: {
-        TaskId: req.params.taskId,
-        id: req.params.id,
-      },
-      include: TaskCommentAttachment,
-    });
-    res.json(comment);
-  } catch (error) {
-    res.json({ message: error });
-  }
-});
-
-router.post("/:taskId/comments/", async (req, res) => {
-  if (!req.body.text) {
+router.post("/:taskId/comments/", authenticateToken, async (req, res) => {
+  const requiredAttr = ['text'];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
     res.status(400).send({
-      message: "text is required",
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
     });
     return;
   }
@@ -74,12 +37,13 @@ router.post("/:taskId/comments/", async (req, res) => {
     const newItem = await TaskComment.create(data);
     res.send(newItem);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.patch("/:taskId/comments/:id", async (req, res) => {
+router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
+
     let taskComment = await TaskComment.findByPk(req.params.id);
     
     task.text = req.body.text;
@@ -91,7 +55,7 @@ router.patch("/:taskId/comments/:id", async (req, res) => {
   }
 });
 
-router.delete("/:taskId/comments/:id", async (req, res) => {
+router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   //todo remove all task comment attach
   try {
     const attachments = await TaskCommentAttachment.findAll({

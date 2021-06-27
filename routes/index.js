@@ -9,4 +9,5 @@ module.exports = {
     todoRoutes: require('./todo/todoRoutes.js'),
     notificationRoutes: require('./notification/notificationRoutes.js'),
     clientRoutes: require('./project/clientRoutes'),
+    meRoutes: require('./user/meRoutes'),
 };

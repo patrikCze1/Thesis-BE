@@ -1,26 +1,27 @@
 const express = require("express");
 const router = express.Router();
 const { TimeTrack } = require("../../models/modelHelper");
+const { authenticateToken } = require("../../auth/auth");
 
-router.get("/", async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const items = await TimeTrack.findAll();
     res.json(items);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const record = await TimeTrack.findByPk(req.params.id);
     res.json(record);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", authenticateToken, async (req, res) => {
   //todo validate
 
   const data = {
@@ -35,11 +36,11 @@ router.post("/", async (req, res) => {
     const newItem = await TimeTrack.create(data);
     res.send(newItem);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.patch("/:id", async (req, res) => {
+router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     let track = await TimeTrack.findByPk(req.params.id);
     
@@ -51,16 +52,16 @@ router.patch("/:id", async (req, res) => {
 
     res.json(track);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const removedRecord = await TimeTrack.remove({ id: req.params.id });
     res.json(removedRecord);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

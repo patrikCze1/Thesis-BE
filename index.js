@@ -13,7 +13,8 @@ const {
     groupRoutes, 
     todoRoutes, 
     timeTrackRoutes, 
-    notificationRoutes }  = require('./routes');
+    notificationRoutes, 
+    meRoutes }  = require('./routes');
 
 sequelize.sync();
 
@@ -34,6 +35,7 @@ app.use('/groups', groupRoutes);
 app.use('/todos', todoRoutes);
 app.use('/tracks', timeTrackRoutes);
 app.use('/', notificationRoutes);
+app.use('/me', meRoutes);
 
 app.get('/', (req, res) => {
     res.send('Api index');

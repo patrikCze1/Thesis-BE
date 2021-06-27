@@ -7,9 +7,9 @@ const {
   TaskNotification,
   User, TaskComment, TaskCommentAttachment, TaskCheck
 } = require("../../models/modelHelper");
+const { authenticateToken } = require("../../auth/auth");
 
-// todo check if user is in project?
-router.get("/:projectId/tasks/", async (req, res) => {
+router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const tasks = await Task.findAll({
       where: {
@@ -28,7 +28,7 @@ router.get("/:projectId/tasks/", async (req, res) => {
   }
 });
 
-router.get("/:projectId/tasks/:id", async (req, res) => {
+router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // try {
   //   const userId = 1; // todo
   //   const notifications = await Notification.findAll({
@@ -81,7 +81,7 @@ router.get("/:projectId/tasks/:id", async (req, res) => {
   }
 });
 
-router.post("/:projectId/tasks/", async (req, res) => {
+router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   if (!req.body.title) {
     res.status(400).send({
       message: "title is required",
@@ -102,7 +102,7 @@ router.post("/:projectId/tasks/", async (req, res) => {
   }
 });
 
-router.patch("/tasks/:id", async (req, res) => {
+router.patch("/tasks/:id", authenticateToken, async (req, res) => {
   try {
     let task = await Task.findByPk(req.params.id);
 
@@ -118,7 +118,7 @@ router.patch("/tasks/:id", async (req, res) => {
   //console.log(task.changed())
 });
 
-router.delete("/tasks/:id", async (req, res) => {
+router.delete("/tasks/:id", authenticateToken, async (req, res) => {
   try {
     const removedTask = await Task.remove({ id: req.params.id });
     res.json(removedTask);
