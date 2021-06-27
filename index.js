@@ -7,9 +7,7 @@ const {
     projectRoutes, 
     clientRoutes, 
     taskRoutes, 
-    taskAttachmentRoutes, 
     taskChangeLogRoutes, 
-    taskCommentRoutes, 
     authRoutes, 
     userRoutes, 
     groupRoutes, 
@@ -29,8 +27,6 @@ if (process.env.NODE_ENV !== 'production') {
 app.use('/projects', projectRoutes);
 app.use('/clients', clientRoutes);
 app.use('/projects', taskRoutes);
-app.use('/tasks', taskAttachmentRoutes);
-app.use('/tasks', taskCommentRoutes);
 app.use('/tasks', taskChangeLogRoutes);
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);

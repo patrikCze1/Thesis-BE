@@ -1,62 +1,41 @@
 const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
-const { Project, User, Group } = require("../../models/modelHelper");
+const { Project, User, Group, Client } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
 const { validator } = require('../../service');
+const { projectRepo } = require('./../../repo');
 
 router.get('/', async (req, res) => {
   const user = getUser(req, res);
   
   try {
-    const projects = await Project.findAll({
-      // attributes: { exclude: ['user'] },
-      where: {
-        [Op.or]: [
-          { '$User.id$': user.id },
-          { '$group->groupUser.id$': user.id },
-        ],
-      },
-      include: [
-        {
-          model: Group,
-          as: 'group',
-          attributes: [],
-          include: {
-            model: User,
-            as: 'groupUser',
-            attributes: [],
-          }
-        },
-        {
-          model: User,
-          as: 'user',
-          attributes: [], // dont select users fields
-        },
-      ],
-      limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 0,
-      order: [
-        [
-          req.query.orderBy ? req.query.orderBy : 'name', 
-          req.query.sort ? req.query.sort : 'ASC',
-        ]
-      ]
-    });
+    const filter =  req.query;
+    const projects = await projectRepo.findByUser(user, filter);
     res.json(projects);
   } catch (error) {
-    res.status(500);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 router.get("/:id", async (req, res) => {
+  const user = getUser(req, res);
+
   try {
-    const project = await Project.findByPk(req.params.id);
+    const projects = await projectRepo.findByUser(user, {});
+    const result = projects.find(project => project.id == req.params.id);
+    if (!result) res.status(403).json({ message: 'Uživatel nemá přístup k tomuto projektu.' });
+
+    const project = await Project.findByPk(req.params.id, {
+      include: [
+        { model: Client }, 
+        { model: User, as: 'creator' }, 
+      ],
+    });
+
     res.json(project);
   } catch (error) {
-    res.status(500);
-    res.json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -88,6 +67,7 @@ router.patch("/:id", async (req, res) => {
 
     res.json(project);
   } catch (error) {
+    res.status(500);
     res.json({ message: error.message });
   }
   //console.log(project.changed())
@@ -99,6 +79,7 @@ router.delete("/:id", async (req, res) => {
     const removedProject = await Project.remove({ id: req.params.id });
     res.json(removedProject);
   } catch (error) {
+    res.status(500);
     res.json({ message: error.message });
   }
 });

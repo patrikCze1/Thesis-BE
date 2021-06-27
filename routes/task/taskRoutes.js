@@ -59,7 +59,7 @@ router.get("/:projectId/tasks/:id", async (req, res) => {
     const task = await Task.findByPk(req.params.id, {
       include: [
         { model: TaskAttachment }, 
-        { model: Task, as: 'subTask' }, 
+        { model: Task, as: 'subTask' },
         { model: User, as: 'creator' },
         { model: User, as: 'solver' },
         {
