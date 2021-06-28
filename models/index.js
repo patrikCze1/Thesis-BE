@@ -45,7 +45,6 @@ Object.keys(sequelize.models).forEach(key => {
 	}
 });
 
-
 // Client.hasMany(Project, {
 //   onDelete: 'CASCADE',
 //   foreignKey: 'clientId',

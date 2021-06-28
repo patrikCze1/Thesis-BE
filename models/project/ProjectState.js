@@ -1,0 +1,6 @@
+module.exports = {
+    STATUS_FUTURE: 1,
+    STATUS_ACTIVE: 5,
+    STATUS_COMPLETED: 10,
+    STATUS_CANCELLED: 20,
+}

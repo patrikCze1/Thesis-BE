@@ -1,4 +1,5 @@
 const { DataTypes } = require('sequelize');
+const projectState = require('./ProjectState');
 
 module.exports = (sequelize) => {
   const Project = sequelize.define("Project", {
@@ -11,10 +12,13 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
-    completed: {
-      type: DataTypes.BOOLEAN,
+    description: {
+      type: DataTypes.TEXT,
+    },
+    status: {
+      type: DataTypes.TINYINT,
       allowNull: false,
-      defaultValue: false,
+      defaultValue: projectState.STATUS_ACTIVE,
     },
     createdById: {
       type: DataTypes.INTEGER,
@@ -30,7 +34,15 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
-    //budget - time,price
+    timeBudget: {
+      type: DataTypes.INTEGER,
+    },
+    priceBudget: {
+      type: DataTypes.INTEGER,
+    },
+    deadline: {
+      type: DataTypes.DATE,
+    },
   });
 
   Project.associate = function(models) {

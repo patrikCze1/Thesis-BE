@@ -29,7 +29,7 @@ router.post("/:taskId/comments/", authenticateToken, async (req, res) => {
 
   const data = {
     text: req.body.text,
-    TaskId: req.params.taskId,
+    TaskId: req.body.taskId,
     UserId: getUser().id,
   };
 

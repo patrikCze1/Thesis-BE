@@ -27,7 +27,6 @@ module.exports = (sequelize) => {
     },
     deadline: {
       type: DataTypes.DATE,
-      allowNull: false,
     },
     solverId: {
       type: DataTypes.INTEGER,
@@ -61,11 +60,11 @@ module.exports = (sequelize) => {
     Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'creator'});
     Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
-    Task.hasMany(models.Task, {foreignKey: 'parentId',  as: 'subTask', onDelete: 'SET NULL' });
+    Task.belongsTo(models.Task, {foreignKey: 'parentId',  as: 'parentTask', onDelete: 'SET NULL' });
     Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskComment, {foreignKey: 'taskId', as: 'taskComments'});
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
-    Task.hasMany(models.TaskCheck, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskCheck, {foreignKey: 'taskId', as: 'checks'});
     Task.hasMany(models.TimeTrack, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskNotification, {foreignKey: 'taskId'});
   }

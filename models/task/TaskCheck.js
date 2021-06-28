@@ -14,6 +14,7 @@ module.exports = (sequelize) => {
     completed: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
+      defaultValue: false,
     },
     solverId: {
       type: DataTypes.INTEGER,
@@ -33,8 +34,8 @@ module.exports = (sequelize) => {
   });
 
   TaskCheck.associate = function(models) {
-    TaskCheck.belongsTo(sequelize.models.Task, {foreignKey: 'taskId', as: 'task'});
-    TaskCheck.belongsTo(sequelize.models.User, {foreignKey: 'solverId', as: 'solver'});
+    TaskCheck.belongsTo(models.Task, {foreignKey: 'taskId', as: 'task'});
+    TaskCheck.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
   }
   
   return TaskCheck;

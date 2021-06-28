@@ -1,8 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { Client } = require("../../models/modelHelper");
+const { Client, Project } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 const { authenticateToken } = require("../../auth/auth");
+const { validator } = require('../../service');
+
+// jen pro adminy
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -29,7 +32,11 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const client = await Client.findByPk(req.params.id);
+    const client = await Client.findByPk(req.params.id, {
+      include: [
+        { model: Project, as: 'projects' },
+      ],
+    });
     res.json(client);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -37,16 +44,16 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
-  if (!req.body.name) {
+  const requiredAttr = ['name'];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
     res.status(400).send({
-      message: "name is required",
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
     });
     return;
   }
 
-  const data = {
-    name: req.body.name,
-  };
+  const data = req.body;
 
   try {
     const newRecord = await Client.create(data);
@@ -58,12 +65,11 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.patch("/:id", authenticateToken, async (req, res) => {
   try {
-    let client = await Client.findByPk(req.params.id);
+    const client = await Client.findByPk(req.params.id);
 
-    client.name = req.body.name;
-    await client.save();
+    const updated = await client.update(req.body);
 
-    res.json(client);
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -71,8 +77,10 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    const removedClient = await Client.remove({ id: req.params.id });
-    res.json(removedClient);
+    const client = await Client.findByPk(req.params.id);
+    client.destroy();
+
+    res.json({ message: 'Success' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

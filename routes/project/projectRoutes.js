@@ -40,6 +40,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
   const requiredAttr = ['name'];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -51,36 +52,39 @@ router.post("/", authenticateToken, async (req, res) => {
 
   const data = {
     name: req.body.name,
+    createdById: user.id,
+    status: req.body.status,
   };
 
-  const newProject = await Project.create(data);
-  res.send(newProject);
+  try {
+    const newProject = await Project.create(data);
+    res.send(newProject);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
   try {
-    let project = await Project.findByPk(req.params.id);
+    const project = await Project.findByPk(req.params.id);
     
-    project.title = req.body.title;
-    project.description = req.body.description;
-    await project.save();
+    const updated = await project.update(req.body); // not showing changed fields console.log(project.changed())
 
-    res.json(project);
+    res.json(updated);
   } catch (error) {
-    res.status(500);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
-  //console.log(project.changed())
 });
 
-router.delete("/:id", authenticateToken, async (req, res) => {
+router.delete("/:id", authenticateToken, async (req, res) => { // todo role
   //todo remove all task attach and comment attach
   try {
-    const removedProject = await Project.remove({ id: req.params.id });
-    res.json(removedProject);
+    const project = await Project.findByPk(req.params.id);
+    await project.destroy();
+
+    res.json({message: 'Success'});
   } catch (error) {
-    res.status(500);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

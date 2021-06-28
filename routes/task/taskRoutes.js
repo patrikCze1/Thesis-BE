@@ -5,9 +5,13 @@ const {
   TaskAttachment,
   Notification,
   TaskNotification,
-  User, TaskComment, TaskCommentAttachment, TaskCheck
+  User,
+  TaskComment,
+  TaskCommentAttachment,
+  TaskCheck, TaskChangeLog,
 } = require("../../models/modelHelper");
-const { authenticateToken } = require("../../auth/auth");
+const { getUser, authenticateToken } = require("../../auth/auth");
+const { validator } = require('../../service');
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -18,13 +22,13 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
       include: [
         {
           model: User,
-          as: 'user',
+          as: "creator",
         },
       ],
     });
     res.json(tasks);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -50,55 +54,90 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   //     notification.seen = true;
   //     await notification.save();
   //   });
-    
+
   // } catch (error) {
-    
+
   // }
 
   try {
-    const task = await Task.findByPk(req.params.id, {
+    const task = await Task.findOne({
+      where: {
+        id: req.params.id,
+        projectId: req.params.projectId,
+      },
       include: [
-        { model: TaskAttachment }, 
-        { model: Task, as: 'subTask' },
-        { model: User, as: 'creator' },
-        { model: User, as: 'solver' },
+        { model: TaskAttachment },
+        { model: Task, as: "parentTask" },
+        { model: User, as: "creator" },
+        { model: User, as: "solver" },
         {
           model: TaskComment,
-          as: 'taskComments',
+          as: "taskComments",
           include: [
-            { model: User, as: 'taskCommentUser', required: true },
-            { model: TaskCommentAttachment, as: 'attachmetns', },
+            { model: User, as: "taskCommentUser", required: true },
+            { model: TaskCommentAttachment, as: "attachmetns" },
           ],
         },
         { model: TaskCheck },
       ],
     });
 
+    if (task) {
+      const subtasks = await Task.findAll({
+        where: {
+          parentId: req.params.id,
+        },
+      });
+      task.setDataValue("subtasks", subtasks); // assign subtasks
+    }
+
     res.json(task);
   } catch (error) {
-    res.status(500);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
-  if (!req.body.title) {
+  const requiredAttr = ["title", 'description'];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
     res.status(400).send({
-      message: "title is required",
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
     });
     return;
   }
 
-  const data = {
-    title: req.body.title,
-    ProjectId: req.params.projectId,
-  };
+  const user = getUser(req, res);
+
+  let data = req.body;
+  data.projectId = req.params.projectId;
+  data.createdById = user.id;
 
   try {
-    const newItem = await Task.create(data);
-    res.json(newItem);
+    const newTask = await Task.create(data);
+    await TaskChangeLog.create({
+      taskId: newTask.id,
+      userId: user.id,
+      name: 'Vytvoření úkolu',
+    });
+
+    if (req.body.solverId) {
+      // send notification
+      // todo pokud jsem nevypl odesilani
+      const newNotif = await Notification.create({
+        message: `Přiřazení k úkolu: ${newTask.title}` ,
+        userId: user.id,
+        type: 1,
+      });
+      await TaskNotification.create({
+        taskId: newTask.id,
+        notificationId: newNotif.id,
+      });
+    }
+
+    res.json(newTask);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -113,7 +152,7 @@ router.patch("/tasks/:id", authenticateToken, async (req, res) => {
 
     res.json(task);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
   //console.log(task.changed())
 });
@@ -123,7 +162,7 @@ router.delete("/tasks/:id", authenticateToken, async (req, res) => {
     const removedTask = await Task.remove({ id: req.params.id });
     res.json(removedTask);
   } catch (error) {
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
