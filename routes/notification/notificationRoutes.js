@@ -4,25 +4,49 @@ const {
   Notification,
   TaskNotification,
   Task,
+  User
 } = require("../../models/modelHelper");
-const { authenticateToken } = require("../../auth/auth");
+const { authenticateToken, getUser } = require("./../../auth/auth");
 
-router.get("/users/:userId/notifications/", authenticateToken, async (req, res) => {
+router.get("/notifications/", authenticateToken, async (req, res) => {
   try {
-    const records = await Notification.findAll({
-      where: {
-        userId: req.params.userId,
-      },
-      include: TaskNotification,
+    const user = getUser(req, res);
+    let where = {
+      userId: user.id,
+    }
+    if (req.query.seen != null) {
+      where.seen = req.query.seen;
+    }
+    const records = await Notification.findAndCountAll({
+      where: where,
+      include: [
+        {
+          model: TaskNotification,
+        },
+        {
+          model: User,
+          as: 'creator',
+        }
+      ],
+      limit: req.query.limit ? parseInt(req.query.limit) : null,
+      offset: req.query.page ? parseInt(req.query.page) : 0,
+      order: [
+        [
+          req.query.orderBy ? req.query.orderBy : "createdAt",
+          req.query.sort ? req.query.sort : "DESC",
+        ],
+      ],
     });
+
     res.json(records);
   } catch (error) {
-    res.status(500).json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 });
 
-router.get("/users/:userId/notifications/:id", async (req, res) => {
+router.patch("/notifications/:id", async (req, res) => {
   try {
+    const user = getUser(req, res);
     const notification = await Notification.findByPk(req.params.id);
 
     if (!notification.seen) {
@@ -30,17 +54,18 @@ router.get("/users/:userId/notifications/:id", async (req, res) => {
       await notification.save();
     }
 
-    if (notification.type == 1) {
-      const taskNotification = await TaskNotification.findOne({
-        where: { NotificationId: req.params.id },
-        include: Task,
-      });
-      res.json(taskNotification);
-    } else {
-      res.json(notification);
-    }
+    // if (notification.type == 1) {
+    //   const taskNotification = await TaskNotification.findOne({
+    //     where: { NotificationId: req.params.id },
+    //     include: Task,
+    //   });
+    //   res.json(taskNotification);
+    // } else {
+    //   res.json(notification);
+    // }
+    res.json({ message: 'Success' });
   } catch (error) {
-    res.json({ message: error });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -49,7 +74,7 @@ router.get("/users/:userId/notifications/:id", async (req, res) => {
 //     const removedRecord = await Notification.remove({ id: req.params.id });
 //     res.json(removedRecord);
 //   } catch (error) {
-//     res.json({ message: error });
+//     res.status(500).json({ message: error.message });
 //   }
 // });
 
