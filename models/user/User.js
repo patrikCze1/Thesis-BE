@@ -38,6 +38,9 @@ module.exports = (sequelize) => {
       sex: {
         type: DataTypes.STRING(1),
       },
+      shortName: {
+        type: DataTypes.STRING(3),
+      },
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,

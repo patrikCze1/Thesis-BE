@@ -2,6 +2,7 @@ module.exports = {
     projectRoutes: require('./project/projectRoutes'),
     taskRoutes: require('./task/taskRoutes.js'),
     taskChangeLogRoutes: require('./task/taskChangeLogRoutes.js'),
+    taskCommentRoutes: require('./task/taskCommentRoutes'),
     timeTrackRoutes: require('./task/timeTrackRoutes.js'),
     userRoutes: require('./user/userRoutes.js'),
     authRoutes: require('./auth/authRoutes.js'),

@@ -10,7 +10,7 @@ router.get("/:taskId/change-logs/", authenticateToken, async (req, res) => {
         TaskId: req.params.taskId,
       },
       include: [
-        { model: User },
+        { model: User, as: 'user' },
       ]
     });
     res.json(logs);

@@ -147,8 +147,6 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     let task = await Task.findByPk(req.params.id);
 
-    console.log(req.body);
-
     Object.keys(req.body).forEach((key) => {
       task[key] = req.body[key];
     });
@@ -184,13 +182,14 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-  //console.log(task.changed())
 });
 
+// todo delete task??? + remoev attachments
 router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
-    const removedTask = await Task.remove({ id: req.params.id });
-    res.json(removedTask);
+    const task = await Task.findByPk(req.params.id);
+    await task.destroy()
+    res.json({ message: 'Success'});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
