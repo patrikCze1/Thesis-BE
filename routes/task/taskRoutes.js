@@ -8,10 +8,12 @@ const {
   User,
   TaskComment,
   TaskCommentAttachment,
-  TaskCheck, TaskChangeLog,
+  TaskCheck,
+  TaskChangeLog,
 } = require("../../models/modelHelper");
+const { notificationType } = require("./../../models/constantHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
-const { validator } = require('../../service');
+const { validator, notificationService } = require("../../service");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -98,7 +100,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
-  const requiredAttr = ["title", 'description'];
+  const requiredAttr = ["title", "description"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).send({
@@ -118,16 +120,16 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     await TaskChangeLog.create({
       taskId: newTask.id,
       userId: user.id,
-      name: 'Vytvoření úkolu',
+      name: "Vytvoření úkolu",
     });
 
     if (req.body.solverId) {
       // send notification
       // todo pokud jsem nevypl odesilani
       const newNotif = await Notification.create({
-        message: `Přiřazení k úkolu: ${newTask.title}` ,
+        message: `Přiřazení k úkolu: ${newTask.title}`,
         userId: user.id,
-        type: 1,
+        type: notificationType.TYPE_TASK,
       });
       await TaskNotification.create({
         taskId: newTask.id,
@@ -141,14 +143,42 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   }
 });
 
-router.patch("/tasks/:id", authenticateToken, async (req, res) => {
+router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     let task = await Task.findByPk(req.params.id);
 
-    task.title = req.body.title;
-    task.description = req.body.description;
-    task.status = req.body.status;
-    await task.save();
+    console.log(req.body);
+
+    Object.keys(req.body).forEach((key) => {
+      task[key] = req.body[key];
+    });
+
+    const changedFileds = task.changed();
+    const user = getUser(req, res);
+    if (changedFileds.length > 0) {
+      changedFileds.forEach(async (field) => {
+        await TaskChangeLog.create({
+          taskId: req.params.id,
+          userId: user.id,
+          name: "Změna pole: " + field,
+        });
+
+        if (
+          field === "solverId" &&
+          task.solverId != null &&
+          user.id !== task.solverId
+        ) {
+          notificationService.createTaskNotification(
+            task.id,
+            `Přiřazení k úkolu: ${task.title}`,
+            task.solverId,
+            user.id
+          );
+        }
+      });
+
+      await task.save();
+    }
 
     res.json(task);
   } catch (error) {
@@ -157,7 +187,7 @@ router.patch("/tasks/:id", authenticateToken, async (req, res) => {
   //console.log(task.changed())
 });
 
-router.delete("/tasks/:id", authenticateToken, async (req, res) => {
+router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     const removedTask = await Task.remove({ id: req.params.id });
     res.json(removedTask);

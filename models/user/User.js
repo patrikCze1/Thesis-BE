@@ -65,6 +65,7 @@ module.exports = (sequelize) => {
     User.hasMany(models.TimeTrack, {foreignKey: 'userId'});
     User.hasMany(models.Todo, {foreignKey: 'userId'});
     User.hasMany(models.Notification, {foreignKey: 'userId'});
+    User.hasMany(models.Notification, {foreignKey: 'createdById'});
     User.belongsToMany(models.Group, {
       through: {
         model: models.UserGroup,

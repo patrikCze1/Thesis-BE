@@ -28,7 +28,7 @@ const models = [
   require("./task/TaskCommentAttachment"),
   require("./task/TaskChangeLog"),
   require("./task/TaskCheck"),
-  require("./task/TimeTrack"),
+  require("./time_track/TimeTrack"),
   require("./todo/Todo"),
   require("./notification/Notification"),
   require("./notification/TaskNotification"),

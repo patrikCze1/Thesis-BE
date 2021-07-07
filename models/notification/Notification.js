@@ -23,6 +23,9 @@ module.exports = (sequelize) => {
       userId: {
         type: DataTypes.INTEGER,
       },
+      createdById: {
+        type: DataTypes.INTEGER,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
@@ -36,7 +39,8 @@ module.exports = (sequelize) => {
   );
 
   Notification.associate = function (models) {
-    Notification.belongsTo(models.User, {as: 'user'});
+    Notification.belongsTo(models.User, {as: 'user', foreignKey: 'userId'});
+    Notification.belongsTo(models.User, {as: 'creator', foreignKey: 'createdById'});
     Notification.hasOne(models.TaskNotification, {foreignKey: 'notificationId'});
   }
   return Notification;

@@ -48,4 +48,4 @@ app.listen(port, () => {
 
 //nodemon index.js
 //socket, pwa, graphql
-// todo auth routes
+// todo role, turn off motifikace
