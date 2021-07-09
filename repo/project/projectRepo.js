@@ -3,6 +3,9 @@ const { Op } = require("sequelize");
 
 /**
  * 
+ * @param {Object} user 
+ * @param {Object} filter 
+ * @returns 
  */
 exports.findByUser = async (user, filter) => {
     return await Project.findAll({

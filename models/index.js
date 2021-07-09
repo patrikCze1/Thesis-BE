@@ -22,6 +22,7 @@ const models = [
   require("./project/Client"),
   require("./project/Project"),
   require("./project/ProjectGroup"),
+  require("./project/ProjectStage"),
   require("./task/Task"),
   require("./task/TaskAttachment"),
   require("./task/TaskComment"),

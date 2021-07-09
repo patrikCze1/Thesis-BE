@@ -144,6 +144,9 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
+  // const update = req.body
+  // const userId = req.params.userId;
+  // await User.findByIdAndUpdate(userId, update);
   try {
     let task = await Task.findByPk(req.params.id);
 

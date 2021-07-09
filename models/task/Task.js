@@ -15,11 +15,6 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
       allowNull: false,
     },
-    status: {
-      type: DataTypes.STRING,//?model?
-      allowNull: false,
-      defaultValue: 1,
-    },
     priority: {
       type: DataTypes.INTEGER,//?model?
       allowNull: false,
@@ -42,6 +37,9 @@ module.exports = (sequelize) => {
     parentId: { // parent task
       type: DataTypes.INTEGER,
     },
+    projectStageId: {
+      type: DataTypes.INTEGER,
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
@@ -61,6 +59,7 @@ module.exports = (sequelize) => {
     Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
     Task.belongsTo(models.Task, {foreignKey: 'parentId',  as: 'parentTask', onDelete: 'SET NULL' });
+    Task.belongsTo(models.ProjectStage, {foreignKey: 'projectStageId',  as: 'projectStage', onDelete: 'SET NULL' });
     Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskComment, {foreignKey: 'taskId', as: 'taskComments'});
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
