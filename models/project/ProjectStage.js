@@ -17,6 +17,7 @@ module.exports = (sequelize) => {
       },
       projectId: {
         type: DataTypes.INTEGER,
+        allowNull: false,
       },
     }, 
     {
