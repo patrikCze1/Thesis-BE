@@ -19,11 +19,13 @@ const {
     meRoutes }  = require('./routes');
 
 sequelize.sync();
+const bodyParser = require('body-parser')
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(express.bodyParser());
 
-if (process.env.NODE_ENV !== 'production') {
+if (process.env.NODE_ENV !== 'production') { 
     app.use(cors({origin: 'http://localhost:8080'}));
 }
 

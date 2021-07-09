@@ -5,7 +5,6 @@ const {
   TaskChangeLog,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
-const { validator, notificationService } = require("../../service");
 const crypto = require("crypto");
 var path = require('path');
 const multer  = require('multer');
@@ -21,7 +20,6 @@ var storage = multer.diskStorage({
     });
   },
   filename: function(req, file, cb) {
-    // cb(null, file.originalname);
     crypto.pseudoRandomBytes(16, function (err, raw) {
       if (err) return cb(err);
 
@@ -32,7 +30,19 @@ var storage = multer.diskStorage({
 var upload = multer({ storage: storage });
 
 router.get("/:taskId/attachemts", authenticateToken, async (req, res) => {
-
+  try {
+    const attachemts = await TaskAttachment.findAll({
+      where: {
+        taskId: req.params.taskId,
+      },
+      limit: req.query.limit ? parseInt(req.query.limit) : null,
+      offset: req.query.page ? parseInt(req.query.page) : 0,
+    });
+    res.json(attachemts);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+  
 });
 
 router.post("/:taskId/attachemts", upload.array('attachments', 10), async (req, res, next) => {//authenticateToken
@@ -65,7 +75,7 @@ console.log(req.files, req.body);
       await TaskChangeLog.create({
         taskId: req.params.taskId,
         userId: user.id,
-        name: `Nahrání přílohy: ${file.originalName}`,
+        name: `Nahrání přílohy: ${file.originalname}`,
       });
     });
 
