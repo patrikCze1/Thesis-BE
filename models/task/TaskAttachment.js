@@ -15,18 +15,27 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      path: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       taskId: {
         type: DataTypes.INTEGER,
         allowNull: false
+      },
+      size: {
+        type: DataTypes.INTEGER,
+      },
+      type: {
+        type: DataTypes.STRING,
       },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      updatedAt: {
-          type: DataTypes.DATE,
-          defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-      },
+    },
+    {
+      timestamps: false,
     }
   );
 

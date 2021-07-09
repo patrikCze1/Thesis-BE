@@ -11,7 +11,7 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     acquire: 30000,
     idle: 10000,
   }, 
-  force: true,
+  // force: true,
 });
 
 const models = [

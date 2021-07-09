@@ -7,6 +7,7 @@ const {
     projectRoutes, 
     clientRoutes, 
     taskRoutes, 
+    taskAttachmentRoutes, 
     taskChangeLogRoutes, 
     taskCommentRoutes, 
     authRoutes, 
@@ -31,6 +32,7 @@ app.use('/clients', clientRoutes);
 app.use('/projects', taskRoutes);
 app.use('/tasks', taskChangeLogRoutes);
 app.use('/tasks', taskCommentRoutes);
+app.use('/tasks', taskAttachmentRoutes);
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
 app.use('/groups', groupRoutes);

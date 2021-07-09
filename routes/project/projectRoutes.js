@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
-const { Project, User, Group, Client } = require("../../models/modelHelper");
+const { Project, User, Group, Client, ProjectStage } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require('../../service');
 const { projectRepo } = require('./../../repo');
@@ -30,6 +30,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
       include: [
         { model: Client }, 
         { model: User, as: 'creator' }, 
+        { model: ProjectStage, as: 'projectStages' }, 
       ],
     });
 
