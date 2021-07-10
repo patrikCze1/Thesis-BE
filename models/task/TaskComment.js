@@ -33,7 +33,7 @@ module.exports = (sequelize) => {
   TaskComment.associate = (models) => {
     TaskComment.belongsTo(models.User, {foreignKey: 'userId', as: 'taskCommentUser'});
     TaskComment.belongsTo(models.Task, {foreignKey: 'taskId', onDelete: 'CASCADE', as: 'taskComments'});
-    TaskComment.hasMany(models.TaskCommentAttachment, {foreignKey: 'commentId', as: 'attachmetns'});
+    TaskComment.hasMany(models.TaskCommentAttachment, {foreignKey: 'commentId'});
   }
 
   return TaskComment;

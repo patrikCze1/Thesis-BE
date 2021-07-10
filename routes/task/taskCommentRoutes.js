@@ -34,13 +34,14 @@ var upload = multer({ storage: storage });
 router.post(
   "/:taskId/comments",
   upload.array("attachments", 10),
-  async (req, res) => {
-    //authenticateToken
+  async (req, res) => { //authenticateToken
     const requiredAttr = ["text"];
-    console.log(req);
-    const result = validator.validateRequiredFields(requiredAttr, req.body);
+    const body = {...req.body};
+    const result = validator.validateRequiredFields(requiredAttr, body);
+
     if (!result.valid) {
       res.status(400).send({
+        success: false,
         message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
       });
       return;
@@ -58,27 +59,33 @@ router.post(
       // );
 
       const data = {
-        text: req.body.text,
+        text: body.text,
         taskId: req.params.taskId,
         userId: user.id,
       };
 
       const newItem = await TaskComment.create(data);
+      let attachemnts = [];
 
       if (req.files && req.files.length > 0) {
-        req.files.forEach(async (file) => {
-          await TaskCommentAttachment.create({
-            commentId: newItem.id,
-            originalName: file.originalname,
-            file: file.filename,
-            path: file.path,
-            size: file.size,
-            type: file.mimetype,
-          });
-        });
+        await Promise.all(req.files.map(async (file) => {
+          try {
+            const attach = await TaskCommentAttachment.create({
+              commentId: newItem.id,
+              originalName: file.originalname,
+              file: file.filename,
+              path: file.path,
+              size: file.size,
+              type: file.mimetype,
+            });
+            attachemnts.push(attach);
+          } catch (error) {
+            console.log(error)
+          }
+        }));
       }
 
-      res.send(newItem);
+      res.send({ success: true, comment: newItem, attachemnts: attachemnts });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
@@ -94,14 +101,14 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
       // || admin...
       res
         .status(403)
-        .json({ message: "Pro tuto akci nemáte dostatečná práva." });
+        .json({ success: false, message: "Pro tuto akci nemáte dostatečná práva." });
       return;
     }
 
     taskComment.text = req.body.text;
     await taskComment.save();
 
-    res.json(taskComment);
+    res.json({ success: true, comment: taskComment });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -123,15 +130,27 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 
     const attachments = await TaskCommentAttachment.findAll({
       where: {
-        TaskCommentId: req.params.id,
+        commentId: req.params.id,
       },
     });
-    attachments.forEach(async (attachment) => {
-      const attach = TaskCommentAttachment.findByPk(attachment.id);
-      await attach.destroy();
-      //todo remove files
+    const files = attachments.map(async (attachment) => {
+      try {
+        const attach = await TaskCommentAttachment.findByPk(attachment.id);
+        const path = attach.path;
+        await attach.destroy();
+        return path;
+      } catch (error) {
+        console.log(error);
+      }
     });
 
+    const arr = await Promise.all(files);
+    arr.forEach(file => {
+      fs.unlink(file, (error) => {
+        if (error) console.log('File delete err ', error);
+        else console.log('file deleted');
+      });
+    });
     await comment.destroy();
 
     res.json({ success: true, message: "Success" });
@@ -141,9 +160,9 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete(
-  "/comment-attachments/:id",
+  "/:taskId/comment-attachments/:id",
   authenticateToken,
-  async (req, res) => {
+  async (req, res) => { // todo prava
     try {
       const attachment = await TaskCommentAttachment.findByPk(req.params.id);
       fs.unlink(attachment.path, (error) => console.log(error));

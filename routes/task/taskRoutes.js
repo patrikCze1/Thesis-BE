@@ -80,7 +80,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             { model: TaskCommentAttachment, as: "attachmetns" },
           ],
         },
-        { model: TaskCheck },
+        { model: TaskCheck, as: 'checks' },
       ],
     });
 

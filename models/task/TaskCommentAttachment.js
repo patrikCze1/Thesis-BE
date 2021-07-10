@@ -45,7 +45,7 @@ module.exports = (sequelize) => {
     TaskCommentAttachment.belongsTo(models.TaskComment, {
       onDelete: "CASCADE",
       foreignKey: "commentId",
-      as: "attachmetns",
+      as: 'comment',
     });
   };
 
