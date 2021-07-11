@@ -13,9 +13,9 @@ router.get("/:taskId/change-logs/", authenticateToken, async (req, res) => {
         { model: User, as: 'user' },
       ]
     });
-    res.json(logs);
+    res.json({ succes: true, logs});
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ succes: false, message: error.message });
   }
 });
 

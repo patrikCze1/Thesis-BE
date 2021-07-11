@@ -78,9 +78,16 @@ router.post(
     console.log(req.files, req.body);
     // req.files is array of `photos` files
     // req.body will contain the text fields, if there were any
-    const user = getUser(req, res);
 
     try {
+      const task = await Task.findByPk(req.params.taskId);
+      const user = getUser(req, res);
+      const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
+      if (!permission.granted) {
+        res.status(403).json({ success: false });
+        return;
+      }
+
       req.files.forEach(async (file) => {
         await TaskAttachment.create({
           taskId: req.params.taskId,
@@ -111,12 +118,19 @@ router.delete(
   authenticateToken,
   async (req, res) => {
     try {
+      const task = await Task.findByPk(req.params.taskId);
+      const user = getUser(req, res);
+      const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
+      if (!permission.granted) {
+        res.status(403).json({ success: false });
+        return;
+      }
+
       const attachment = await TaskAttachment.findByPk(req.params.id);
       fs.unlink(attachment.path, (error) => console.log(error));
       const origName = attachment.originalName;
       await attachment.destroy();
 
-      const user = getUser(req, res);
       await TaskChangeLog.create({
         taskId: req.params.taskId,
         userId: user.id,

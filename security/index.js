@@ -29,7 +29,18 @@ const grantsObject = {
             'read:any': ['*'],
             'update:any': ['*'],
             'delete:any': ['*'],
-        }
+        },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+            // 'update:any': ['*'],
+            'delete:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
     },
     user: {
         project: {
@@ -38,7 +49,16 @@ const grantsObject = {
         task: {
             'read:own': ['*'],
             'update:own': ['solverId', 'status'],
-        }
+        },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
     },
     manager: {
         project: {
@@ -52,13 +72,21 @@ const grantsObject = {
         task: {
             'create:any': ['*'],
             'read:any': ['*'],
-            'update:any': ['*'],
 
             'create:own': ['*'],
             'read:own': ['*'],
             'update:own': ['*'],
             'delete:own': ['*']
-        }
+        },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
     },
     client: {
 

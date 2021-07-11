@@ -30,6 +30,7 @@ var storage = multer.diskStorage({
   },
 });
 var upload = multer({ storage: storage });
+const ac = require("./../../security");
 
 router.post(
   "/:taskId/comments",
@@ -96,12 +97,9 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
     let taskComment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
-
-    if (taskComment.userId !== user.id) {
-      // || admin...
-      res
-        .status(403)
-        .json({ success: false, message: "Pro tuto akci nemáte dostatečná práva." });
+    const permission = taskComment.userId == user.id ? ac.can(user.role).updateOwn("taskComment") : ac.can(user.role).updateAny("taskComment");
+    if (!permission.granted) {
+      res.status(403).json({ success: false });
       return;
     }
 
@@ -119,12 +117,9 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
     const comment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
-
-    if (comment.userId !== user.id) {
-      // || admin...
-      res
-        .status(403)
-        .json({ message: "Pro tuto akci nemáte dostatečná práva." });
+    const permission = comment.userId == user.id ? ac.can(user.role).deleteOwn("taskComment") : ac.can(user.role).deleteAny("taskComment");
+    if (!permission.granted) {
+      res.status(403).json({ success: false });
       return;
     }
 
@@ -162,9 +157,17 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 router.delete(
   "/:taskId/comment-attachments/:id",
   authenticateToken,
-  async (req, res) => { // todo prava
+  async (req, res) => {
     try {
       const attachment = await TaskCommentAttachment.findByPk(req.params.id);
+      const comment = await TaskComment.findByPk(rattachment.commentId);
+      const task = await Task.findByPk(req.params.taskId);
+      const user = getUser(req, res);
+      const permission = comment.userId == user.id ? ac.can(user.role).deleteOwn("taskComment") : ac.can(user.role).deleteAny("taskComment");
+      if (!permission.granted && task.createdById != user.id) {
+        res.status(403).json({ success: false });
+        return;
+      }
       fs.unlink(attachment.path, (error) => console.log(error));
       await attachment.destroy();
 
