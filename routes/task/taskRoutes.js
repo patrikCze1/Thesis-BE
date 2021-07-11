@@ -14,7 +14,9 @@ const {
 const { notificationType } = require("./../../models/constantHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
+const ac = require("./../../security");
 
+// check if user is in project?
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const tasks = await Task.findAll({
@@ -28,38 +30,41 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         },
       ],
     });
-    res.json(tasks);
+    res.json({ success: true, tasks});
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
+// check if user is in project?
 router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
-  // try {
-  //   const userId = 1; // todo
-  //   const notifications = await Notification.findAll({
-  //     where: {
-  //       seen: 0,
-  //       UserId: userId,
-  //     },
-  //     include: [
-  //       {
-  //         model: TaskNotification,
-  //         where: {
-  //           TaskId: req.params.id,
-  //         },
-  //       },
-  //     ],
-  //   });
+  const user = getUser(req, res);
+  try {
+    const notifications = await Notification.findAll({
+      where: {
+        seen: 0,
+        UserId: user.id,
+      },
+      include: [
+        {
+          model: TaskNotification,
+          where: {
+            TaskId: req.params.id,
+          },
+        },
+      ],
+    });
 
-  //   notifications.forEach(async notification => {
-  //     notification.seen = true;
-  //     await notification.save();
-  //   });
+    // todo test
+    for (let i = 0; i < notifications.length; i++) {
+      notifications[i].seen = true;
+      await notification.save();
+    }
 
-  // } catch (error) {
-
-  // }
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+    return;
+  }
 
   try {
     const task = await Task.findOne({
@@ -91,15 +96,25 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         },
       });
       task.setDataValue("subtasks", subtasks); // assign subtasks
+    } else {
+      res.status(404).json({ success: false });
+      return;
     }
 
-    res.json(task);
+    res.json({ success: true, task });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).createAny("task");
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   const requiredAttr = ["title", "description"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -108,8 +123,6 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     });
     return;
   }
-
-  const user = getUser(req, res);
 
   let data = req.body;
   data.projectId = req.params.projectId;
@@ -137,9 +150,9 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       });
     }
 
-    res.json(newTask);
+    res.json({ success: true, task: newTask });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -149,13 +162,18 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // await User.findByIdAndUpdate(userId, update);
   try {
     let task = await Task.findByPk(req.params.id);
+    const user = getUser(req, res);
+    const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
+    if (!permission.granted) {
+      res.status(403).json({ success: false });
+      return;
+    }
 
     Object.keys(req.body).forEach((key) => {
       task[key] = req.body[key];
     });
 
     const changedFileds = task.changed();
-    const user = getUser(req, res);
     if (changedFileds.length > 0) {
       changedFileds.forEach(async (field) => {
         await TaskChangeLog.create({
@@ -181,9 +199,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       await task.save();
     }
 
-    res.json(task);
+    res.json({ success: true, task });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -191,10 +209,17 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     const task = await Task.findByPk(req.params.id);
+    const user = getUser(req, res);
+    const permission = task.createdById == user.id ? ac.can(user.role).deleteOwn("task") : ac.can(user.role).deleteAny("task");
+    if (!permission.granted) {
+      res.status(403).json({ success: false });
+      return;
+    }
+
     await task.destroy()
-    res.json({ message: 'Success'});
+    res.json({ success: true, message: 'Úkol odstraněn'});
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

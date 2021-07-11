@@ -54,6 +54,9 @@ const grantsObject = {
             'read:any': ['*'],
             'update:any': ['*'],
 
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
             'delete:own': ['*']
         }
     },
