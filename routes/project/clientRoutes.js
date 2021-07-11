@@ -4,10 +4,19 @@ const { Client, Project } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 const { authenticateToken } = require("../../auth/auth");
 const { validator } = require('../../service');
+const ac = require("./../../security");
 
-// jen pro adminy
+// only for admins
 
 router.get("/", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).readAny("client");
+
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   try {
     const clients = await Client.findAll({
       where: {
@@ -24,26 +33,48 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       ],
     });
-    res.json(clients);
+    res.json({ success: false, clients });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.get("/:id", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).readAny("client");
+
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   try {
     const client = await Client.findByPk(req.params.id, {
       include: [
         { model: Project, as: 'projects' },
       ],
     });
-    res.json(client);
+
+    if (!client) {
+      res.status(404).json({ success: false });
+      return;
+    }
+
+    res.json({ success: true, client });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.post("/", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).createAny("client");
+
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   const requiredAttr = ['name'];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -57,32 +88,52 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const newRecord = await Client.create(data);
-    res.send(newRecord);
+    res.send({ success: true, client: newRecord });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).updateAny("client");
+
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   try {
     const client = await Client.findByPk(req.params.id);
+    if (!client) {
+      res.status(404).json({ success: false });
+      return;
+    }
 
     const updated = await client.update(req.body);
 
-    res.json(updated);
+    res.json({ success: true, client: updated });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+  const permission = ac.can(user.role).deleteAny("client");
+
+  if (!permission.granted) {
+    res.status(403).json({ success: false });
+    return;
+  }
+
   try {
     const client = await Client.findByPk(req.params.id);
     client.destroy();
 
-    res.json({ message: 'Success' });
+    res.json({ success: true, message: 'Success' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

@@ -2,44 +2,42 @@ const { Project, User, Group, Client } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 
 /**
- * 
- * @param {Object} user 
- * @param {Object} filter 
- * @returns 
+ *
+ * @param {Object} user
+ * @param {Object} filter
+ * @returns
  */
 exports.findByUser = async (user, filter) => {
-    return await Project.findAll({
-        // attributes: { exclude: ['user'] },
-        where: {
-          [Op.or]: [
-            { '$User.id$': user.id },
-            { '$group->groupUser.id$': user.id },
-          ],
+  return await Project.findAll({
+    // attributes: { exclude: ['user'] },
+    where: {
+      [Op.or]: [{ "$User.id$": user.id }, { "$group->groupUser.id$": user.id }],
+    },
+    include: [
+      {
+        model: Group,
+        as: "group",
+        attributes: [],
+        include: {
+          model: User,
+          as: "groupUser",
+          attributes: [],
         },
-        include: [
-          {
-            model: Group,
-            as: 'group',
-            attributes: [],
-            include: {
-              model: User,
-              as: 'groupUser',
-              attributes: [],
-            }
-          },
-          {
-            model: User,
-            as: 'user',
-            attributes: [], // dont select users fields
-          },
-        ],
-        limit: filter.limit ? parseInt(filter.limit) : null,
-        offset: filter.page ? parseInt(filter.page) : 0,
-        order: [
-          [
-            filter.orderBy ? filter.orderBy : 'name', 
-            filter.sort ? filter.sort : 'ASC',
-          ]
-        ]
-      });
-}
+      },
+      {
+        model: User,
+        as: "user",
+        attributes: [], // dont select users fields
+      },
+    ],
+    limit: filter.limit ? parseInt(filter.limit) : null,
+    offset: filter.page ? parseInt(filter.page) : 0,
+    order: [
+      [
+        filter.orderBy ? filter.orderBy : "name",
+        filter.sort ? filter.sort : "ASC",
+      ],
+    ],
+  });
+};
+

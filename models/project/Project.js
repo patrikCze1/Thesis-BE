@@ -35,10 +35,10 @@ module.exports = (sequelize) => {
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
     },
     timeBudget: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
     },
     priceBudget: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.FLOAT,
     },
     deadline: {
       type: DataTypes.DATE,

@@ -23,6 +23,12 @@ const grantsObject = {
             'read:own': ['*'],
             'update:own': ['*'],
             'delete:own': ['*'],
+        },
+        client: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+            'update:any': ['*'],
+            'delete:any': ['*'],
         }
     },
     user: {
@@ -38,6 +44,7 @@ const grantsObject = {
         project: {
             'create:any': ['*'],
 
+            'create:own': ['*'],
             'read:own': ['*'],
             'update:own': ['*'],
             'delete:own': ['*']
@@ -49,7 +56,10 @@ const grantsObject = {
 
             'delete:own': ['*']
         }
-    }
+    },
+    client: {
+
+    },
 };
 
 module.exports = new AccessControl(grantsObject);
