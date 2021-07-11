@@ -40,11 +40,17 @@ module.exports = (sequelize) => {
       },
       shortName: {
         type: DataTypes.STRING(3),
+        allowNull: false,
       },
       active: {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
         allowNull: false,
+      },
+      role: {
+        type: DataTypes.STRING(10),
+        allowNull: false,
+        defaultValue: 'user',
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -54,7 +60,6 @@ module.exports = (sequelize) => {
           type: DataTypes.DATE,
           defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
       },
-      //role, image???
     }
   );
 

@@ -38,9 +38,9 @@ router.get("/notifications/", authenticateToken, async (req, res) => {
       ],
     });
 
-    res.json(records);
+    res.json({ success: true, records });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -63,9 +63,9 @@ router.patch("/notifications/:id", async (req, res) => {
     // } else {
     //   res.json(notification);
     // }
-    res.json({ message: 'Success' });
+    res.json({ success: true, message: 'Success' });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 

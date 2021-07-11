@@ -43,6 +43,8 @@ module.exports = (sequelize) => {
     deadline: {
       type: DataTypes.DATE,
     },
+  }, {
+    paranoid: true,
   });
 
   Project.associate = function(models) {
