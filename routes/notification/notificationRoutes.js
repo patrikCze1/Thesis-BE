@@ -44,7 +44,7 @@ router.get("/notifications/", authenticateToken, async (req, res) => {
   }
 });
 
-router.patch("/notifications/:id", async (req, res) => {
+router.patch("/notifications/:id/seen", async (req, res) => {
   try {
     const user = getUser(req, res);
     const notification = await Notification.findByPk(req.params.id);
@@ -53,16 +53,7 @@ router.patch("/notifications/:id", async (req, res) => {
       notification.seen = true;
       await notification.save();
     }
-
-    // if (notification.type == 1) {
-    //   const taskNotification = await TaskNotification.findOne({
-    //     where: { NotificationId: req.params.id },
-    //     include: Task,
-    //   });
-    //   res.json(taskNotification);
-    // } else {
-    //   res.json(notification);
-    // }
+    
     res.json({ success: true, message: 'Success' });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

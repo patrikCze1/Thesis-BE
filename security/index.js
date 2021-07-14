@@ -41,6 +41,14 @@ const grantsObject = {
             'update:own': ['*'],
             'delete:own': ['*'],
         },
+        timeTrack: {
+            'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        }
     },
     user: {
         project: {
@@ -59,6 +67,12 @@ const grantsObject = {
             'update:own': ['*'],
             'delete:own': ['*'],
         },
+        timeTrack: {
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        }
     },
     manager: {
         project: {
@@ -87,9 +101,40 @@ const grantsObject = {
             'update:own': ['*'],
             'delete:own': ['*'],
         },
+        timeTrack: {
+            'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        }
     },
     client: {
+        project: {
 
+            'read:own': ['*'],
+        },
+        task: {
+            'read:any': ['*'],
+
+            'read:own': ['*'],
+        },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
+        timeTrack: {
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        }
     },
 };
 

@@ -24,6 +24,9 @@ module.exports = (sequelize) => {
           model: sequelize.models.User,
         }
       },
+      taskId: {
+        type: DataTypes.INTEGER,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
@@ -38,6 +41,7 @@ module.exports = (sequelize) => {
   TimeTrack.associate = (models) => {
     TimeTrack.belongsTo(models.User, {as: 'user'});
     TimeTrack.belongsTo(models.Task, {as: 'task'});
+    TimeTrack.belongsTo(models.Project, {as: 'project'});
   }
 
   return TimeTrack;

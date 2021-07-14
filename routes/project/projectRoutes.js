@@ -104,11 +104,12 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.post("/:id/complete", authenticateToken, async (req, res) => {
+router.patch("/:id/complete", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
+    const status = project.status == projectState.STATUS_ACTIVE ? projectState.STATUS_COMPLETED : projectState.STATUS_COMPLETED;
     const updated = await project.update({
-      status: projectState.STATUS_COMPLETED,
+      status,
     });
 
     res.json({ success: true, project: updated });
