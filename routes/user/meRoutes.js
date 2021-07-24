@@ -23,9 +23,9 @@ router.get("/groups", authenticateToken, async (req, res) => {
         }
       ],
     });
-    res.json(groups);
+    res.json({ success: true, groups });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
