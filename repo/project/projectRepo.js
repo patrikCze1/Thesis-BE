@@ -29,6 +29,9 @@ exports.findByUser = async (user, filter) => {
         as: "user",
         attributes: [], // dont select users fields
       },
+      {
+        model: Client,
+      },
     ],
     limit: filter.limit ? parseInt(filter.limit) : null,
     offset: filter.page ? parseInt(filter.page) : 0,

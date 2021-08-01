@@ -19,45 +19,42 @@ router.post("/login", async (req, res) => {
     if (user && match) { // if ok return auth token
       const token = generateToken(user);
       const refreshToken = generateRefreshToken(user);
-      
+
       res
-        // .cookie("auth-token", token, { secure: true, httpOnly: true })
-        // .cookie("refresh-token", refreshToken, { secure: true, httpOnly: true })
+        .cookie("auth-token", token, { secure: true, httpOnly: true })
+        .cookie("refresh-token", refreshToken, { secure: true, httpOnly: true })
+        .cookie("curr-user", user)
         .send({
           token,
           refreshToken,
-          tokenExpire: parseInt(process.env.TOKEN_SECRET_EXPIRATION),
+          user,
         });
     } else {
-      res.status(401);
-      res.send({ message: "Invalid Credentials" });
+      res.status(400).send({ message: "Invalid Credentials", success: false });
     }
   } catch (error) {
-    res.status(500);
-    res.send({error: error.message});
+    res.status(500).send({ error: error.message, success: false });
   }
 });
 
 router.post("/refresh", async (req, res) => {
-  //https://hasura.io/blog/best-practices-of-using-jwt-with-graphql/
   const token = req.header("refresh-token");
 
   if (token == null) return res.sendStatus(401);
 
-  const user = decodeToken(token);
-  if (!isRefreshTokenValid(user.userId, token)) return res.sendStatus(401);
+  const data = decodeToken(token);
+  if (!data.user || !isRefreshTokenValid(data.user.id, token)) return res.sendStatus(400);// todo store in db
 
   try {
     // jwt.verify(token, process.env.REFRESH_TOKEN); //todo
     
-    const newToken = generateToken(user.userId);
+    const newToken = generateToken(data.user);
 
     res.send({
       token: newToken,
-      tokenExpire: parseInt(process.env.TOKEN_SECRET_EXPIRATION),
     });
   } catch (error) {
-    res.status(400).send("Invalid token");
+    res.status(400).send({ error: error.message, success: false });
   }
 });
 

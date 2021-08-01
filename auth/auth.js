@@ -11,7 +11,7 @@ const generateToken = (user) => {
 
 const generateRefreshToken = (user) => {
   const token = jwt.sign(
-    { user: user }, 
+    { user }, 
     process.env.REFRESH_TOKEN, 
     {
       expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
@@ -21,7 +21,7 @@ const generateRefreshToken = (user) => {
 };
 
 const authenticateToken = function (req, res, next) {
-  const token = req.header("auth-token");
+  const token = req.header("auth-token"); //req => req.cookies.token
 
   if (token == null) return res.sendStatus(401);
 
@@ -29,7 +29,7 @@ const authenticateToken = function (req, res, next) {
     jwt.verify(token, process.env.TOKEN_SECRET);
     next();
   } catch (error) {
-    res.status(401).send({ message: error.message });
+    res.status(401).send({ message: error.message, success: false });
   }
 };
 

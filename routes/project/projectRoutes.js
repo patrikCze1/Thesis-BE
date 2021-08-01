@@ -19,10 +19,10 @@ router.get("/", authenticateToken, async (req, res) => {
   let projects;
   try {
     if (adminPermission.granted) {
+      projects = await Project.findAll();
+    } else {
       const filter = req.query;
       projects = await projectRepo.findByUser(user, filter);
-    } else {
-      projects = await Project.findAll();
     }
 
     res.json({ success: true, projects });
