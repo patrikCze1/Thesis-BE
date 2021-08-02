@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Client, Project } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
-const { authenticateToken } = require("../../auth/auth");
+const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require('../../service');
 const ac = require("./../../security");
 

@@ -32,7 +32,7 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.use("/api/projects", projectRoutes);
-app.use("/clients", clientRoutes);
+app.use("/api/clients", clientRoutes);
 app.use("/projects", taskRoutes);
 app.use("/tasks", taskChangeLogRoutes);
 app.use("/tasks", taskCommentRoutes);
