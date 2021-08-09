@@ -13,7 +13,7 @@ const ac = require("./../../security");
 const { projectState } = require("../../models/constantHelper");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const user = getUser(req, res);console.log(user)
   const adminPermission = ac.can(user.role).readAny("project");
 
   let projects;
