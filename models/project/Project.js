@@ -48,7 +48,7 @@ module.exports = (sequelize) => {
   });
 
   Project.associate = function(models) {
-    Project.belongsTo(models.Client, {foreignKey: 'clientId'});
+    Project.belongsTo(models.Client, {foreignKey: {name: 'clientId', allowNull: true}});
     Project.hasMany(models.Task, { onDelete: 'CASCADE', foreignKey: 'taskId' });
     Project.hasMany(models.ProjectStage, { onDelete: 'CASCADE', foreignKey: 'projectId', as: 'projectStages' });
     Project.belongsTo(models.User, {foreignKey: 'createdById', as: 'creator'});

@@ -129,7 +129,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
   try {
     const client = await Client.findByPk(req.params.id);
-    client.destroy();
+    await client.destroy();
 
     res.json({ success: true, message: 'Success' });
   } catch (error) {
