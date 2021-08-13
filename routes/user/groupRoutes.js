@@ -6,7 +6,7 @@ const { authenticateToken } = require("../../auth/auth");
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const groups = await Group.findAll();
-    res.json(groups);
+    res.json({ groups });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

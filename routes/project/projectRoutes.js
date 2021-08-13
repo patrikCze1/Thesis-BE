@@ -5,6 +5,9 @@ const {
   User,
   Client,
   ProjectStage,
+  ProjectGroup,
+  ProjectUser,
+  Group,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
@@ -13,7 +16,7 @@ const ac = require("./../../security");
 const { projectState } = require("../../models/constantHelper");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);console.log(user)
+  const user = getUser(req, res);
   const adminPermission = ac.can(user.role).readAny("project");
 
   let projects;
@@ -56,6 +59,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
         { model: Client },
         { model: User, as: "creator" },
         { model: ProjectStage, as: "projectStages" },
+        { model: Group, as: "groups" },
+        { model: User, as: "users" },
       ],
     });
 
@@ -92,13 +97,24 @@ router.post("/", authenticateToken, async (req, res) => {
 
   const data = {
     name: req.body.name,
+    description: req.body.description,
     createdById: user.id,
     status: req.body.status,
+    clientId: req.body.client,
   };
 
   try {
     const newProject = await Project.create(data);
-    res.send({ success: true, peoject: newProject });
+    
+    for (let groupId of req.body.groups) {
+      await ProjectGroup.create({ projectId: newProject.id, groupId });
+    }
+
+    for (let userId of req.body.users) {
+      await ProjectUser.create({ projectId: newProject.id, userId });
+    }
+
+    res.send({ success: true, project: newProject });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -136,8 +152,23 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       res.status(403).json({ success: false });
       return;
     }
+    const data = {
+      ...req.body,
+      clientId: req.body.client,
+    }
 
-    const updated = await project.update(req.body);
+    const updated = await project.update(data);
+
+    await ProjectGroup.destroy({ where: { projectId: project.id } });
+    await ProjectUser.destroy({ where: { projectId: project.id } });
+
+    for (let groupId of req.body.groups) {
+      await ProjectGroup.create({ projectId: project.id, groupId });
+    }
+
+    for (let userId of req.body.users) {
+      await ProjectUser.create({ projectId: project.id, userId });
+    }
 
     res.json({ success: true, project: updated });
   } catch (error) {

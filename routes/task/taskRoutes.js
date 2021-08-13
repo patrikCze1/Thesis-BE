@@ -30,7 +30,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         },
       ],
     });
-    res.json({ success: true, tasks});
+    res.json({ success: true, tasks });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

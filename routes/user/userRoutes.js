@@ -7,7 +7,7 @@ const { validator } = require('../../service');
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const items = await User.findAll({
+    const users = await User.findAll({
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.page ? parseInt(req.query.page) : 0,
       order: [
@@ -17,7 +17,7 @@ router.get("/", authenticateToken, async (req, res) => {
         ]
       ]
     });
-    res.json(items);
+    res.json({ users });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -33,13 +33,13 @@ if (process.env.NODE_ENV !== "production") {
 
 app.use("/api/projects", projectRoutes);
 app.use("/api/clients", clientRoutes);
-app.use("/projects", taskRoutes);
+app.use("/api/projects", taskRoutes);
 app.use("/tasks", taskChangeLogRoutes);
 app.use("/tasks", taskCommentRoutes);
 app.use("/tasks", taskAttachmentRoutes);
 app.use("/api/auth", authRoutes);
-app.use("/users", userRoutes);
-app.use("/groups", groupRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/groups", groupRoutes);
 app.use("/todos", todoRoutes);
 app.use("/tracks", timeTrackRoutes);
 app.use("/", notificationRoutes);
