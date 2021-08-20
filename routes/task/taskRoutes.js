@@ -73,7 +73,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         projectId: req.params.projectId,
       },
       include: [
-        { model: TaskAttachment },
+        { model: TaskAttachment, as: 'attachments' },
         { model: Task, as: "parentTask" },
         { model: User, as: "creator" },
         { model: User, as: "solver" },
@@ -82,7 +82,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           as: "taskComments",
           include: [
             { model: User, as: "taskCommentUser", required: true },
-            { model: TaskCommentAttachment, as: "attachmetns" },
+            { model: TaskCommentAttachment, as: "commentAttachments" },
           ],
         },
         { model: TaskCheck, as: 'checks' },

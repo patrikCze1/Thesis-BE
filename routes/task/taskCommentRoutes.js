@@ -34,7 +34,7 @@ const ac = require("./../../security");
 
 router.post(
   "/:taskId/comments",
-  upload.array("attachments", 10),
+  upload.array("files", 10),
   async (req, res) => { //authenticateToken
     const requiredAttr = ["text"];
     const body = {...req.body};
@@ -59,6 +59,7 @@ router.post(
       //   user.id
       // );
 
+      console.log(req.files)
       const data = {
         text: body.text,
         taskId: req.params.taskId,
@@ -86,7 +87,11 @@ router.post(
         }));
       }
 
-      res.send({ success: true, comment: newItem, attachemnts: attachemnts });
+      newItem.setDataValue('commentAttachments', attachemnts);
+      newItem.setDataValue('taskCommentUser', user);
+      newItem.setDataValue('createdAt', new Date());
+
+      res.send({ success: true, comment: newItem });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
@@ -148,7 +153,7 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
     });
     await comment.destroy();
 
-    res.json({ success: true, message: "Success" });
+    res.json({ success: true, comment: comment });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

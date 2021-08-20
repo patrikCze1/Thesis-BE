@@ -60,7 +60,7 @@ module.exports = (sequelize) => {
     Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
     Task.belongsTo(models.Task, {foreignKey: 'parentId',  as: 'parentTask', onDelete: 'SET NULL' });
     Task.belongsTo(models.ProjectStage, {foreignKey: 'projectStageId',  as: 'projectStage', onDelete: 'SET NULL' });
-    Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId'});
+    Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId', as: 'attachments'});
     Task.hasMany(models.TaskComment, {foreignKey: 'taskId', as: 'taskComments'});
     Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
     Task.hasMany(models.TaskCheck, {foreignKey: 'taskId', as: 'checks'});

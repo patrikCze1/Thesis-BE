@@ -11,6 +11,7 @@ const {
   taskAttachmentRoutes,
   taskChangeLogRoutes,
   taskCommentRoutes,
+  taskCheckRoutes,
   authRoutes,
   userRoutes,
   groupRoutes,
@@ -34,16 +35,17 @@ if (process.env.NODE_ENV !== "production") {
 app.use("/api/projects", projectRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/projects", taskRoutes);
-app.use("/tasks", taskChangeLogRoutes);
-app.use("/tasks", taskCommentRoutes);
-app.use("/tasks", taskAttachmentRoutes);
+app.use("/api/tasks", taskChangeLogRoutes);
+app.use("/api/tasks", taskCommentRoutes);
+app.use("/api/tasks", taskAttachmentRoutes);
+app.use("/api/tasks/checks", taskCheckRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/groups", groupRoutes);
-app.use("/todos", todoRoutes);
-app.use("/tracks", timeTrackRoutes);
+app.use("/api/todos", todoRoutes);
+app.use("/api/tracks", timeTrackRoutes);
 app.use("/", notificationRoutes);
-app.use("/me", meRoutes);
+app.use("/api/me", meRoutes);
 
 app.get("/", (req, res) => {
   res.send("Api index");

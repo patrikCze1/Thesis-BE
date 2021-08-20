@@ -41,6 +41,17 @@ const grantsObject = {
             'update:own': ['*'],
             'delete:own': ['*'],
         },
+        taskCheck: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+            // 'update:any': ['*'],
+            'delete:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
         timeTrack: {
             'read:any': ['*'],
 
@@ -62,6 +73,12 @@ const grantsObject = {
             'create:any': ['*'],
             'read:any': ['*'],
 
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
+        taskCheck: {
             'create:own': ['*'],
             'read:own': ['*'],
             'update:own': ['*'],
@@ -101,6 +118,17 @@ const grantsObject = {
             'update:own': ['*'],
             'delete:own': ['*'],
         },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+            // 'update:any': ['*'],
+            'delete:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
         timeTrack: {
             'read:any': ['*'],
 
@@ -123,6 +151,17 @@ const grantsObject = {
         taskComment: {
             'create:any': ['*'],
             'read:any': ['*'],
+
+            'create:own': ['*'],
+            'read:own': ['*'],
+            'update:own': ['*'],
+            'delete:own': ['*'],
+        },
+        taskComment: {
+            'create:any': ['*'],
+            'read:any': ['*'],
+            // 'update:any': ['*'],
+            'delete:any': ['*'],
 
             'create:own': ['*'],
             'read:own': ['*'],
