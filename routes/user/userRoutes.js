@@ -23,6 +23,16 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+router.get("/:id", authenticateToken, async (req, res) => {
+  try {
+    const user = await User.findByPk(req.params.id);
+
+    res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 router.get("/:userId/tracks", authenticateToken, async (req, res) => {
   try {
     const items = await TimeTrack.findAll({
@@ -64,10 +74,13 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     let user = await User.findByPk(req.params.id);
 
-    user.username = req.body.username;
-    await user.save();
+    const data = {
+      ...req.body,
+    }
 
-    res.json(user);
+    const updated = await user.update(data);
+
+    res.json({user: updated});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
