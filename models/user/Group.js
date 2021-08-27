@@ -32,7 +32,7 @@ module.exports = (sequelize) => {
       },
       foreignKey: "groupId",
       constraints: false,
-      as: 'groupUser',
+      as: 'groupUsers',
     });
     Group.belongsToMany(models.Project, { through: models.ProjectGroup, foreignKey: "groupId", });
   }

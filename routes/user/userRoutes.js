@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { User, TimeTrack } = require("../../models/modelHelper");
+const { User, TimeTrack, UserGroup, ProjectUser } = require("../../models/modelHelper");
 const bcrypt = require("bcrypt");
 const { authenticateToken } = require("../../auth/auth");
 const { validator } = require('../../service');
@@ -50,7 +50,7 @@ router.post("/", authenticateToken, async (req, res) => {
   const requiredAttr = ['username', 'email', 'password'];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
-    res.status(400).send({
+    res.status(400).json({
       message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
     });
     return;
@@ -60,13 +60,17 @@ router.post("/", authenticateToken, async (req, res) => {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const data = req.body;
     data.password = hashedPassword;
-    console.log(data);
+    data.shortName = `${data.lastName.charAt(0).toUpperCase()}${data.firstName.charAt(0).toUpperCase()}`;
+
     const savedUser = await User.create(data);
-    console.log(savedUser.toJSON());
-    res.json(savedUser);
+    
+    res.json({ user: savedUser });
   } catch (e) {
-    res.status(500);
-    res.status(500).json({ message: e.message });
+    if (e.errors.length > 0) {
+      res.status(500).json({ message: e.errors[0].message });
+    } else {
+      res.status(500).json({ message: e.message });
+    }
   }
 });
 
@@ -81,8 +85,12 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     const updated = await user.update(data);
 
     res.json({user: updated});
-  } catch (error) {
-    res.status(500).json({ message: error.message });
+  } catch (e) {
+    if (e.errors.length > 0) {
+      res.status(500).json({ message: e.errors[0].message });
+    } else {
+      res.status(500).json({ message: e.message });
+    }
   }
 });
 
@@ -95,6 +103,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     await removedUser.save();
 
     res.json(removedUser);
+    // todo remove all users records...
+    await UserGroup.destroy({ where: { userId: req.params.id } });
+    await ProjectUser.destroy({ where: { userId: req.params.id } });
 
     // const removedUser = await User.remove({ id: req.params.id });
     // res.json(removedUser);
