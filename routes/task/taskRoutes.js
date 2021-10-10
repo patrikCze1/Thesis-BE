@@ -28,6 +28,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
           model: User,
           as: "creator",
         },
+        { model: User, as: "solver" },
       ],
     });
     res.json({ success: true, tasks });
@@ -60,7 +61,6 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       notifications[i].seen = true;
       await notification.save();
     }
-
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
     return;
@@ -73,7 +73,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         projectId: req.params.projectId,
       },
       include: [
-        { model: TaskAttachment, as: 'attachments' },
+        { model: TaskAttachment, as: "attachments" },
         { model: Task, as: "parentTask" },
         { model: User, as: "creator" },
         { model: User, as: "solver" },
@@ -85,7 +85,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             { model: TaskCommentAttachment, as: "commentAttachments" },
           ],
         },
-        { model: TaskCheck, as: 'checks' },
+        { model: TaskCheck, as: "checks" },
       ],
     });
 
@@ -163,7 +163,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     let task = await Task.findByPk(req.params.id);
     const user = getUser(req, res);
-    const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
+    const permission =
+      task.createdById == user.id
+        ? ac.can(user.role).updateOwn("task")
+        : ac.can(user.role).updateAny("task");
     if (!permission.granted) {
       res.status(403).json({ success: false });
       return;
@@ -210,14 +213,17 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   try {
     const task = await Task.findByPk(req.params.id);
     const user = getUser(req, res);
-    const permission = task.createdById == user.id ? ac.can(user.role).deleteOwn("task") : ac.can(user.role).deleteAny("task");
+    const permission =
+      task.createdById == user.id
+        ? ac.can(user.role).deleteOwn("task")
+        : ac.can(user.role).deleteAny("task");
     if (!permission.granted) {
       res.status(403).json({ success: false });
       return;
     }
 
-    await task.destroy()
-    res.json({ success: true, message: 'Úkol odstraněn'});
+    await task.destroy();
+    res.json({ success: true, message: "Úkol odstraněn" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

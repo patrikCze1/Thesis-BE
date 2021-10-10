@@ -10,20 +10,17 @@ const generateToken = (user) => {
 };
 
 const generateRefreshToken = (user) => {
-  const token = jwt.sign(
-    { user }, 
-    process.env.REFRESH_TOKEN, 
-    {
-      expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
+  const token = jwt.sign({ user }, process.env.REFRESH_TOKEN, {
+    expiresIn: parseInt(process.env.REFRESH_TOKEN_EXPIRATION),
   });
   refreshTokens[user.id] = token;
   return token;
 };
 
 const authenticateToken = function (req, res, next) {
-  const token = req.header("auth-token"); //req => req.cookies.token
+  const token = req.cookies["Auth-Token"];
 
-  if (token == null) return res.sendStatus(401);
+  if (!token) return res.sendStatus(401);
 
   try {
     jwt.verify(token, process.env.TOKEN_SECRET);
@@ -38,6 +35,7 @@ const decodeToken = (token) => {
 };
 
 const isRefreshTokenValid = (userId, token) => {
+  //todo
   if (userId in refreshTokens && refreshTokens[userId] == token) {
     return true;
   }
@@ -46,8 +44,8 @@ const isRefreshTokenValid = (userId, token) => {
 
 const getUserToken = (req, res) => {
   try {
-    const token = req.header("auth-token");
-    if (token == null) return res.sendStatus(401);
+    const token = req.cookies["Auth-Token"];
+    if (!token) return res.sendStatus(401);
 
     const data = jwt.decode(token, process.env.TOKEN_SECRET);
     return data;

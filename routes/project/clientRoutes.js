@@ -18,14 +18,14 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 
   try {
-    const clients = await Client.findAll({
+    const clients = await Client.findAndCountAll({
       where: {
         name: {
             [Op.like]: req.query.name ? `%${req.query.name}%` : '%',
         }
       },
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 0,
+      offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [
         [
           req.query.orderBy ? req.query.orderBy : "name",

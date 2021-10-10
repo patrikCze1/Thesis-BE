@@ -44,3 +44,11 @@ exports.findByUser = async (user, filter) => {
   });
 };
 
+exports.findBySearch = async (user, query) => {
+  return await Project.findAll({
+    where: {
+      [Op.or]: [{ "$User.id$": user.id }, { "$group->groupUser.id$": user.id }],
+      [Op.like]: query,
+    },
+  });
+};

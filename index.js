@@ -2,10 +2,12 @@ const express = require("express");
 require("dotenv/config");
 const app = express();
 const cors = require("cors");
-const csrf = require('csurf')
+const csrf = require("csurf");
+const cookieParser = require("cookie-parser");
 const sequelize = require("./models/index");
 const {
   projectRoutes,
+  projectStageRoutes,
   clientRoutes,
   taskRoutes,
   taskAttachmentRoutes,
@@ -19,20 +21,29 @@ const {
   timeTrackRoutes,
   notificationRoutes,
   meRoutes,
+  searchRoutes,
 } = require("./routes");
 
 sequelize.sync();
 
+if (process.env.NODE_ENV !== "production") {
+  app.use(
+    cors({
+      origin: "http://localhost:3000",
+      credentials: true,
+      optionsSuccessStatus: 200,
+    })
+  );
+}
+
 app.use(express.json()); // todo post routes
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // app.use(csrf({ cookie: true }));
 
-if (process.env.NODE_ENV !== "production") {
-  app.use(cors({ origin: "http://localhost:3000" }));
-}
-
 app.use("/api/projects", projectRoutes);
+app.use("/api/projects", projectStageRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/projects", taskRoutes);
 app.use("/api/tasks", taskChangeLogRoutes);
@@ -46,6 +57,7 @@ app.use("/api/todos", todoRoutes);
 app.use("/api/tracks", timeTrackRoutes);
 app.use("/", notificationRoutes);
 app.use("/api/me", meRoutes);
+app.use("/api/search", searchRoutes);
 
 app.get("/", (req, res) => {
   res.send("Api index");

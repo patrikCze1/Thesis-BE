@@ -37,19 +37,19 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   const adminPermission = ac.can(user.role).readAny("project");
-  
+
   try {
     if (!adminPermission.granted) {
       const userProjects = await projectRepo.findByUser(user, {});
-      const result = userProjects.find((project) => project.id == req.params.id);
-      
+      const result = userProjects.find(
+        (project) => project.id == req.params.id
+      );
+
       if (!result) {
-        res
-          .status(403)
-          .json({
-            success: false,
-            message: "Uživatel nemá přístup k tomuto projektu.",
-          });
+        res.status(403).json({
+          success: false,
+          message: "Uživatel nemá přístup k tomuto projektu.",
+        });
         return;
       }
     }
@@ -62,6 +62,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
         { model: Group, as: "groups" },
         { model: User, as: "users" },
       ],
+      order: [[{ model: ProjectStage, as: "projectStages" }, "order", "ASC"]],
     });
 
     if (!project) {
@@ -105,7 +106,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const newProject = await Project.create(data);
-    
+
     for (let groupId of req.body.groups) {
       await ProjectGroup.create({ projectId: newProject.id, groupId });
     }
@@ -123,7 +124,10 @@ router.post("/", authenticateToken, async (req, res) => {
 router.patch("/:id/complete", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
-    const status = project.status == projectState.STATUS_ACTIVE ? projectState.STATUS_COMPLETED : projectState.STATUS_COMPLETED;
+    const status =
+      project.status == projectState.STATUS_ACTIVE
+        ? projectState.STATUS_COMPLETED
+        : projectState.STATUS_COMPLETED;
     const updated = await project.update({
       status,
     });
@@ -155,7 +159,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     const data = {
       ...req.body,
       clientId: req.body.client,
-    }
+    };
 
     const updated = await project.update(data);
 

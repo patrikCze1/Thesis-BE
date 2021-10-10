@@ -1,11 +1,11 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
   const Task = sequelize.define("Task", {
     id: {
-      type: DataTypes.INTEGER, 
-      primaryKey: true, 
-      autoIncrement: true 
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     title: {
       type: DataTypes.STRING,
@@ -15,7 +15,7 @@ module.exports = (sequelize) => {
       type: DataTypes.TEXT,
     },
     priority: {
-      type: DataTypes.INTEGER,//?model?
+      type: DataTypes.INTEGER, //?model?
       allowNull: false,
       defaultValue: 1,
     },
@@ -33,7 +33,8 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    parentId: { // parent task
+    parentId: {
+      // parent task
       type: DataTypes.INTEGER,
     },
     projectStageId: {
@@ -41,31 +42,45 @@ module.exports = (sequelize) => {
     },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
     updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
-    }
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+    },
     //begin / hours
     //budget - time,price
     //muted, favourites...
     // todo proverit taskId
   });
 
-  Task.associate = function(models) {
-    Task.belongsTo(models.User, {foreignKey: 'createdById', as: 'creator'});
-    Task.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
-    Task.belongsTo(models.Project, {foreignKey: 'projectId', as: 'project'});
-    Task.belongsTo(models.Task, {foreignKey: 'parentId',  as: 'parentTask', onDelete: 'SET NULL' });
-    Task.belongsTo(models.ProjectStage, {foreignKey: 'projectStageId',  as: 'projectStage', onDelete: 'SET NULL' });
-    Task.hasMany(models.TaskAttachment, {foreignKey: 'taskId', as: 'attachments'});
-    Task.hasMany(models.TaskComment, {foreignKey: 'taskId', as: 'taskComments'});
-    Task.hasMany(models.TaskChangeLog, {foreignKey: 'taskId'});
-    Task.hasMany(models.TaskCheck, {foreignKey: 'taskId', as: 'checks'});
-    Task.hasMany(models.TimeTrack, {foreignKey: 'taskId'});
-    Task.hasMany(models.TaskNotification, {foreignKey: 'taskId'});
-  }
+  Task.associate = function (models) {
+    Task.belongsTo(models.User, { foreignKey: "createdById", as: "creator" });
+    Task.belongsTo(models.User, { foreignKey: "solverId", as: "solver" });
+    Task.belongsTo(models.Project, { foreignKey: "projectId", as: "project" });
+    Task.belongsTo(models.Task, {
+      foreignKey: "parentId",
+      as: "parentTask",
+      onDelete: "SET NULL",
+    });
+    Task.belongsTo(models.ProjectStage, {
+      foreignKey: "projectStageId",
+      as: "projectStage",
+      onDelete: "SET NULL",
+    });
+    Task.hasMany(models.TaskAttachment, {
+      foreignKey: "taskId",
+      as: "attachments",
+    });
+    Task.hasMany(models.TaskComment, {
+      foreignKey: "taskId",
+      as: "taskComments",
+    });
+    Task.hasMany(models.TaskChangeLog, { foreignKey: "taskId" });
+    Task.hasMany(models.TaskCheck, { foreignKey: "taskId", as: "checks" });
+    Task.hasMany(models.TimeTrack, { foreignKey: "taskId" });
+    Task.hasMany(models.TaskNotification, { foreignKey: "taskId" });
+  };
 
   return Task;
 };
