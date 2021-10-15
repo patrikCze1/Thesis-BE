@@ -47,8 +47,31 @@ exports.findByUser = async (user, filter) => {
 exports.findBySearch = async (user, query) => {
   return await Project.findAll({
     where: {
-      [Op.or]: [{ "$User.id$": user.id }, { "$group->groupUser.id$": user.id }],
-      [Op.like]: query,
+      [Op.or]: [
+        { "$users->ProjectUser.userId$": user.id },
+        { "$groups->groupUsers->UserGroup.userId$": user.id },
+        { createdById: user.id },
+      ],
+      name: {
+        [Op.like]: `%${query}%`,
+      },
     },
+    include: [
+      {
+        model: Group,
+        as: "groups",
+        attributes: [],
+        include: {
+          model: User,
+          as: "groupUsers",
+          attributes: [],
+        },
+      },
+      {
+        model: User,
+        as: "users",
+        attributes: [],
+      },
+    ],
   });
 };

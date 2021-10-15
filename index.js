@@ -1,9 +1,12 @@
 const express = require("express");
-require("dotenv/config");
 const app = express();
 const cors = require("cors");
-const csrf = require("csurf");
+const csrf = require("csurf"); //csrf??
 const cookieParser = require("cookie-parser");
+const i18next = require("i18next");
+const i18Middleware = require("i18next-http-middleware");
+
+require("dotenv/config");
 const sequelize = require("./models/index");
 const {
   projectRoutes,
@@ -26,6 +29,10 @@ const {
 
 sequelize.sync();
 
+i18next.use(i18Middleware.LanguageDetector).init({
+  preload: ["cs", "en"],
+});
+
 if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
@@ -36,12 +43,17 @@ if (process.env.NODE_ENV !== "production") {
   );
 }
 
+app.use(i18Middleware.handle(i18next)); // todo include locales json
+
 app.use(express.json()); // todo post routes
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // app.use(csrf({ cookie: true }));
 
+/**
+ * List of routes
+ */
 app.use("/api/projects", projectRoutes);
 app.use("/api/projects", projectStageRoutes);
 app.use("/api/clients", clientRoutes);

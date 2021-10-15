@@ -1,5 +1,8 @@
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const { Op } = require("sequelize");
+
 const { User } = require("../../models/modelHelper");
 const {
   generateToken,
@@ -7,19 +10,23 @@ const {
   isRefreshTokenValid,
   decodeToken,
 } = require("../../auth/auth");
-const bcrypt = require("bcrypt");
 
 router.post("/login", async (req, res) => {
-  if (!req.body.email || !req.body.password) {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
     res.status(400).json({
-      message: "Content can not be empty!",
+      message: req.t("error.bad_credentials"),
     });
     return;
   }
 
   try {
-    const user = await User.findOne({ where: { email: req.body.email } });
-    const match = await bcrypt.compare(req.body.password, user.password);
+    const user = await User.findOne({
+      where: { [Op.or]: [{ email: email }, { username: email }] },
+    });
+
+    const match = await bcrypt.compare(password, user.password);
 
     if (user && match) {
       // if ok return auth token

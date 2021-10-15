@@ -50,7 +50,7 @@ const getUserToken = (req, res) => {
     const data = jwt.decode(token, process.env.TOKEN_SECRET);
     return data;
   } catch (error) {
-    console.log(error);
+    console.log("getUserToken", error);
     return null;
   }
 };
@@ -60,7 +60,7 @@ const getUser = (req, res) => {
     const token = getUserToken(req, res);
     return token.user;
   } catch (error) {
-    console.log(error);
+    console.log("getUser", error);
     return null;
   }
 };
