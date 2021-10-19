@@ -11,7 +11,7 @@ module.exports = {
   authRoutes: require("./auth/authRoutes.js"),
   groupRoutes: require("./user/groupRoutes.js"),
   todoRoutes: require("./todo/todoRoutes.js"),
-  notificationRoutes: require("./notification/notificationRoutes.js"),
+  notificationRoutes: require("./notification/notification.routes.js"),
   clientRoutes: require("./project/clientRoutes"),
   meRoutes: require("./user/meRoutes"),
   searchRoutes: require("./search/search.routes"),

@@ -67,7 +67,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/todos", todoRoutes);
 app.use("/api/tracks", timeTrackRoutes);
-app.use("/", notificationRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/me", meRoutes);
 app.use("/api/search", searchRoutes);
 

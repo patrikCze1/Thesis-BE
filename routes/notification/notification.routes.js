@@ -4,16 +4,16 @@ const {
   Notification,
   TaskNotification,
   Task,
-  User
+  User,
 } = require("../../models/modelHelper");
-const { authenticateToken, getUser } = require("./../../auth/auth");
+const { authenticateToken, getUser } = require("../../auth/auth");
 
-router.get("/notifications/", authenticateToken, async (req, res) => {
+router.get("/", authenticateToken, async (req, res) => {
   try {
     const user = getUser(req, res);
     let where = {
       userId: user.id,
-    }
+    };
     if (req.query.seen != null) {
       where.seen = req.query.seen;
     }
@@ -25,11 +25,11 @@ router.get("/notifications/", authenticateToken, async (req, res) => {
         },
         {
           model: User,
-          as: 'creator',
-        }
+          as: "creator",
+        },
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 0,
+      offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [
         [
           req.query.orderBy ? req.query.orderBy : "createdAt",
@@ -44,7 +44,7 @@ router.get("/notifications/", authenticateToken, async (req, res) => {
   }
 });
 
-router.patch("/notifications/:id/seen", async (req, res) => {
+router.patch("/:id/seen", async (req, res) => {
   try {
     const user = getUser(req, res);
     const notification = await Notification.findByPk(req.params.id);
@@ -53,8 +53,8 @@ router.patch("/notifications/:id/seen", async (req, res) => {
       notification.seen = true;
       await notification.save();
     }
-    
-    res.json({ success: true, message: 'Success' });
+
+    res.json({ success: true, message: "Success" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
