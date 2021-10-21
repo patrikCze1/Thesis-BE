@@ -28,7 +28,7 @@ module.exports = (sequelize) => {
       allowNull: false,
       validate: {
         isEmail: {
-          msg: 'Email is not valid'
+          msg: "Email is not valid",
         },
       },
     },
@@ -63,6 +63,9 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: "user",
     },
+    // passwordResetHash: {
+    //   type: DataTypes.STRING(100),
+    // },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),

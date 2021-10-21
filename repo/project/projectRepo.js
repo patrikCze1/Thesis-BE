@@ -13,7 +13,8 @@ exports.findByUser = async (user, filter) => {
     where: {
       [Op.or]: [
         { "$creator.id$": user.id },
-        { "$groups->groupUsers.id$": user.id },
+        { "$groups->groupUsers.UserGroup.userId$": user.id },
+        { "$users->projectUser.userId$": user.id },
       ],
     },
     include: [
@@ -31,6 +32,11 @@ exports.findByUser = async (user, filter) => {
         model: User,
         as: "creator",
         attributes: [], // dont select users fields
+      },
+      {
+        model: User,
+        as: "users",
+        attributes: [],
       },
       {
         model: Client,
