@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
+const jwt = require("jsonwebtoken");
 
 const { User } = require("../../models/modelHelper");
 const {
@@ -56,16 +57,16 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/refresh", async (req, res) => {
-  const token = req.header("refresh-token");
-
+  const token = req.cookies["Refresh-Token"];
+  console.log("refresh req", token);
   if (token == null) return res.sendStatus(401);
 
   const data = decodeToken(token);
-  if (!data.user || !isRefreshTokenValid(data.user.id, token))
-    return res.sendStatus(400); // todo store in db
+  // if (!data.user || !isRefreshTokenValid(data.user.id, token))
+  //   return res.sendStatus(400); // todo store in db
 
   try {
-    // jwt.verify(token, process.env.REFRESH_TOKEN); //todo
+    jwt.verify(token, process.env.REFRESH_TOKEN); //todo
 
     const newToken = generateToken(data.user);
 

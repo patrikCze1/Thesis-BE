@@ -59,7 +59,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     // todo test
     for (let i = 0; i < notifications.length; i++) {
       notifications[i].seen = true;
-      await notification.save();
+      await notifications[i].save();
     }
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -70,7 +70,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     const task = await Task.findOne({
       where: {
         id: req.params.id,
-        projectId: req.params.projectId,
+        // projectId: req.params.projectId,
       },
       include: [
         { model: TaskAttachment, as: "attachments" },

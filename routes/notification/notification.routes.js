@@ -22,6 +22,7 @@ router.get("/", authenticateToken, async (req, res) => {
       include: [
         {
           model: TaskNotification,
+          include: [{ model: Task, as: "task" }],
         },
         {
           model: User,
@@ -44,17 +45,16 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
-router.patch("/:id/seen", async (req, res) => {
+router.patch("/:id/seen", authenticateToken, async (req, res) => {
   try {
-    const user = getUser(req, res);
     const notification = await Notification.findByPk(req.params.id);
 
-    if (!notification.seen) {
-      notification.seen = true;
-      await notification.save();
-    }
+    if (!notification.seen) notification.seen = true;
+    else notification.seen = false;
 
-    res.json({ success: true, message: "Success" });
+    await notification.save();
+
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
