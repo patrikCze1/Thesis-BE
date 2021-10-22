@@ -36,7 +36,7 @@ i18next.use(i18Middleware.LanguageDetector).init({
 if (process.env.NODE_ENV !== "production") {
   app.use(
     cors({
-      origin: "http://localhost:3000",
+      origin: process.env.FE_URI,
       credentials: true,
       optionsSuccessStatus: 200,
     })

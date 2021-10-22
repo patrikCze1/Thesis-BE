@@ -49,10 +49,6 @@ module.exports = (sequelize) => {
     sex: {
       type: DataTypes.STRING(1),
     },
-    shortName: {
-      type: DataTypes.STRING(3),
-      allowNull: false,
-    },
     active: {
       type: DataTypes.BOOLEAN,
       defaultValue: true,
@@ -63,9 +59,9 @@ module.exports = (sequelize) => {
       allowNull: false,
       defaultValue: "user",
     },
-    // passwordResetHash: {
-    //   type: DataTypes.STRING(100),
-    // },
+    passwordResetHash: {
+      type: DataTypes.STRING(255),
+    },
     createdAt: {
       type: DataTypes.DATE,
       defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),

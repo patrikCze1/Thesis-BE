@@ -4,10 +4,10 @@ const { User, Group } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const Email = require("email-templates");
+const path = require("path");
 
 const { authenticateToken, getUser } = require("../../auth/auth");
-const { transporter, APP_EMAIL, APP_NAME } = require("../../email/config");
+const { sendMail, APP_EMAIL, APP_NAME } = require("../../email/config");
 
 /**
  * List of users groups
@@ -71,7 +71,7 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
   }
 });
 
-router.post("/forgotten-password", async (req, res, next) => {
+router.post("/forgotten-password", async (req, res) => {
   const { email } = req.body;
 
   try {
@@ -79,57 +79,58 @@ router.post("/forgotten-password", async (req, res, next) => {
 
     if (!user) throw new Error("Email does not exist");
     else {
-      // const mailOptions = {
-      //   from: `"${APP_NAME}" <${APP_EMAIL}>`,
-      //   to: email,
-      //   subject: "Forgotten passoword",
-      //   html: "This is an email test using Mailtrap.io",
-      // };
-
       const token = jwt.sign({ email }, process.env.PASSWORD_SECRET, {
         expiresIn: parseInt(process.env.PASSWORD_SECRET_EXPIRATION),
       });
 
-      // user.passwordResetHash = token;
-      // await user.save();
+      user.passwordResetHash = token;
+      await user.save();
 
-      const emailObject = new Email({
-        message: {
-          to: email,
-          from: `${APP_NAME} <${APP_EMAIL}>`,
-          subject: "Forgotten passoword",
-        },
-        send: true,
-        transport: transporter,
-        views: {
-          root: "./../../email/user/",
-        },
-      });
+      try {
+        await sendMail(
+          user.email,
+          "Forgotten password",
+          "email/user/",
+          "reset-password",
+          { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}` }
+        );
+      } catch (error) {
+        throw new Error(error.message);
+      }
 
-      emailObject
-        .send({
-          template: "reset-password",
-          message: {
-            to: email,
-            from: `${APP_NAME} <${APP_EMAIL}>`,
-          },
-          locals: { link: `/obnova-hesla/?token=${token}` },
-        })
-        .then(console.log)
-        .catch(console.error);
-
-      // transporter.sendMail(mailOptions, (err, info) => {
-      //   if (err) {
-      //     console.log(err);
-      //     return next(err);
-      //   }
-
-      //   res.json({
-      //     message: "Email successfully sent.",
-      //   });
-      // });
       res.json({
         message: "Email successfully sent.",
+        success: true,
+      });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const { token, password } = req.body;
+
+  try {
+    const { email } = jwt.verify(token, process.env.PASSWORD_SECRET);
+    if (!email) throw new Error("Invalid token");
+
+    const user = await User.findOne({
+      where: { email, passwordResetHash: token },
+    });
+
+    if (!user) throw new Error("Invalid token");
+    else {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const data = {
+        password: hashedPassword,
+        passwordResetHash: null,
+      };
+      await user.update(data);
+
+      res.json({
+        message: "Password changed.",
+        success: true,
       });
     }
   } catch (error) {
