@@ -18,17 +18,15 @@ router.get("/", authenticateToken, async (req, res) => {
       where: {
         createdAt: {
           [Op.between]: [req.query.from, req.query.to],
-        }
+        },
       },
-      include: [
-        { model: User, as: "user" },
-      ],
+      include: [{ model: User, as: "user" }],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.page ? parseInt(req.query.page) : 0,
+      offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [
         [
-          req.query.orderBy ? req.query.orderBy : "name",
-          req.query.sort ? req.query.sort : "ASC",
+          req.query.orderBy ? req.query.orderBy : "beginAt",
+          req.query.sort ? req.query.sort : "DESC",
         ],
       ],
     });
@@ -38,6 +36,9 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 });
 
+/**
+ * Get all user tracks
+ */
 router.get("/me/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
@@ -45,12 +46,23 @@ router.get("/me/", authenticateToken, async (req, res) => {
     const tracks = await TimeTrack.findAll({
       where: {
         userId: user.id,
-        createdAt: {
-          [Op.between]: [req.query.from, req.query.to],
-        },
+        // createdAt: {
+        //   [Op.between]: [req.query.from, req.query.to],
+        // },
       },
+      limit: req.query.limit ? parseInt(req.query.limit) : null,
+      offset: req.query.offset ? parseInt(req.query.offset) : 0,
+      order: [
+        [
+          req.query.orderBy ? req.query.orderBy : "beginAt",
+          req.query.sort ? req.query.sort : "DESC",
+        ],
+      ],
     });
-    res.json({ success: true, tracks });
+    const activeTrack = await TimeTrack.findOne({
+      where: { userId: user.id, endAt: null },
+    });
+    res.json({ success: true, tracks, activeTrack });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -58,7 +70,8 @@ router.get("/me/", authenticateToken, async (req, res) => {
 
 // maybe findActive???
 
-router.post("/", authenticateToken, async (req, res) => { // create track
+router.post("/", authenticateToken, async (req, res) => {
+  // create track
   const requiredAttr = ["beginAt", "endAt"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -69,14 +82,15 @@ router.post("/", authenticateToken, async (req, res) => { // create track
   }
 
   const user = getUser(req, res);
+  const { name, beginAt, endAt, projectId } = req.body;
 
   const data = {
-    name: req.body.name,
-    beginAt: req.body.beginAt,
-    endAt: req.body.endAt,
+    name: name,
+    beginAt: beginAt,
+    endAt: endAt,
     userId: user.id,
-    projectId: req.body.projectId,
-    // taskId: req.body.taskId,
+    projectId: projectId,
+    // taskId: taskId,
   };
 
   try {
@@ -87,37 +101,34 @@ router.post("/", authenticateToken, async (req, res) => { // create track
   }
 });
 
-router.post("/start-timer/", authenticateToken, async (req, res) => { // create track
+router.post("/start/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
     const activeTracks = await TimeTrack.findAll({
       where: {
         endAt: {
-          [Op.is]: null, 
+          [Op.is]: null,
         },
         userId: user.id,
-      }
+      },
     });
 
     for (let i = 0; i < activeTracks.length; i++) {
       activeTracks[i].endAt = new Date();
       await activeTracks.save();
     }
-    
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
 
-  const data = {
-    name: req.body.name,
-    beginAt: new Date(),
-    userId: user.id,
-    projectId: req.body.projectId,
-    // taskId: req.params.taskId,
-  };
+    const { name, projectId } = req.body;
 
-  try {
+    const data = {
+      name: name,
+      beginAt: new Date(),
+      userId: user.id,
+      projectId: projectId,
+      // taskId: taskId,
+    };
+
     const track = await TimeTrack.create(data);
     res.send({ success: true, track });
   } catch (error) {
@@ -125,24 +136,23 @@ router.post("/start-timer/", authenticateToken, async (req, res) => { // create 
   }
 });
 
-router.post("/:id/stop-timer/", authenticateToken, async (req, res) => { // stop track
+router.post("/stop/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
     let track = await TimeTrack.findByPk(req.params.id);
-
+    console.log(track);
     if (track.userId != user.id) {
-      res
-          .status(403)
-          .json({
-            success: false,
-          });
-        return;
+      res.status(403).json({
+        success: false,
+      });
+      return;
     }
 
-    track.endAt = new Date();
+    const { name, projectId } = req.body;
 
-    await track.save();
+    track.endAt = new Date();
+    (track.projectId = projectId), (track.name = name), await track.save();
 
     res.send({ success: true, track });
   } catch (error) {
@@ -150,19 +160,18 @@ router.post("/:id/stop-timer/", authenticateToken, async (req, res) => { // stop
   }
 });
 
-router.patch("/:id", authenticateToken, async (req, res) => { // update trakc
+router.patch("/:id", authenticateToken, async (req, res) => {
+  // update trakc
   const user = getUser(req, res);
-  
+
   try {
     let track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res
-          .status(403)
-          .json({
-            success: false,
-          });
-        return;
+      res.status(403).json({
+        success: false,
+      });
+      return;
     }
 
     track.name = req.body.name;
@@ -186,12 +195,10 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res
-          .status(403)
-          .json({
-            success: false,
-          });
-        return;
+      res.status(403).json({
+        success: false,
+      });
+      return;
     }
 
     await track.destroy();

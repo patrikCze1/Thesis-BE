@@ -6,7 +6,7 @@ module.exports = {
   taskChangeLogRoutes: require("./task/taskChangeLogRoutes.js"),
   taskCommentRoutes: require("./task/taskCommentRoutes"),
   taskCheckRoutes: require("./task/taskCheckRoutes"),
-  timeTrackRoutes: require("./task/timeTrackRoutes.js"),
+  timeTrackRoutes: require("./task/timeTrack.routes.js"),
   userRoutes: require("./user/user.routes.js"),
   authRoutes: require("./auth/authRoutes.js"),
   groupRoutes: require("./user/group.routes.js"),
