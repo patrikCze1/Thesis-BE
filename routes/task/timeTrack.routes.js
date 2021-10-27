@@ -46,6 +46,9 @@ router.get("/me/", authenticateToken, async (req, res) => {
     const tracks = await TimeTrack.findAll({
       where: {
         userId: user.id,
+        endAt: {
+          [Op.ne]: null,
+        },
         // createdAt: {
         //   [Op.between]: [req.query.from, req.query.to],
         // },
