@@ -4,22 +4,29 @@ const { TimeTrack, User } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
+const { validator } = require("../../service");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).readAny("timeTrack");
-  if (!permission.granted) {
-    res.status(403).json({ success: false });
-    return;
+  // const permission = ac.can(user.role).readAny("timeTrack");
+  // if (!permission.granted) {
+  //   res.status(403).json({ success: false });
+  //   return;
+  // }
+
+  const { from, to, userId, projectId } = req.query;
+  const where = {};
+  if (from && to) {
+    where.createdAt = {
+      [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
+    };
   }
+  if (userId) where.userId = parseInt(userId);
+  if (projectId) where.projectId = parseInt(projectId);
 
   try {
     const tracks = await TimeTrack.findAll({
-      where: {
-        createdAt: {
-          [Op.between]: [req.query.from, req.query.to],
-        },
-      },
+      where: where,
       include: [{ model: User, as: "user" }],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
@@ -42,17 +49,22 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/me/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
+  const where = {
+    userId: user.id,
+    endAt: {
+      [Op.ne]: null,
+    },
+  };
+  console.log(req.query);
+  if (req.query.from && req.query.to) {
+    where.createdAt = {
+      [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
+    };
+  }
+  console.log(where);
   try {
     const tracks = await TimeTrack.findAll({
-      where: {
-        userId: user.id,
-        endAt: {
-          [Op.ne]: null,
-        },
-        // createdAt: {
-        //   [Op.between]: [req.query.from, req.query.to],
-        // },
-      },
+      where,
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [
@@ -89,8 +101,8 @@ router.post("/", authenticateToken, async (req, res) => {
 
   const data = {
     name: name,
-    beginAt: beginAt,
-    endAt: endAt,
+    beginAt: new Date(beginAt),
+    endAt: new Date(endAt),
     userId: user.id,
     projectId: projectId,
     // taskId: taskId,

@@ -8,7 +8,7 @@ module.exports = {
   taskCheckRoutes: require("./task/taskCheckRoutes"),
   timeTrackRoutes: require("./task/timeTrack.routes.js"),
   userRoutes: require("./user/user.routes.js"),
-  authRoutes: require("./auth/authRoutes.js"),
+  authRoutes: require("./auth/auth.routes.js"),
   groupRoutes: require("./user/group.routes.js"),
   todoRoutes: require("./todo/todo.routes.js"),
   notificationRoutes: require("./notification/notification.routes.js"),
