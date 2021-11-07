@@ -1,12 +1,21 @@
 const express = require("express");
+require("dotenv/config");
 const app = express();
+const server = require("http").createServer(app);
 const cors = require("cors");
 const csrf = require("csurf"); //csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
+const io = require("socket.io")(server, {
+  cors: {
+    origin: process.env.FE_URI,
+    methods: ["GET", "POST", "PATCH", "DELETE"],
+    // allowedHeaders: ["my-custom-header"],
+    // credentials: true,
+  },
+});
 
-require("dotenv/config");
 const sequelize = require("./models/index");
 const {
   projectRoutes,
@@ -51,6 +60,26 @@ app.use(cookieParser());
 
 // app.use(csrf({ cookie: true }));
 
+let interval;
+
+const getApiAndEmit = (socket) => {
+  const response = new Date();
+  // Emitting a new message. Will be consumed by the client
+  socket.emit("FromAPI", response);
+};
+
+io.on("connection", (socket) => {
+  console.log("New client connected");
+  if (interval) {
+    clearInterval(interval);
+  }
+  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  socket.on("disconnect", () => {
+    console.log("Client disconnected");
+    clearInterval(interval);
+  });
+});
+
 /**
  * List of routes
  */
@@ -76,7 +105,7 @@ app.get("/", (req, res) => {
 });
 
 const port = process.env.PORT || 8080;
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });
 
