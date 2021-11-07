@@ -19,10 +19,17 @@ const ac = require("./../../security");
 // check if user is in project?
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
+    const where = {};
+    const { projectId } = req.params;
+
+    if (projectId && projectId != "-1") where.ProjectId = projectId;
+
+    for (const key in req.query) {
+      if (req.query[key]) where[key] = req.query[key];
+    }
+
     const tasks = await Task.findAll({
-      where: {
-        ProjectId: req.params.projectId,
-      },
+      where,
       include: [
         {
           model: User,
