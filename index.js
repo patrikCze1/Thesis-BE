@@ -7,14 +7,7 @@ const csrf = require("csurf"); //csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
-const io = require("socket.io")(server, {
-  cors: {
-    origin: process.env.FE_URI,
-    methods: ["GET", "POST", "PATCH", "DELETE"],
-    // allowedHeaders: ["my-custom-header"],
-    // credentials: true,
-  },
-});
+const io = require("./service/io").init(server);
 
 const sequelize = require("./models/index");
 const {
@@ -35,6 +28,7 @@ const {
   meRoutes,
   searchRoutes,
 } = require("./routes");
+const { connect, disconnect } = require("./service/io");
 
 sequelize.sync();
 
@@ -60,23 +54,15 @@ app.use(cookieParser());
 
 // app.use(csrf({ cookie: true }));
 
-let interval;
-
-const getApiAndEmit = (socket) => {
-  const response = new Date();
-  // Emitting a new message. Will be consumed by the client
-  socket.emit("FromAPI", response);
-};
-
 io.on("connection", (socket) => {
-  console.log("New client connected");
-  if (interval) {
-    clearInterval(interval);
-  }
-  interval = setInterval(() => getApiAndEmit(socket), 1000);
+  console.log("New client connected", socket.id);
+  connect(socket.id, 1);
+  socket.join(1);
+
   socket.on("disconnect", () => {
     console.log("Client disconnected");
-    clearInterval(interval);
+    disconnect(socket.id);
+    socket.leave(1);
   });
 });
 
@@ -110,5 +96,5 @@ server.listen(port, () => {
 });
 
 //nodemon index.js
-//socket, pwa, graphql, check xss
+//pwa, graphql, check xss
 // todo role, turn off notifikace

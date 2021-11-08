@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   Notification,
   TaskNotification,
@@ -7,8 +8,11 @@ const {
   User,
 } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
+const { getIo } = require("../../service/io");
 
 router.get("/", authenticateToken, async (req, res) => {
+  const io = getIo();
+  console.log("io", io);
   try {
     const user = getUser(req, res);
     let where = {
@@ -38,6 +42,12 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       ],
     });
+
+    // for (const socket of io.sockets.sockets) {
+    //   console.log("socket", socket);
+    //   // socket.broadcast.to(socketid).emit('message', 'for your eyes only');
+    // }
+    io.to(1).emit("test", "test");
 
     res.json({ success: true, records });
   } catch (error) {
