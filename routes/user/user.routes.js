@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const { QueryTypes } = require("sequelize");
-const bcrypt = require("bcrypt");
 
-const sequelize = require("./../../models/index");
+const bcrypt = require("bcrypt");
 const { authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 
@@ -15,6 +13,7 @@ const {
   Group,
   Project,
 } = require("../../models/modelHelper");
+const { findUsersByProject } = require("../../repo/userRepo");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -39,23 +38,7 @@ router.get("/", authenticateToken, async (req, res) => {
  */
 router.get("/project/:id", authenticateToken, async (req, res) => {
   try {
-    const users = await sequelize.query(
-      `
-    SELECT DISTINCT User.* FROM Users AS User 
-    LEFT JOIN ProjectUsers AS pu ON User.id = pu.userId 
-    LEFT JOIN UserGroups AS ug ON User.id = ug.userId
-    LEFT JOIN Groups AS g ON g.id = ug.groupId
-    LEFT JOIN ProjectGroups AS pg ON g.id = pg.groupId
-    LEFT JOIN Projects AS p ON p.id = :projectId
-    WHERE User.active = true AND (pu.projectId = :projectId OR pg.projectId = :projectId OR p.createdById = User.id)
-    ORDER BY User.lastName ASC
-    `,
-      {
-        model: User,
-        replacements: { projectId: req.params.id },
-        type: QueryTypes.SELECT,
-      }
-    );
+    const users = await findUsersByProject(req.params.id);
 
     res.json({ users });
   } catch (error) {

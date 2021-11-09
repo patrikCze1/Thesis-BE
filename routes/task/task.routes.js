@@ -16,6 +16,8 @@ const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
 const ac = require("./../../security");
 const { getIo } = require("../../service/io");
+const { SOCKET_EMIT } = require("../../enum/enum");
+const { findUsersByProject } = require("../../repo/userRepo");
 
 // check if user is in project?
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
@@ -118,6 +120,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   const io = getIo();
+  const { projectId } = req.params;
   const permission = ac.can(user.role).createAny("task");
   if (!permission.granted) {
     res.status(403).json({ success: false });
@@ -134,7 +137,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   }
 
   let data = req.body;
-  data.projectId = req.params.projectId;
+  data.projectId = projectId;
   data.createdById = user.id;
 
   try {
@@ -145,23 +148,27 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       name: "Vytvoření úkolu",
     });
 
-    if (req.body.solverId) {
-      // send notification
-      // todo pokud jsem nevypl odesilani
-      const newNotif = await Notification.create({
-        message: `Přiřazení k úkolu: ${newTask.title}`,
-        userId: user.id,
-        type: notificationType.TYPE_TASK,
-      });
-      const notification = await TaskNotification.create({
-        taskId: newTask.id,
-        notificationId: newNotif.id,
-      });
+    // if (req.body.solverId) {
+    //   // send notification
+    //   // todo pokud jsem nevypl odesilani
+    //   const newNotif = await Notification.create({
+    //     message: `Přiřazení k úkolu: ${newTask.title}`,
+    //     userId: user.id,
+    //     type: notificationType.TYPE_TASK,
+    //   });
+    //   const notification = await TaskNotification.create({
+    //     taskId: newTask.id,
+    //     notificationId: newNotif.id,
+    //   });
 
-      io.to(req.body.solverId).emit("NOTIFICATION_NEW", { notification });
-    }
+    //   const projectUsers = await findUsersByProject(projectId);
+    //   console.log("projectUsers", projectUsers);
+    //   io.to(req.body.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+    //     notification,
+    //   });
+    // }
 
-    io.to(1).emit("TASK_NEW", { task: newTask });
+    io.to(1).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     res.json({ success: true, task: newTask });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -173,6 +180,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // const userId = req.params.userId;
   // await User.findByIdAndUpdate(userId, update);
   const io = getIo();
+  const { projectId } = req.params;
   try {
     let task = await Task.findByPk(req.params.id);
     const user = getUser(req, res);
@@ -209,7 +217,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             task.solverId,
             user.id
           );
-          io.to(task.solverId).emit("NOTIFICATION_NEW", {
+          io.to(task.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
             notification: newNotification,
           });
         }
@@ -218,8 +226,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       await task.save();
     }
 
-    // io.to(task.solverId).emit("TASK_EDIT", { task });
-    io.emit("TASK_EDIT", { task });
+    const projectUsers = await findUsersByProject(projectId);
+    for (const u of projectUsers) {
+      io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+    }
     res.json({ success: true, task });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

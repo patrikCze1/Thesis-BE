@@ -1,6 +1,7 @@
 const db = require("./../models");
 const User = db.User;
 const Op = db.Sequelize.Op;
+const { QueryTypes } = require("sequelize");
 const generateAccessToken = require("./../auth/auth");
 
 exports.create = async (req, res) => {
@@ -45,9 +46,34 @@ exports.findAll = (req, res) => {
     });
 };
 
-
 exports.findByEmailAndPassword = async (email, password) => {
-    const user = await User.findOne({where: {email: email, password: password }});
+  const user = await User.findOne({
+    where: { email: email, password: password },
+  });
 
-    return user;
-}
+  return user;
+};
+
+exports.findUsersByProject = async (id) => {
+  try {
+    return await db.query(
+      `
+    SELECT DISTINCT User.* FROM Users AS User 
+    LEFT JOIN ProjectUsers AS pu ON User.id = pu.userId 
+    LEFT JOIN UserGroups AS ug ON User.id = ug.userId
+    LEFT JOIN Groups AS g ON g.id = ug.groupId
+    LEFT JOIN ProjectGroups AS pg ON g.id = pg.groupId
+    LEFT JOIN Projects AS p ON p.id = :projectId
+    WHERE User.active = true AND (pu.projectId = :projectId OR pg.projectId = :projectId OR p.createdById = User.id)
+    ORDER BY User.lastName ASC
+    `,
+      {
+        model: db.User,
+        replacements: { projectId: id },
+        type: QueryTypes.SELECT,
+      }
+    );
+  } catch (error) {
+    throw error.message;
+  }
+};
