@@ -14,6 +14,10 @@ const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
 const ac = require("./../../security");
 const { projectState } = require("../../models/constantHelper");
+const { getIo } = require("../../service/io");
+const { SOCKET_EMIT } = require("../../enum/enum");
+
+const io = getIo();
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -21,10 +25,19 @@ router.get("/", authenticateToken, async (req, res) => {
 
   let projects;
   try {
+    const filter = req.query;
     if (adminPermission.granted) {
-      projects = await Project.findAll();
+      projects = await Project.findAll({
+        limit: filter.limit ? parseInt(filter.limit) : null,
+        offset: filter.offset ? parseInt(filter.offset) : 0,
+        order: [
+          [
+            filter.orderBy ? filter.orderBy : "name",
+            filter.sort ? filter.sort : "ASC",
+          ],
+        ],
+      });
     } else {
-      const filter = req.query;
       projects = await projectRepo.findByUser(user, filter);
     }
 
@@ -113,7 +126,10 @@ router.post("/", authenticateToken, async (req, res) => {
 
     for (let userId of req.body.users) {
       await ProjectUser.create({ projectId: newProject.id, userId });
+      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project: newProject });
     }
+
+    //todo notifikace, prirazeni k projektu
 
     res.send({ success: true, project: newProject });
   } catch (error) {
@@ -131,6 +147,8 @@ router.patch("/:id/complete", authenticateToken, async (req, res) => {
     const updated = await project.update({
       status,
     });
+
+    //todo notifikace, ukonceni projektu zakladateli
 
     res.json({ success: true, project: updated });
   } catch (error) {
@@ -172,7 +190,10 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     for (let userId of req.body.users) {
       await ProjectUser.create({ projectId: project.id, userId });
+      io.to(userId).emit(SOCKET_EMIT.PROJECT_EDIT, { project: updated });
     }
+
+    //todo notifikace, prirazeni/obrani projektu
 
     res.json({ success: true, project: updated });
   } catch (error) {
@@ -181,7 +202,6 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
-  // todo role
   const user = getUser(req, res);
 
   try {
@@ -203,6 +223,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
     await project.destroy(); // soft delete (paranoid)
 
+    io.emit(SOCKET_EMIT.PROJECT_DELETE, { id: req.params.id });
     res.json({ success: true, message: "Projekt smazán" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

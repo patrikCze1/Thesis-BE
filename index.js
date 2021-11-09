@@ -7,8 +7,8 @@ const csrf = require("csurf"); //csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
-const io = require("./service/io").init(server);
 
+const io = require("./service/io").init(server);
 const sequelize = require("./models/index");
 const {
   projectRoutes,
@@ -47,7 +47,6 @@ if (process.env.NODE_ENV !== "production") {
 }
 
 app.use(i18Middleware.handle(i18next)); // todo include locales json
-
 app.use(express.json()); // todo post routes
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -55,14 +54,19 @@ app.use(cookieParser());
 // app.use(csrf({ cookie: true }));
 
 io.on("connection", (socket) => {
-  console.log("New client connected", socket.id);
-  connect(socket.id, 1);
-  socket.join(1);
+  const userId = socket.handshake.query.userId;
+  if (userId && userId !== undefined) {
+    console.log("New client connected", socket.id);
+    connect(socket.id, parseInt(userId));
+    socket.join(parseInt(userId));
+
+    console.log("userId", typeof userId, userId);
+  } else disconnect(socket.id);
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     disconnect(socket.id);
-    socket.leave(1);
+    // socket.leave(1);
   });
 });
 
@@ -86,15 +90,9 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/me", meRoutes);
 app.use("/api/search", searchRoutes);
 
-app.get("/", (req, res) => {
-  res.send("Api index");
-});
-
 const port = process.env.PORT || 8080;
 server.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });
 
-//nodemon index.js
-//pwa, graphql, check xss
-// todo role, turn off notifikace
+// todo role, nastaveni notifikaci, notifikace, socket, xss, cors, save date as utc

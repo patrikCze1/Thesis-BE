@@ -12,7 +12,7 @@ const { getIo } = require("../../service/io");
 
 router.get("/", authenticateToken, async (req, res) => {
   const io = getIo();
-  console.log("io", io);
+  // console.log("io", io);
   try {
     const user = getUser(req, res);
     let where = {

@@ -82,5 +82,13 @@ exports.findBySearch = async (user, query) => {
         attributes: [],
       },
     ],
+    limit: filter.limit ? parseInt(filter.limit) : null,
+    offset: filter.offset ? parseInt(filter.offset) : 0,
+    order: [
+      [
+        filter.orderBy ? filter.orderBy : "name",
+        filter.sort ? filter.sort : "ASC",
+      ],
+    ],
   });
 };
