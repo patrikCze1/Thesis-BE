@@ -11,7 +11,6 @@ const {
   TaskCheck,
   TaskChangeLog,
 } = require("../../models/modelHelper");
-const { notificationType } = require("./../../models/constantHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
 const ac = require("./../../security");

@@ -1,4 +1,4 @@
-const { notificationType } = require("./../../models/constantHelper");
+const { NOTIFICATION_TYPE } = require("../../enum/enum");
 const {
   Notification,
   TaskNotification,
@@ -20,7 +20,7 @@ const createTaskNotification = async (
   const newNotif = await Notification.create({
     message,
     userId: receiverId,
-    type: notificationType.TYPE_TASK,
+    type: NOTIFICATION_TYPE.TYPE_TASK,
     createdById,
   });
   await TaskNotification.create({

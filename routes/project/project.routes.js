@@ -13,7 +13,6 @@ const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
 const ac = require("./../../security");
-const { projectState } = require("../../models/constantHelper");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT } = require("../../enum/enum");
 
@@ -41,7 +40,7 @@ router.get("/", authenticateToken, async (req, res) => {
       projects = await projectRepo.findByUser(user, filter);
     }
 
-    res.json({ success: true, projects });
+    res.json({ projects });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -83,7 +82,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    res.json({ success: true, project });
+    res.json({ project });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -131,26 +130,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
     //todo notifikace, prirazeni k projektu
 
-    res.send({ success: true, project: newProject });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-router.patch("/:id/complete", authenticateToken, async (req, res) => {
-  try {
-    const project = await Project.findByPk(req.params.id);
-    const status =
-      project.status == projectState.STATUS_ACTIVE
-        ? projectState.STATUS_COMPLETED
-        : projectState.STATUS_COMPLETED;
-    const updated = await project.update({
-      status,
-    });
-
-    //todo notifikace, ukonceni projektu zakladateli
-
-    res.json({ success: true, project: updated });
+    res.json({ project: newProject });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -161,7 +141,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
     if (!project) {
-      res.status(404).json({ success: false, message: "Projekt neexistuje" });
+      res.status(404).json({ message: "Projekt neexistuje" });
       return;
     }
 
@@ -181,11 +161,21 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     const updated = await project.update(data);
 
+    // const project = await Project.findByPk(req.params.id);
+    // const status =
+    //   project.status == projectState.STATUS_ACTIVE
+    //     ? projectState.STATUS_COMPLETED
+    //     : projectState.STATUS_COMPLETED;
+    // const updated = await project.update({
+    //   status,
+    // });
+
     await ProjectGroup.destroy({ where: { projectId: project.id } });
     await ProjectUser.destroy({ where: { projectId: project.id } });
 
     for (let groupId of req.body.groups) {
       await ProjectGroup.create({ projectId: project.id, groupId });
+      //todo socket
     }
 
     for (let userId of req.body.users) {
@@ -195,9 +185,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     //todo notifikace, prirazeni/obrani projektu
 
-    res.json({ success: true, project: updated });
+    res.json({ project: updated });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -207,7 +197,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
     if (!project) {
-      res.status(404).json({ success: false, message: "Projekt neexistuje" });
+      res.status(404).json({ message: "Projekt neexistuje" });
       return;
     }
 
@@ -224,9 +214,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     await project.destroy(); // soft delete (paranoid)
 
     io.emit(SOCKET_EMIT.PROJECT_DELETE, { id: req.params.id });
-    res.json({ success: true, message: "Projekt smazán" });
+    res.json({ message: "Projekt smazán" });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
