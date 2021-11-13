@@ -1,8 +1,13 @@
 const express = require("express");
 const router = express.Router();
+
 const { Project, ProjectStage } = require("../../models/modelHelper");
 const { authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
+const { SOCKET_EMIT } = require("../../enum/enum");
+const { getIo } = require("../../service/io");
+
+const io = getIo();
 
 router.post("/:projectId/stages", authenticateToken, async (req, res) => {
   const requiredAttr = ["name"];
@@ -23,8 +28,8 @@ router.post("/:projectId/stages", authenticateToken, async (req, res) => {
 
   try {
     const stage = await ProjectStage.create(data);
-
-    res.send({ success: true, stage });
+    io.emit(SOCKET_EMIT.PROJECT_STAGE_NEW, { stage });
+    res.json({ stage });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
@@ -33,21 +38,26 @@ router.post("/:projectId/stages", authenticateToken, async (req, res) => {
 router.patch("/:projectId/stages", authenticateToken, async (req, res) => {
   try {
     const { stages } = req.body;
-    console.log(stages);
 
     for (const stage of stages) {
       await ProjectStage.update(stage, { where: { id: stage.id } });
     }
-    res.send({ success: true });
+    io.emit(SOCKET_EMIT.PROJECT_STAGE_EDIT, {
+      projectId: req.params.projectId,
+      stages,
+    });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 });
 
 router.delete("/stages/:id", authenticateToken, async (req, res) => {
+  const { id } = req.params;
   try {
-    await ProjectStage.destroy({ where: { id: req.params.id } });
+    await ProjectStage.destroy({ where: { id } });
 
+    io.emit(SOCKET_EMIT.PROJECT_STAGE_DELETE, { id });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

@@ -62,7 +62,7 @@ io.on("connection", (socket) => {
 
     console.log("userId", typeof userId, userId);
   } else disconnect(socket.id);
-
+  console.log("rooms", io.sockets.adapter.rooms);
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     disconnect(socket.id);

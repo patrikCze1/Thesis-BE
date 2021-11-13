@@ -27,6 +27,11 @@ router.get("/", authenticateToken, async (req, res) => {
     const filter = req.query;
     if (adminPermission.granted) {
       projects = await Project.findAll({
+        include: [
+          {
+            model: Client,
+          },
+        ],
         limit: filter.limit ? parseInt(filter.limit) : null,
         offset: filter.offset ? parseInt(filter.offset) : 0,
         order: [

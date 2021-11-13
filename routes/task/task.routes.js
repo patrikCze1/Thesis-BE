@@ -96,6 +96,9 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         },
         { model: TaskCheck, as: "checks" },
       ],
+      order: [
+        [{ model: TaskComment, as: "taskComments" }, "createdAt", "DESC"],
+      ],
     });
 
     if (task) {
@@ -167,7 +170,11 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     //   });
     // }
 
-    io.to(1).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+    const projectUsers = await findUsersByProject(projectId);
+    for (const u of projectUsers) {
+      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+    }
+
     res.json({ success: true, task: newTask });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -208,15 +215,19 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         if (
           field === "solverId" &&
           task.solverId != null &&
-          user.id !== task.solverId
+          user.id != task.solverId
         ) {
-          const newNotification = notificationService.createTaskNotification(
-            task.id,
-            `Přiřazení k úkolu: ${task.title}`,
-            task.solverId,
-            user.id
-          );
-          io.to(task.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+          const newNotification =
+            await notificationService.createTaskNotification(
+              task.id,
+              `Přiřazení k úkolu: ${task.title}`,
+              task.solverId,
+              user.id
+            );
+          newNotification.setDataValue("creator", user);
+          newNotification.setDataValue("createdAt", new Date());
+          newNotification.setDataValue("TaskNotification", { task });
+          io.to(parseInt(task.solverId)).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
             notification: newNotification,
           });
         }
@@ -225,10 +236,16 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       await task.save();
     }
 
+    if (task.solverId) {
+      const solver = await User.findByPk(parseInt(task.solverId));
+      task.setDataValue("solver", solver);
+    }
+
     const projectUsers = await findUsersByProject(projectId);
     for (const u of projectUsers) {
       io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
     }
+
     res.json({ success: true, task });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
