@@ -121,9 +121,10 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   //nemazat jen deaktivovat
+  console.log(req.params.id);
   try {
     let removedUser = await User.findByPk(req.params.id);
-
+    console.log("removedUser", removedUser);
     removedUser.active = false;
     await removedUser.save();
 
@@ -133,7 +134,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     await ProjectUser.destroy({ where: { userId: req.params.id } });
 
     // const removedUser = await User.remove({ id: req.params.id });
-    // res.json(removedUser);
+    res.json();
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

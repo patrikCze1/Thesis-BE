@@ -70,6 +70,17 @@ router.patch("/:id/seen", authenticateToken, async (req, res) => {
   }
 });
 
+router.patch("/see-all", authenticateToken, async (req, res) => {
+  try {
+    const user = getUser(req, res);
+    await Notification.update({ seen: true }, { where: { userId: user.id } });
+
+    res.json();
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // router.delete("/users/:userId/notifications/:id", async (req, res) => {
 //   try {
 //     const removedRecord = await Notification.remove({ id: req.params.id });
