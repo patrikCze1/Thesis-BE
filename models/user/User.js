@@ -54,10 +54,10 @@ module.exports = (sequelize) => {
       defaultValue: true,
       allowNull: false,
     },
-    role: {
-      type: DataTypes.STRING(10),
+    roles: {
+      type: DataTypes.JSON,
       allowNull: false,
-      defaultValue: "user",
+      defaultValue: '["user"]',
     },
     passwordResetHash: {
       type: DataTypes.STRING(255),
