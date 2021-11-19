@@ -1,76 +1,77 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const User = sequelize.define("User", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
-    },
-    username: {
-      type: DataTypes.STRING(20),
-      unique: {
-        args: true,
-        msg: "This username is already taken.",
+  const User = sequelize.define(
+    "User",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
-      allowNull: false,
-    },
-    password: {
-      type: DataTypes.STRING(100),
-      allowNull: false,
-    },
-    email: {
-      type: DataTypes.STRING(50),
-      unique: {
-        args: true,
-        msg: "This email is already taken.",
+      username: {
+        type: DataTypes.STRING(20),
+        unique: {
+          args: true,
+          msg: "This username is already taken.",
+        },
+        allowNull: false,
       },
-      allowNull: false,
-      validate: {
-        isEmail: {
-          msg: "Email is not valid",
+      password: {
+        type: DataTypes.STRING(100),
+        allowNull: false,
+      },
+      email: {
+        type: DataTypes.STRING(50),
+        unique: {
+          args: true,
+          msg: "This email is already taken.",
+        },
+        allowNull: false,
+        validate: {
+          isEmail: {
+            msg: "Email is not valid",
+          },
         },
       },
+      phone: {
+        type: DataTypes.STRING(16),
+      },
+      firstName: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+      },
+      lastName: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+      },
+      position: {
+        type: DataTypes.STRING(50),
+      },
+      sex: {
+        type: DataTypes.STRING(1),
+      },
+      roles: {
+        type: DataTypes.JSON,
+        allowNull: false,
+        defaultValue: '["user"]',
+      },
+      passwordResetHash: {
+        type: DataTypes.STRING(255),
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      },
     },
-    phone: {
-      type: DataTypes.STRING(16),
-    },
-    firstName: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    lastName: {
-      type: DataTypes.STRING(20),
-      allowNull: false,
-    },
-    position: {
-      type: DataTypes.STRING(50),
-    },
-    sex: {
-      type: DataTypes.STRING(1),
-    },
-    active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
-      allowNull: false,
-    },
-    roles: {
-      type: DataTypes.JSON,
-      allowNull: false,
-      defaultValue: '["user"]',
-    },
-    passwordResetHash: {
-      type: DataTypes.STRING(255),
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-    },
-  });
+    {
+      paranoid: true,
+    }
+  );
 
   User.associate = function (models) {
     User.hasMany(models.Task, { foreignKey: "createdById", as: "creator" });

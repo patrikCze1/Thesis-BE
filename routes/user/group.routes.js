@@ -4,9 +4,15 @@ const { Group, User, UserGroup } = require("../../models/modelHelper");
 const { authenticateToken } = require("../../auth/auth");
 
 router.get("/", authenticateToken, async (req, res) => {
+  const where = {};
+
+  for (const key in req.query) {
+    if (req.query[key]) where[key] = req.query[key];
+  }
+
   try {
-    const groups = await Group.findAll();
-    res.send({ groups });
+    const groups = await Group.findAll(where);
+    res.json({ groups });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -16,13 +22,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
   try {
     const group = await Group.findByPk(req.params.id, {
       include: [
-        { 
-          model: User, 
-          as: 'groupUsers' 
+        {
+          model: User,
+          as: "groupUsers",
         },
       ],
     });
-    res.send({ group });
+    res.json({ group });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -30,7 +36,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 router.post("/", authenticateToken, async (req, res) => {
   if (!req.body.name) {
-    res.status(400).send({
+    res.status(400).json({
       message: "name is required",
     });
     return;
@@ -42,9 +48,9 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const newGroup = await Group.create(data);
-    newGroup.setDataValue('groupUsers', []);
-    newGroup.setDataValue('createdAt', new Date());
-    res.send({ group: newGroup });
+    newGroup.setDataValue("groupUsers", []);
+    newGroup.setDataValue("createdAt", new Date());
+    res.json({ group: newGroup });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -56,7 +62,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     const data = {
       ...req.body,
-    }
+    };
 
     const updated = await group.update(data);
 
@@ -65,7 +71,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       await UserGroup.create({ groupId: req.params.id, userId });
     }
 
-    res.send({group: updated});
+    res.json({ group: updated });
   } catch (e) {
     if (e.errors.length > 0) {
       res.status(500).json({ message: e.errors[0].message });

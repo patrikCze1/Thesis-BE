@@ -78,7 +78,7 @@ router.post("/", authenticateToken, async (req, res) => {
     });
     return;
   }
-
+  //todo set role if role is empty
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const data = req.body;
@@ -120,15 +120,12 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
-  //nemazat jen deaktivovat
-  console.log(req.params.id);
   try {
-    let removedUser = await User.findByPk(req.params.id);
+    const removedUser = await User.findByPk(req.params.id);
     console.log("removedUser", removedUser);
-    removedUser.active = false;
-    await removedUser.save();
 
-    res.json(removedUser);
+    await removedUser.destroy();
+
     // todo remove all users records...
     await UserGroup.destroy({ where: { userId: req.params.id } });
     await ProjectUser.destroy({ where: { userId: req.params.id } });
