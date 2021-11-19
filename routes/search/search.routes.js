@@ -53,9 +53,9 @@ router.get("/", authenticateToken, async (req, res) => {
       ],
     });
     // console.log(tasks);
-    res.json({ success: true, tasks, projects });
+    res.json({ tasks, projects });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 module.exports = router;

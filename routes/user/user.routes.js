@@ -130,7 +130,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     await UserGroup.destroy({ where: { userId: req.params.id } });
     await ProjectUser.destroy({ where: { userId: req.params.id } });
 
-    // const removedUser = await User.remove({ id: req.params.id });
     res.json();
   } catch (error) {
     res.status(500).json({ message: error.message });

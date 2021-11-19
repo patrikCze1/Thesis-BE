@@ -40,9 +40,9 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         { model: User, as: "solver" },
       ],
     });
-    res.json({ success: true, tasks });
+    res.json({ tasks });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -71,7 +71,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       await notifications[i].save();
     }
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
     return;
   }
 
@@ -113,9 +113,9 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    res.json({ success: true, task });
+    res.json({ task });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -125,14 +125,14 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const { projectId } = req.params;
   const permission = ac.can(user.role).createAny("task");
   if (!permission.granted) {
-    res.status(403).json({ success: false });
+    res.status(403).json();
     return;
   }
 
   const requiredAttr = ["title", "description"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
-    res.status(400).send({
+    res.status(400).json({
       message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
     });
     return;
@@ -175,9 +175,9 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
 
-    res.json({ success: true, task: newTask });
+    res.json({ task: newTask });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -195,7 +195,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         ? ac.can(user.role).updateOwn("task")
         : ac.can(user.role).updateAny("task");
     if (!permission.granted) {
-      res.status(403).json({ success: false });
+      res.status(403).json();
       return;
     }
 
@@ -246,9 +246,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
     }
 
-    res.json({ success: true, task });
+    res.json({ task });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -263,15 +263,15 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         ? ac.can(user.role).deleteOwn("task")
         : ac.can(user.role).deleteAny("task");
     if (!permission.granted) {
-      res.status(403).json({ success: false });
+      res.status(403).json();
       return;
     }
 
     await task.destroy();
     io.emit("TASK_DELETE", { id: req.params.id });
-    res.json({ success: true, message: "Úkol odstraněn" });
+    res.json({ message: "Úkol odstraněn" });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

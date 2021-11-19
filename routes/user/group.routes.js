@@ -4,14 +4,23 @@ const { Group, User, UserGroup } = require("../../models/modelHelper");
 const { authenticateToken } = require("../../auth/auth");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const where = {};
+  const where = { "$groupUsers.UserGroup.userId$": req.query.userId };
 
-  for (const key in req.query) {
-    if (req.query[key]) where[key] = req.query[key];
-  }
+  // for (const key in req.query) {
+  //   if (req.query[key]) where[key] = req.query[key];
+  // }
 
   try {
-    const groups = await Group.findAll(where);
+    const groups = await Group.findAll({
+      where,
+      include: [
+        {
+          model: User,
+          as: "groupUsers",
+          // attributes: [],
+        },
+      ],
+    });
     res.json({ groups });
   } catch (error) {
     res.status(500).json({ message: error.message });

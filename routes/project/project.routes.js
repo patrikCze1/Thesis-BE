@@ -47,7 +47,7 @@ router.get("/", authenticateToken, async (req, res) => {
 
     res.json({ projects });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -83,13 +83,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
     });
 
     if (!project) {
-      res.status(404).json({ success: false, message: "Projekt neexistuje" });
+      res.status(404).json({ message: "Projekt neexistuje" });
       return;
     }
 
     res.json({ project });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -99,15 +99,14 @@ router.post("/", authenticateToken, async (req, res) => {
   const permission = ac.can(user.role).createAny("project");
 
   if (!permission.granted) {
-    res.status(403).json({ success: false });
+    res.status(403).json();
     return;
   }
 
   const requiredAttr = ["name"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
-    res.status(400).send({
-      success: false,
+    res.status(400).json({
       message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
     });
     return;
@@ -137,7 +136,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
     res.json({ project: newProject });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
