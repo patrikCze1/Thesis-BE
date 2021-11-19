@@ -58,7 +58,9 @@ const getUserToken = (req, res) => {
 const getUser = (req, res) => {
   try {
     const token = getUserToken(req, res);
-    return token.user;
+    const { user } = token;
+
+    return user;
   } catch (error) {
     console.log("getUser", error);
     return null;

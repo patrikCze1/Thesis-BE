@@ -64,7 +64,7 @@ exports.findUsersByProject = async (id) => {
     LEFT JOIN Groups AS g ON g.id = ug.groupId
     LEFT JOIN ProjectGroups AS pg ON g.id = pg.groupId
     LEFT JOIN Projects AS p ON p.id = :projectId
-    WHERE User.active = true AND (pu.projectId = :projectId OR pg.projectId = :projectId OR p.createdById = User.id)
+    WHERE User.deletedAt IS NULL AND (pu.projectId = :projectId OR pg.projectId = :projectId OR p.createdById = User.id)
     ORDER BY User.lastName ASC
     `,
       {

@@ -23,3 +23,9 @@ exports.NOTIFICATION_TYPE = Object.freeze({
   TYPE_TASK: 1,
   TYPE_TASK_COMMENT: 2,
 });
+
+exports.ROLE = Object.freeze({
+  ADMIN: "admin",
+  USER: "user",
+  MANAGEMENT: "management",
+});

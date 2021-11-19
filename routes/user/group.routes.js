@@ -4,8 +4,10 @@ const { Group, User, UserGroup } = require("../../models/modelHelper");
 const { authenticateToken } = require("../../auth/auth");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const where = { "$groupUsers.UserGroup.userId$": req.query.userId };
+  const where = {};
 
+  if (req.query.userId)
+    where["$groupUsers.UserGroup.userId$"] = req.query.userId;
   // for (const key in req.query) {
   //   if (req.query[key]) where[key] = req.query[key];
   // }
@@ -17,7 +19,7 @@ router.get("/", authenticateToken, async (req, res) => {
         {
           model: User,
           as: "groupUsers",
-          // attributes: [],
+          attributes: [],
         },
       ],
     });

@@ -12,20 +12,18 @@ const {
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
-const ac = require("./../../security");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 
 const io = getIo();
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const adminPermission = ac.can(user.role).readAny("project");
 
   let projects;
   try {
     const filter = req.query;
-    if (adminPermission.granted) {
+    if (user.roles.includes(ROLE.ADMIN)) {
       projects = await Project.findAll({
         include: [
           {
@@ -53,10 +51,9 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const adminPermission = ac.can(user.role).readAny("project");
 
   try {
-    if (!adminPermission.granted) {
+    if (user.roles.includes(ROLE.ADMIN)) {
       const userProjects = await projectRepo.findByUser(user, {});
       const result = userProjects.find(
         (project) => project.id == req.params.id
@@ -96,9 +93,10 @@ router.get("/:id", authenticateToken, async (req, res) => {
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
-  const permission = ac.can(user.role).createAny("project");
-
-  if (!permission.granted) {
+  if (
+    !user.roles.includes(ROLE.ADMIN) &&
+    !user.roles.includes(ROLE.MANAGEMENT)
+  ) {
     res.status(403).json();
     return;
   }
@@ -149,12 +147,10 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    const permission =
-      project.createdById == user.id
-        ? ac.can(user.role).updateOwn("project")
-        : ac.can(user.role).updateAny("project");
-
-    if (!permission.granted) {
+    if (
+      !user.roles.includes(ROLE.ADMIN) &&
+      !user.roles.includes(ROLE.MANAGEMENT)
+    ) {
       res.status(403).json({ success: false });
       return;
     }
@@ -205,12 +201,10 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    const permission =
-      project.createdById == user.id
-        ? ac.can(user.role).deleteOwn("project")
-        : ac.can(user.role).deleteAny("project");
-
-    if (!permission.granted) {
+    if (
+      !user.roles.includes(ROLE.ADMIN) &&
+      !user.roles.includes(ROLE.MANAGEMENT)
+    ) {
       res.status(403).json({ success: false });
       return;
     }
