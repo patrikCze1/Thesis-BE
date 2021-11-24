@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
+
 const { Task, TaskCheck } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
-const ac = require("./../../security");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

@@ -2,14 +2,24 @@ const express = require("express");
 const router = express.Router();
 
 const { Project, ProjectStage } = require("../../models/modelHelper");
-const { authenticateToken } = require("../../auth/auth");
+const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
-const { SOCKET_EMIT } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { getIo } = require("../../service/io");
 
 const io = getIo();
 
 router.post("/:projectId/stages", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   const requiredAttr = ["name"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -36,6 +46,16 @@ router.post("/:projectId/stages", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:projectId/stages", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   try {
     const { stages } = req.body;
 
@@ -53,6 +73,16 @@ router.patch("/:projectId/stages", authenticateToken, async (req, res) => {
 });
 
 router.delete("/stages/:id", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   const { id } = req.params;
   try {
     await ProjectStage.destroy({ where: { id } });

@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const { Group, User, UserGroup } = require("../../models/modelHelper");
-const { authenticateToken } = require("../../auth/auth");
+const { authenticateToken, getUser } = require("../../auth/auth");
+const { ROLE } = require("../../enum/enum");
 
 router.get("/", authenticateToken, async (req, res) => {
   const where = {};
@@ -46,6 +47,16 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   if (!req.body.name) {
     res.status(400).json({
       message: "name is required",
@@ -68,6 +79,16 @@ router.post("/", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   try {
     const group = await Group.findByPk(req.params.id);
 
@@ -93,6 +114,16 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   try {
     await Group.remove({ id: req.params.id });
     res.json({ success: true });

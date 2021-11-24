@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const bcrypt = require("bcrypt");
-const { authenticateToken } = require("../../auth/auth");
+const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
 
 const {
@@ -14,6 +14,7 @@ const {
   Project,
 } = require("../../models/modelHelper");
 const { findUsersByProject } = require("../../repo/userRepo");
+const { ROLE } = require("../../enum/enum");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -70,6 +71,16 @@ router.get("/:userId/tracks", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   const requiredAttr = ["username", "email", "password"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -100,6 +111,16 @@ router.post("/", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   try {
     let user = await User.findByPk(req.params.id);
 
@@ -120,6 +141,16 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    return;
+  }
+
   try {
     const removedUser = await User.findByPk(req.params.id);
     console.log("removedUser", removedUser);
