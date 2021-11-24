@@ -7,12 +7,11 @@ const ac = require("./../../security");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).createAny("taskCheck");
 
-  if (!permission.granted) {
-    res.status(403).json({ success: false });
-    return;
-  }
+  // if (!permission.granted) {
+  //   res.status(403).json();
+  //   return;
+  // }
 
   const requiredAttr = ["title"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
@@ -29,7 +28,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const newRecord = await TaskCheck.create(data);
     res.send({ success: true, check: newRecord });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -50,27 +49,25 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ success: true, check: updated });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const check = await TaskCheck.findByPk(req.params.id);
+    const task = await Task.findByPk(check.taskId);
     const user = getUser(req, res);
-    const permission =
-      check.createdById == user.id
-        ? ac.can(user.role).deleteOwn("taskCheck")
-        : ac.can(user.role).deleteAny("taskCheck");
-    if (!permission.granted) {
-      res.status(403).json({ success: false });
+
+    if (!task.createdById !== user.id && !user.roles.includes(ROLE.ADMIN)) {
+      res.status(403).json();
       return;
     }
 
     await check.destroy();
-    res.json({ success: true });
+    res.json();
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

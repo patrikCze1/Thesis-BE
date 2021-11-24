@@ -1,19 +1,19 @@
 const express = require("express");
 const router = express.Router();
-const { Client, Project } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
+
+const { Client, Project } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
-const { validator } = require('../../service');
-const ac = require("./../../security");
+const { validator } = require("../../service");
+const { ROLE } = require("../../enum/enum");
 
 // only for admins
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).readAny("client");
 
-  if (!permission.granted) {
-    res.status(403).json({ success: false });
+  if (!user.roles.includes(ROLE.ADMIN)) {
+    res.status(403).json();
     return;
   }
 
@@ -21,8 +21,8 @@ router.get("/", authenticateToken, async (req, res) => {
     const clients = await Client.findAndCountAll({
       where: {
         name: {
-            [Op.like]: req.query.name ? `%${req.query.name}%` : '%',
-        }
+          [Op.like]: req.query.name ? `%${req.query.name}%` : "%",
+        },
       },
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
@@ -41,18 +41,15 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).readAny("client");
 
-  if (!permission.granted) {
+  if (!user.roles.includes(ROLE.ADMIN)) {
     res.status(403).json({ success: false });
     return;
   }
 
   try {
     const client = await Client.findByPk(req.params.id, {
-      include: [
-        { model: Project, as: 'projects' },
-      ],
+      include: [{ model: Project, as: "projects" }],
     });
 
     if (!client) {
@@ -68,18 +65,17 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).createAny("client");
 
-  if (!permission.granted) {
+  if (!user.roles.includes(ROLE.ADMIN)) {
     res.status(403).json({ success: false });
     return;
   }
 
-  const requiredAttr = ['name'];
+  const requiredAttr = ["name"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).send({
-      message: "Tyto pole jsou povinná: " + result.requiredFields.join(', '),
+      message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
     });
     return;
   }
@@ -96,9 +92,8 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).updateAny("client");
 
-  if (!permission.granted) {
+  if (!user.roles.includes(ROLE.ADMIN)) {
     res.status(403).json({ success: false });
     return;
   }
@@ -120,9 +115,8 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  const permission = ac.can(user.role).deleteAny("client");
 
-  if (!permission.granted) {
+  if (!user.roles.includes(ROLE.ADMIN)) {
     res.status(403).json({ success: false });
     return;
   }
@@ -131,7 +125,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const client = await Client.findByPk(req.params.id);
     await client.destroy();
 
-    res.json({ success: true, message: 'Success' });
+    res.json({ success: true, message: "Success" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

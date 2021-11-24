@@ -34,7 +34,7 @@ const upload = multer({ storage: storage });
 
 const ac = require("./../../security");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const io = getIo();
 
@@ -118,11 +118,8 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
     let taskComment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
-    const permission =
-      taskComment.userId == user.id
-        ? ac.can(user.role).updateOwn("taskComment")
-        : ac.can(user.role).updateAny("taskComment");
-    if (!permission.granted) {
+
+    if (!user.id !== taskComment.userId) {
       res.status(403).json();
       return;
     }
@@ -141,11 +138,8 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
     const comment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
-    const permission =
-      comment.userId == user.id
-        ? ac.can(user.role).deleteOwn("taskComment")
-        : ac.can(user.role).deleteAny("taskComment");
-    if (!permission.granted) {
+
+    if (!comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
       res.status(403).json();
       return;
     }
@@ -188,20 +182,17 @@ router.delete(
     try {
       const attachment = await TaskCommentAttachment.findByPk(req.params.id);
       const comment = await TaskComment.findByPk(rattachment.commentId);
-      const task = await Task.findByPk(req.params.taskId);
+      // const task = await Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
-      const permission =
-        comment.userId == user.id
-          ? ac.can(user.role).deleteOwn("taskComment")
-          : ac.can(user.role).deleteAny("taskComment");
-      if (!permission.granted && task.createdById != user.id) {
-        res.status(403).json({});
+
+      if (!comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
+        res.status(403).json();
         return;
       }
       fs.unlink(attachment.path, (error) => console.log(error));
       await attachment.destroy();
 
-      res.json({ message: "Success" });
+      res.json();
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

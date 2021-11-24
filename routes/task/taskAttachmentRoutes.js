@@ -11,6 +11,7 @@ const crypto = require("crypto");
 var path = require("path");
 const multer = require("multer");
 const fs = require("fs");
+const { ROLE } = require("../../enum/enum");
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = `public/uploads/task/${req.params.taskId}/`;
@@ -82,8 +83,12 @@ router.post(
     try {
       const task = await Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
-      const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
-      if (!permission.granted) {
+
+      if (
+        !user.roles.includes(ROLE.ADMIN) &&
+        !user.roles.includes(ROLE.MANAGEMENT) &&
+        task.createdById !== user.id
+      ) {
         res.status(403).json({ success: false });
         return;
       }
@@ -120,8 +125,11 @@ router.delete(
     try {
       const task = await Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
-      const permission = task.createdById == user.id ? ac.can(user.role).updateOwn("task") : ac.can(user.role).updateAny("task");
-      if (!permission.granted) {
+      if (
+        !user.roles.includes(ROLE.ADMIN) &&
+        !user.roles.includes(ROLE.MANAGEMENT) &&
+        task.createdById !== user.id
+      ) {
         res.status(403).json({ success: false });
         return;
       }

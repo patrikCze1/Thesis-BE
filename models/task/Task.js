@@ -36,7 +36,6 @@ module.exports = (sequelize) => {
         allowNull: false,
       },
       parentId: {
-        // parent task
         type: DataTypes.INTEGER,
       },
       projectStageId: {
