@@ -23,6 +23,7 @@ router.get("/", authenticateToken, async (req, res) => {
   let projects;
   try {
     const filter = req.query;
+    // only admin can see all projects
     if (user.roles.includes(ROLE.ADMIN)) {
       projects = await Project.findAll({
         include: [
@@ -53,7 +54,8 @@ router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    if (user.roles.includes(ROLE.ADMIN)) {
+    if (!user.roles.includes(ROLE.ADMIN)) {
+      // only admin can see all projects
       const userProjects = await projectRepo.findByUser(user, {});
       const result = userProjects.find(
         (project) => project.id == req.params.id
@@ -97,7 +99,7 @@ router.post("/", authenticateToken, async (req, res) => {
     !user.roles.includes(ROLE.ADMIN) &&
     !user.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json();
+    res.status(403).json({ message: "Nedostatečné oprávnění" });
     return;
   }
 
@@ -160,15 +162,6 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     };
 
     const updated = await project.update(data);
-
-    // const project = await Project.findByPk(req.params.id);
-    // const status =
-    //   project.status == projectState.STATUS_ACTIVE
-    //     ? projectState.STATUS_COMPLETED
-    //     : projectState.STATUS_COMPLETED;
-    // const updated = await project.update({
-    //   status,
-    // });
 
     await ProjectGroup.destroy({ where: { projectId: project.id } });
     await ProjectUser.destroy({ where: { projectId: project.id } });

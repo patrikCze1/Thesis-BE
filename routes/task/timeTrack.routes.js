@@ -21,6 +21,7 @@ router.get("/", authenticateToken, async (req, res) => {
       [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
     };
   }
+  console.log("where", where);
   if (userId) where.userId = parseInt(userId);
   if (projectId) where.projectId = parseInt(projectId);
 
@@ -37,9 +38,9 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       ],
     });
-    res.json({ success: true, tracks });
+    res.json({ tracks });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -55,13 +56,13 @@ router.get("/me/", authenticateToken, async (req, res) => {
       [Op.ne]: null,
     },
   };
-  console.log(req.query);
+
   if (req.query.from && req.query.to) {
     where.createdAt = {
       [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
     };
   }
-  console.log(where);
+
   try {
     const tracks = await TimeTrack.findAll({
       where,
@@ -77,9 +78,9 @@ router.get("/me/", authenticateToken, async (req, res) => {
     const activeTrack = await TimeTrack.findOne({
       where: { userId: user.id, endAt: null },
     });
-    res.json({ success: true, tracks, activeTrack });
+    res.json({ tracks, activeTrack });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -110,9 +111,9 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const track = await TimeTrack.create(data);
-    res.send({ success: true, track });
+    res.send({ track });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -145,9 +146,9 @@ router.post("/start/", authenticateToken, async (req, res) => {
     };
 
     const track = await TimeTrack.create(data);
-    res.send({ success: true, track });
+    res.send({ track });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -158,9 +159,7 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     let track = await TimeTrack.findByPk(req.params.id);
     console.log(track);
     if (track.userId != user.id) {
-      res.status(403).json({
-        success: false,
-      });
+      res.status(403).json({});
       return;
     }
 
@@ -169,9 +168,9 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     track.endAt = new Date();
     (track.projectId = projectId), (track.name = name), await track.save();
 
-    res.send({ success: true, track });
+    res.send({ track });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -183,9 +182,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     let track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res.status(403).json({
-        success: false,
-      });
+      res.status(403).json({});
       return;
     }
 
@@ -197,9 +194,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     await track.save();
 
-    res.json({ success: true, track });
+    res.json({ track });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -210,17 +207,15 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res.status(403).json({
-        success: false,
-      });
+      res.status(403).json({});
       return;
     }
 
     await track.destroy();
 
-    res.json({ success: true });
+    res.json();
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

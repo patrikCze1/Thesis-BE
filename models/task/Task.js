@@ -1,58 +1,69 @@
 const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const Task = sequelize.define("Task", {
-    id: {
-      type: DataTypes.INTEGER,
-      primaryKey: true,
-      autoIncrement: true,
+  const Task = sequelize.define(
+    "Task",
+    {
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+      },
+      title: {
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
+      description: {
+        type: DataTypes.TEXT,
+      },
+      priority: {
+        type: DataTypes.INTEGER, //?model?
+        allowNull: false,
+        defaultValue: 1,
+      },
+      deadline: {
+        type: DataTypes.DATE,
+      },
+      solverId: {
+        type: DataTypes.INTEGER,
+      },
+      createdById: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      projectId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      parentId: {
+        // parent task
+        type: DataTypes.INTEGER,
+      },
+      projectStageId: {
+        type: DataTypes.INTEGER,
+      },
+      isCompleted: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
+      },
+      //begin / hours
+      //budget - time,price
+      //muted, favourites...
+      // todo proverit taskId
     },
-    title: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },
-    description: {
-      type: DataTypes.TEXT,
-    },
-    priority: {
-      type: DataTypes.INTEGER, //?model?
-      allowNull: false,
-      defaultValue: 1,
-    },
-    deadline: {
-      type: DataTypes.DATE,
-    },
-    solverId: {
-      type: DataTypes.INTEGER,
-    },
-    createdById: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    projectId: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    parentId: {
-      // parent task
-      type: DataTypes.INTEGER,
-    },
-    projectStageId: {
-      type: DataTypes.INTEGER,
-    },
-    createdAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-    },
-    updatedAt: {
-      type: DataTypes.DATE,
-      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
-    },
-    //begin / hours
-    //budget - time,price
-    //muted, favourites...
-    // todo proverit taskId
-  });
+    {
+      paranoid: true,
+    }
+  );
 
   Task.associate = function (models) {
     Task.belongsTo(models.User, { foreignKey: "createdById", as: "creator" });

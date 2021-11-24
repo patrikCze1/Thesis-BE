@@ -3,8 +3,6 @@ const router = express.Router();
 const {
   Task,
   TaskAttachment,
-  Notification,
-  TaskNotification,
   User,
   TaskComment,
   TaskCommentAttachment,
@@ -13,12 +11,11 @@ const {
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
-const ac = require("./../../security");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
+const { getFullName } = require("../../service/user.service");
 
-// check if user is in project?
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const where = {};
@@ -79,7 +76,6 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     const task = await Task.findOne({
       where: {
         id: req.params.id,
-        // projectId: req.params.projectId,
       },
       include: [
         { model: TaskAttachment, as: "attachments" },
@@ -124,11 +120,6 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const io = getIo();
   const { projectId } = req.params;
 
-  // if () {
-  //   res.status(403).json();
-  //   return;
-  // }
-
   const requiredAttr = ["title", "description"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
@@ -169,22 +160,38 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   const { projectId } = req.params;
   try {
     let task = await Task.findByPk(req.params.id);
+    const taskSolverId = task.solverId;
     const user = getUser(req, res);
-    const permission =
-      task.createdById == user.id
-        ? ac.can(user.role).updateOwn("task")
-        : ac.can(user.role).updateAny("task");
-    if (!permission.granted) {
-      res.status(403).json();
-      return;
-    }
 
     Object.keys(req.body).forEach((key) => {
       task[key] = req.body[key];
     });
 
     const changedFileds = task.changed();
+    console.log("changed fields: ", changedFileds);
     if (changedFileds.length > 0) {
+      if (
+        !user.roles.includes(ROLE.ADMIN) &&
+        !user.roles.includes(ROLE.MANAGEMENT) &&
+        task.createdById !== user.id
+      ) {
+        changedFileds.forEach((field) => {
+          if (
+            [
+              "createdById",
+              "priority",
+              "deadline",
+              "parentId",
+              "title",
+              "description",
+            ].includes(field)
+          ) {
+            res.status(403).json({ message: "Nedostatečné oprávnění" });
+            return;
+          }
+        });
+      }
+
       changedFileds.forEach(async (field) => {
         await TaskChangeLog.create({
           taskId: req.params.id,
@@ -194,6 +201,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
         if (
           field === "solverId" &&
+          (taskSolverId === null || taskSolverId !== task.solverId) &&
           task.solverId != null &&
           user.id != task.solverId
         ) {
@@ -208,6 +216,25 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           newNotification.setDataValue("createdAt", new Date());
           newNotification.setDataValue("TaskNotification", { task });
           io.to(parseInt(task.solverId)).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            notification: newNotification,
+          });
+        } else if (
+          field === "solverId" &&
+          taskSolverId !== null &&
+          taskSolverId !== task.solverId &&
+          user.id != taskSolverId
+        ) {
+          const newNotification =
+            await notificationService.createTaskNotification(
+              task.id,
+              `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.title}`,
+              taskSolverId,
+              user.id
+            );
+          newNotification.setDataValue("creator", user);
+          newNotification.setDataValue("createdAt", new Date());
+          newNotification.setDataValue("TaskNotification", { task });
+          io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
             notification: newNotification,
           });
         }
@@ -232,18 +259,49 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// todo delete task??? + remoev attachments
+router.patch(
+  "/:projectId/tasks/:id/complete",
+  authenticateToken,
+  async (req, res) => {
+    const user = getUser(req, res);
+    try {
+      const task = await Task.findByPk(req.params.id);
+      task.isCompleted = !task.isCompleted;
+
+      if (task.isCompleted && task.createdById !== user.id) {
+        const newNotification =
+          await notificationService.createTaskNotification(
+            task.id,
+            `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
+            task.createdById,
+            user.id
+          );
+        newNotification.setDataValue("creator", user);
+        newNotification.setDataValue("createdAt", new Date());
+        newNotification.setDataValue("TaskNotification", { task });
+
+        await task.save();
+      }
+
+      res.json({ task });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
+
 router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   const io = getIo();
   try {
     const task = await Task.findByPk(req.params.id);
     const user = getUser(req, res);
-    const permission =
-      task.createdById == user.id
-        ? ac.can(user.role).deleteOwn("task")
-        : ac.can(user.role).deleteAny("task");
-    if (!permission.granted) {
-      res.status(403).json();
+
+    if (
+      !user.roles.includes(ROLE.ADMIN) &&
+      !user.roles.includes(ROLE.MANAGEMENT) &&
+      task.createdById !== user.id
+    ) {
+      res.status(403).json({ message: "Nedostatečné oprávnění" });
       return;
     }
 
