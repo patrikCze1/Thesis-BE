@@ -26,7 +26,7 @@ const authenticateToken = function (req, res, next) {
     jwt.verify(token, process.env.TOKEN_SECRET);
     next();
   } catch (error) {
-    res.status(401).send({ message: error.message, success: false });
+    res.status(401).send({ message: error.message });
   }
 };
 

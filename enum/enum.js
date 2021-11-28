@@ -29,3 +29,11 @@ exports.ROLE = Object.freeze({
   USER: "user",
   MANAGEMENT: "management",
 });
+
+exports.TASK_PRIORITY = Object.freeze({
+  1: "Nízká",
+  2: "Střední",
+  3: "Vysoká",
+  4: "Urgentní",
+  5: "Kritická",
+});

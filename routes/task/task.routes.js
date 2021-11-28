@@ -12,7 +12,7 @@ const {
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE, TASK_PRIORITY } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
 
@@ -196,7 +196,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         await TaskChangeLog.create({
           taskId: req.params.id,
           userId: user.id,
-          name: "Změna pole: " + field,
+          name: `Změna pole: ${field}`,
         });
 
         if (
@@ -208,7 +208,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           const newNotification =
             await notificationService.createTaskNotification(
               task.id,
-              `Přiřazení k úkolu: ${task.title}`,
+              `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${
+                task.title
+              }`,
               task.solverId,
               user.id
             );
@@ -237,6 +239,22 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
             notification: newNotification,
           });
+        } else if (field === "priority" && user.id != taskSolverId) {
+          const newNotification =
+            await notificationService.createTaskNotification(
+              task.id,
+              `Uživatel ${getFullName(user)} změnil prioritu úkolu: ${
+                task.title
+              } na ${TASK_PRIORITY[task.priority]}`,
+              taskSolverId,
+              user.id
+            );
+          newNotification.setDataValue("creator", user);
+          newNotification.setDataValue("createdAt", new Date());
+          newNotification.setDataValue("TaskNotification", { task });
+          io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            notification: newNotification,
+          });
         }
       });
 
@@ -250,7 +268,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
     const projectUsers = await findUsersByProject(projectId);
     for (const u of projectUsers) {
-      io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+      if (u.id !== user.id) io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
     }
 
     res.json({ task });
@@ -264,6 +282,7 @@ router.patch(
   authenticateToken,
   async (req, res) => {
     const user = getUser(req, res);
+
     try {
       const task = await Task.findByPk(req.params.id);
       task.isCompleted = !task.isCompleted;
@@ -276,6 +295,7 @@ router.patch(
       });
 
       if (task.isCompleted && task.createdById !== user.id) {
+        const io = getIo();
         const newNotification =
           await notificationService.createTaskNotification(
             task.id,
@@ -286,6 +306,10 @@ router.patch(
         newNotification.setDataValue("creator", user);
         newNotification.setDataValue("createdAt", new Date());
         newNotification.setDataValue("TaskNotification", { task });
+
+        io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+          notification: newNotification,
+        });
 
         await task.save();
       }

@@ -1,5 +1,10 @@
 const express = require("express");
 const router = express.Router();
+const crypto = require("crypto");
+const path = require("path");
+const multer = require("multer");
+const fs = require("fs");
+
 const {
   TaskComment,
   TaskCommentAttachment,
@@ -8,19 +13,12 @@ const {
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
-const crypto = require("crypto");
-const path = require("path");
-const multer = require("multer");
-const fs = require("fs");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = `public/uploads/task-comment/${req.params.taskId}/`;
-    fs.exists(dir, (exist) => {
-      if (!exist) {
-        return fs.mkdir(dir, (error) => cb(error, dir));
-      }
-      return cb(null, dir);
-    });
+
+    if (fs.existsSync(dir)) return cb(null, dir);
+    else return fs.mkdir(dir, (error) => cb(error, dir));
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
@@ -32,22 +30,22 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
-const ac = require("./../../security");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
+const { getFullName } = require("../../service/user.service");
 const io = getIo();
 
 router.post(
   "/:taskId/comments",
-  upload.array("files", 10),
+  [authenticateToken, upload.array("files", 10)],
   async (req, res) => {
-    //authenticateToken
+    const mentionRegex = /\B@[a-z0-9_-]+/gi;
     const requiredAttr = ["text"];
     const body = { ...req.body };
     const result = validator.validateRequiredFields(requiredAttr, body);
 
-    if (!result.valid) {
+    if (!result.valid || !(body.text.length > 0)) {
       res.status(400).send({
         message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
       });
@@ -55,17 +53,40 @@ router.post(
     }
 
     try {
-      // send notification, pokud byl nekdo oznacen
-      // todo pokud jsem nevypl odesilani
       const user = getUser(req, res);
-      // notificationService.createTaskNotification(
-      //   req.params.id,
-      //   req.body.text,
-      //   tagedUserId
-      //   user.id
-      // );
 
-      console.log(req.files);
+      const mentionedUsers = body.text.match(mentionRegex);
+      console.log("mentionedUsers", mentionedUsers);
+      if (Array.isArray(mentionedUsers) && mentionedUsers.length > 0) {
+        const task = await Task.findByPk(req.params.taskId);
+
+        for (const mention of mentionedUsers) {
+          const mentionUser = await User.findOne({
+            where: { username: mention.substring(1) },
+          });
+
+          if (mentionUser) {
+            const newNotification =
+              await notificationService.createTaskNotification(
+                task.id,
+                `Uživatel ${getFullName(
+                  user
+                )} Vás označil v komentáři v úkolu ${task.title}`,
+                mentionUser.id,
+                user.id
+              );
+            newNotification.setDataValue("creator", user);
+            newNotification.setDataValue("createdAt", new Date());
+            newNotification.setDataValue("TaskNotification", { task });
+
+            io.to(mentionUser.id).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+              notification: newNotification,
+            });
+          }
+        }
+      }
+
+      console.log("req.files ", req.files);
       const data = {
         text: body.text,
         taskId: req.params.taskId,
@@ -102,9 +123,11 @@ router.post(
       const task = await Task.findByPk(req.params.taskId);
       const projectUsers = await findUsersByProject(task.projectId);
       for (const u of projectUsers) {
-        io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
-          comment: newItem,
-        });
+        console.log("socket ", u.id);
+        if (u.id !== user.id)
+          io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
+            comment: newItem,
+          });
       }
 
       res.json({ comment: newItem });
@@ -169,7 +192,7 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
     });
     await comment.destroy();
 
-    res.json({ comment: comment });
+    res.json({});
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

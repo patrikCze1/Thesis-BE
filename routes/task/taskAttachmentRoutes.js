@@ -15,12 +15,8 @@ const { ROLE } = require("../../enum/enum");
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = `public/uploads/task/${req.params.taskId}/`;
-    fs.exists(dir, (exist) => {
-      if (!exist) {
-        return fs.mkdir(dir, (error) => cb(error, dir));
-      }
-      return cb(null, dir);
-    });
+    if (fs.existsSync(dir)) return fs.mkdir(dir, (error) => cb(error, dir));
+    else return cb(null, dir);
   },
   filename: function (req, file, cb) {
     crypto.pseudoRandomBytes(16, function (err, raw) {
