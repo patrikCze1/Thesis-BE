@@ -7,6 +7,7 @@ const csrf = require("csurf"); //csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
+const path = require("path");
 
 const io = require("./service/io").init(server);
 const sequelize = require("./models/index");
@@ -50,6 +51,7 @@ app.use(i18Middleware.handle(i18next)); // todo include locales json
 app.use(express.json()); // todo post routes
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 // app.use(csrf({ cookie: true }));
 

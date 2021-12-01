@@ -15,10 +15,12 @@ router.get("/", authenticateToken, async (req, res) => {
   // }
 
   const { from, to, userId, projectId } = req.query;
-  const where = {};
+  const where = { endAt: { [Op.not]: null } };
   if (from && to) {
-    where.createdAt = {
-      [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
+    const to = new Date(req.query.to);
+    to.setHours(23, 59, 59);
+    where.beginAt = {
+      [Op.between]: [new Date(req.query.from), to],
     };
   }
   console.log("where", where);
@@ -53,31 +55,40 @@ router.get("/me/", authenticateToken, async (req, res) => {
   const where = {
     userId: user.id,
     endAt: {
-      [Op.ne]: null,
+      [Op.not]: null,
     },
   };
 
   if (req.query.from && req.query.to) {
-    where.createdAt = {
-      [Op.between]: [new Date(req.query.from), new Date(req.query.to)],
+    const to = new Date(req.query.to);
+    to.setHours(23, 59, 59);
+    where.beginAt = {
+      [Op.between]: [new Date(req.query.from), to],
     };
   }
-
+  console.log("where.beginAt", where.beginAt);
   try {
-    const tracks = await TimeTrack.findAll({
-      where,
-      limit: req.query.limit ? parseInt(req.query.limit) : null,
-      offset: req.query.offset ? parseInt(req.query.offset) : 0,
-      order: [
-        [
-          req.query.orderBy ? req.query.orderBy : "beginAt",
-          req.query.sort ? req.query.sort : "DESC",
+    let tracks, activeTrack;
+    if (req.query.returnTracks === "true") {
+      tracks = await TimeTrack.findAll({
+        where,
+        include: [{ model: User, as: "user" }],
+        limit: req.query.limit ? parseInt(req.query.limit) : null,
+        offset: req.query.offset ? parseInt(req.query.offset) : 0,
+        order: [
+          [
+            req.query.orderBy ? req.query.orderBy : "beginAt",
+            req.query.sort ? req.query.sort : "DESC",
+          ],
         ],
-      ],
-    });
-    const activeTrack = await TimeTrack.findOne({
-      where: { userId: user.id, endAt: null },
-    });
+      });
+    }
+
+    if (req.query.returnActive === "true") {
+      activeTrack = await TimeTrack.findOne({
+        where: { userId: user.id, endAt: null },
+      });
+    }
     res.json({ tracks, activeTrack });
   } catch (error) {
     res.status(500).json({ message: error.message });
