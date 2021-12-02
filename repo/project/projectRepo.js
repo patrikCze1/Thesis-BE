@@ -13,8 +13,8 @@ exports.findByUser = async (user, filter) => {
     where: {
       [Op.or]: [
         { "$creator.id$": user.id },
-        { "$groups->groupUsers.UserGroup.userId$": user.id },
-        { "$users->projectUser.userId$": user.id },
+        { "$groups.groupUsers.UserGroup.userId$": user.id },
+        { "$users.ProjectUser.userId$": user.id },
       ],
     },
     include: [
@@ -31,7 +31,7 @@ exports.findByUser = async (user, filter) => {
       {
         model: User,
         as: "creator",
-        attributes: [], // dont select users fields
+        attributes: [],
       },
       {
         model: User,
@@ -53,12 +53,20 @@ exports.findByUser = async (user, filter) => {
   });
 };
 
-exports.findBySearch = async (user, query) => {
+/**
+ *
+ * @param {Object} user
+ * @param {string} query
+ * @param {Object} filter
+ * @returns
+ */
+exports.findBySearch = async (user, query, filter) => {
   return await Project.findAll({
+    subQuery: false,
     where: {
       [Op.or]: [
-        { "$users->ProjectUser.userId$": user.id },
         { "$groups->groupUsers->UserGroup.userId$": user.id },
+        { "$users.ProjectUser.userId$": user.id },
         { createdById: user.id },
       ],
       name: {

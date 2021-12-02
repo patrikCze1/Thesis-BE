@@ -5,28 +5,49 @@ const { getUser, authenticateToken } = require("../../auth/auth");
 const { projectRepo } = require("./../../repo");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
+const { ROLE } = require("../../enum/enum");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
-  let projects;
-  let tasks;
+  let projects = [];
+  let tasks = [];
   try {
     const { query } = req.query;
     // todo test
-    projects = await projectRepo.findBySearch(user, query);
-    tasks = await Task.findAll({
-      where: {
+    if (user.roles.includes(ROLE.ADMIN)) {
+      projects = await Project.findAll({
+        where: {
+          name: {
+            [Op.like]: `%${query}%`,
+          },
+        },
+      });
+    } else {
+      projects = await projectRepo.findBySearch(user, query, {
+        limit: 10000,
+        offset: 0,
+      });
+    }
+    let tasksWhere = {
+      title: {
+        [Op.like]: `%${query}%`,
+      },
+    };
+    if (!user.roles.includes(ROLE.ADMIN)) {
+      tasksWhere = {
+        ...tasksWhere,
         [Op.or]: [
           { "$project->users->ProjectUser.userId$": user.id },
           { "$project->groups->groupUsers->UserGroup.userId$": user.id },
           { "$project.createdById$": user.id },
           { createdById: user.id },
         ],
-        title: {
-          [Op.like]: `%${query}%`,
-        },
-      },
+      };
+    }
+    tasks = await Task.findAll({
+      where: tasksWhere,
+
       include: [
         {
           model: Project,
@@ -52,6 +73,7 @@ router.get("/", authenticateToken, async (req, res) => {
         },
       ],
     });
+
     // console.log(tasks);
     res.json({ tasks, projects });
   } catch (error) {
