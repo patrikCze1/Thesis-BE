@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   Task,
   TaskAttachment,
@@ -114,6 +115,24 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
+
+router.get(
+  "/:projectId/tasks/:taskId/change-logs/",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const logs = await TaskChangeLog.findAll({
+        where: {
+          taskId: req.params.taskId,
+        },
+        include: [{ model: User, as: "user" }],
+      });
+      res.json({ logs });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
 
 router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

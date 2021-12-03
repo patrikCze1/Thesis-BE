@@ -17,7 +17,6 @@ const {
   clientRoutes,
   taskRoutes,
   taskAttachmentRoutes,
-  taskChangeLogRoutes,
   taskCommentRoutes,
   taskCheckRoutes,
   authRoutes,
@@ -79,7 +78,6 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/projects", projectStageRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/projects", taskRoutes);
-app.use("/api/tasks", taskChangeLogRoutes);
 app.use("/api/tasks", taskCommentRoutes);
 app.use("/api/tasks", taskAttachmentRoutes);
 app.use("/api/tasks/checks", taskCheckRoutes);
