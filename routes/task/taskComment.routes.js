@@ -185,10 +185,7 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 
     const arr = await Promise.all(files);
     arr.forEach((file) => {
-      fs.unlink(file, (error) => {
-        if (error) console.log("File delete err ", error);
-        else console.log("file deleted");
-      });
+      fs.unlinkSync(file);
     });
     await comment.destroy();
 
@@ -212,7 +209,7 @@ router.delete(
         res.status(403).json();
         return;
       }
-      fs.unlink(attachment.path, (error) => console.log(error));
+      fs.unlinkSync(attachment.path);
       await attachment.destroy();
 
       res.json();
