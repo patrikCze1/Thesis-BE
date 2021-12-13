@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Chart from "react-google-charts";
 import Select from "react-select";
 import ReactDatePicker from "react-datepicker";
-import { CSVLink, CSVDownload } from "react-csv";
+import { CSVLink } from "react-csv";
 
 import Loader from "./../common/Loader";
 import { useTranslation, Trans } from "react-i18next";
@@ -156,8 +156,7 @@ export default function ReportScreen() {
   const handleFilterUserChange = (val) => {
     setFilteredUser(val);
   };
-  console.log("csvData.current", csvData.current);
-  console.log("tracks", tracks);
+
   return (
     <div className="row">
       <div className="col-md-12">

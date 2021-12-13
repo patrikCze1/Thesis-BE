@@ -10,6 +10,7 @@ import SearchBar from "../search/SearchBar";
 import { logoutAction } from "./../../reducers/user/currentUserReducer";
 import NavigationNotifications from "./../notification/nav/NavigationNotifications";
 import NavigationActiveTtrack from "../timeTrack/NavigationActiveTtrack";
+import { routeEnum } from "../../enums/navigation/navigation";
 
 export default function Navigation() {
   const history = useHistory();
@@ -36,13 +37,13 @@ export default function Navigation() {
   return (
     <nav className="navbar col-lg-12 col-12 p-lg-0 fixed-top d-flex flex-row">
       <div className="navbar-menu-wrapper d-flex align-items-stretch justify-content-between">
-        <a
+        <NavLink
           className="navbar-brand brand-logo-mini align-self-center d-lg-none"
-          href="!#"
-          onClick={(evt) => evt.preventDefault()}
+          to={routeEnum.HOME}
         >
           <img src={logoMini} alt="logo" />
-        </a>
+        </NavLink>
+
         <button
           className="navbar-toggler navbar-toggler align-self-center mr-2"
           type="button"

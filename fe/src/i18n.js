@@ -160,6 +160,8 @@ i18n
             noRecords: "Žádné záznamy",
             loadOlder: "Načíst starší",
             recordsOfThisWeek: "Záznamy tento týden",
+            workingRecords: "Pracovní záznamy",
+            withoutProject: "Bez projektu",
           },
           todo: {
             name: "Název",
@@ -259,6 +261,10 @@ i18n
             password: "Heslo",
             filesUploaded: "Soubory nahrány",
             fileDeleted: "Soubor odstraněn",
+          },
+          date: {
+            today: "Dnes",
+            thisWeek: "Tento týden",
           },
         },
       },

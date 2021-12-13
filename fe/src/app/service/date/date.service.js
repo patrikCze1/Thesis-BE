@@ -94,6 +94,12 @@ export const getDayMonthShort = (date) => {
   }).format(date);
 };
 
+/**
+ *
+ * @param {(Date|string)} begin
+ * @param {(Date|string)} end
+ * @returns {(number|null)}
+ */
 export const getSecondsDiff = (begin, end) => {
   if (!begin || !end) return null;
   if (typeof begin === "string") begin = new Date(begin);
@@ -127,4 +133,19 @@ export const getFirstDayOfWeek = (date) => {
   const day = date.getDay(),
     diff = date.getDate() - day + (day == 0 ? -6 : 1);
   return new Date(date.setDate(diff));
+};
+
+/**
+ *
+ * @param {Date} date
+ * @returns {boolean}
+ */
+export const isDateToday = (date) => {
+  const today = new Date();
+  if (typeof date === "string") date = new Date(date);
+  return (
+    date.getDate() == today.getDate() &&
+    date.getMonth() == today.getMonth() &&
+    date.getFullYear() == today.getFullYear()
+  );
 };

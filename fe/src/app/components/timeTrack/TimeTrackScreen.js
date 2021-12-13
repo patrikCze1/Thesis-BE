@@ -27,14 +27,14 @@ export default function TimeTrackScreen() {
     (state) => state.timeTrackReducer
   );
   const [groupedTracks, setGroupedTracks] = useState(null);
-  const firstDayOfWeek = useRef(getFirstDayOfWeek(new Date()));
+  const firstDayOfWeekRef = useRef(getFirstDayOfWeek(new Date()));
 
   useEffect(() => {
     const today = new Date();
-    firstDayOfWeek.current = getFirstDayOfWeek(new Date());
-    firstDayOfWeek.current.setHours(0, 0, 0);
+    firstDayOfWeekRef.current = getFirstDayOfWeek(new Date());
+    firstDayOfWeekRef.current.setHours(0, 0, 0);
     dispatch(loadProjectsAction());
-    dispatch(loadMyTimeTracksAction(firstDayOfWeek.current, today));
+    dispatch(loadMyTimeTracksAction(firstDayOfWeekRef.current, today));
   }, []);
 
   useEffect(() => {
@@ -52,15 +52,17 @@ export default function TimeTrackScreen() {
   //todo handle copy track
 
   const handleLoadOlder = () => {
-    const date1 = new Date(firstDayOfWeek.current);
-    const date2 = new Date(firstDayOfWeek.current);
+    const date1 = new Date(firstDayOfWeekRef.current);
+    const date2 = new Date(firstDayOfWeekRef.current);
     const timestamp = date1.setTime(date1.getTime() - 7 * 24 * 60 * 60 * 1000);
     const timestampTo = date2.setTime(
       date2.getTime() - 1 * 24 * 60 * 60 * 1000
     );
-    firstDayOfWeek.current = new Date(timestamp);
+    firstDayOfWeekRef.current = new Date(timestamp);
 
-    dispatch(loadMyOlderTracks(firstDayOfWeek.current, new Date(timestampTo)));
+    dispatch(
+      loadMyOlderTracks(firstDayOfWeekRef.current, new Date(timestampTo))
+    );
   };
   //todo group only new tracks???
   const prepareData = (tracks) => {

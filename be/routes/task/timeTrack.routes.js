@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { TimeTrack, User } = require("../../models/modelHelper");
+const { TimeTrack, User, Project } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
@@ -72,7 +72,17 @@ router.get("/me/", authenticateToken, async (req, res) => {
     if (req.query.returnTracks === "true") {
       tracks = await TimeTrack.findAll({
         where,
-        include: [{ model: User, as: "user" }],
+        include: [
+          {
+            model: User,
+            as: "user",
+          },
+          {
+            model: Project,
+            as: "project",
+            attributes: ["name"],
+          },
+        ],
         limit: req.query.limit ? parseInt(req.query.limit) : null,
         offset: req.query.offset ? parseInt(req.query.offset) : 0,
         order: [
