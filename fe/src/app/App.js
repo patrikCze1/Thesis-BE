@@ -24,7 +24,7 @@ import { initIo } from "../utils/websocket.config";
 import { SOCKET } from "../utils/enum";
 import { socketNewNotification } from "./reducers/notification/notificationReducer";
 import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
-
+console.log("process", process.env);
 export default function App() {
   const location = useLocation();
   const history = useHistory();
