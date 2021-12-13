@@ -1,0 +1,46 @@
+.swal2-icon {
+  &::before {
+    content: none !important;
+  }
+}
+
+.react-datepicker-flex {
+  .react-datepicker {
+    display: flex;
+  }
+}
+
+.editable-text {
+  &:hover {
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.swal2-modal {
+  &.swal2-icon-warning {
+    .swal2-confirm {
+      background-color: $red;
+    }
+  }
+}
+
+.va-middle {
+  vertical-align: middle;
+}
+
+.comment-attachment-list {
+  padding-left: 0;
+  li {
+    list-style-type: none;
+    display: inline-block;
+    margin-right: 5px;
+    a {
+      word-break: break-all;
+    }
+  }
+}
+
+.w-100px {
+  width: 100px;
+}

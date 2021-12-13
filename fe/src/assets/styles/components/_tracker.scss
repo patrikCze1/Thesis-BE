@@ -1,0 +1,193 @@
+.tracker-form {
+  width: 100%;
+  display: flex;
+  flex-wrap: nowrap;
+
+  @media screen and (max-width: 600px) {
+    flex-flow: column;
+  }
+
+  .tracker-group {
+    display: flex;
+    flex-wrap: nowrap;
+    &:first-of-type {
+      flex-grow: 1;
+
+      @media screen and (max-width: 600px) {
+        margin-bottom: 10px;
+      }
+    }
+    @media screen and (max-width: 600px) {
+      width: 100%;
+    }
+
+    &.with-dates {
+      @media screen and (max-width: 450px) {
+        flex-wrap: wrap;
+        .manual-dates {
+          flex-grow: 1;
+          padding-bottom: 10px;
+          .react-datepicker-wrapper {
+            &:first-of-type {
+              padding-right: 10px;
+            }
+          }
+          input {
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  .tracker-item {
+    padding: 0 5px;
+  }
+
+  .tracker-name {
+    flex-grow: 1;
+    input {
+      border-radius: 0;
+    }
+  }
+
+  .tracker-project {
+    flex-basis: 140px;
+  }
+
+  .delta-tracker {
+    display: flex;
+    align-items: center;
+    justify-content: left;
+    min-width: 80px;
+  }
+
+  .tracker-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    button {
+      width: 2.875rem;
+      text-transform: uppercase;
+      height: 2.875rem;
+      margin-right: 0 !important;
+      justify-content: center;
+      align-items: center;
+      display: flex;
+    }
+
+    .tracker-modes {
+      display: flex;
+      flex-flow: column;
+      align-items: center;
+      justify-content: space-around;
+      height: 100%;
+      padding-left: 10px;
+
+      .mode-btn {
+        color: gray;
+        font-size: 18px;
+        &.active {
+          color: $primary;
+        }
+      }
+    }
+  }
+
+  .manual-dates {
+    display: flex;
+    flex-wrap: nowrap;
+    input {
+      width: 80px;
+      &:first-of-type {
+        margin-right: 10px;
+      }
+    }
+  }
+}
+
+.track-list-title {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 5px;
+}
+
+.track-list {
+  .track-item {
+    align-items: center;
+    display: flex;
+    flex-wrap: nowrap;
+    margin-bottom: 10px;
+    @media screen and (max-width: 600px) {
+      flex-wrap: wrap;
+
+      .track-info {
+        padding-bottom: 10px !important;
+      }
+      .track-info-total {
+        margin-left: auto;
+      }
+    }
+    @media screen and (max-width: 420px) {
+      .track-info {
+        flex-grow: 1;
+      }
+    }
+
+    .track-item-dates {
+      display: flex;
+      flex-wrap: nowrap;
+      input {
+        width: 80px;
+        &:first-of-type {
+          margin-right: 10px;
+        }
+      }
+    }
+
+    .track-info {
+      padding: 0 5px;
+      &.track-info-big {
+        flex-grow: 1;
+      }
+      &.track-info-total {
+        text-align: right;
+        min-width: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        padding: 0;
+      }
+    }
+  }
+}
+
+.nav-tracker {
+  .time {
+    padding-left: 5px;
+    min-width: 65px;
+    display: inline-block;
+    @media screen and (max-width: 400px) {
+      display: none;
+    }
+  }
+}
+
+.track-report-filter-form {
+  .react-select-wrapper > div {
+    &:focus-visible {
+      border-color: #80bdff !important;
+    }
+  }
+  .react-select-wrapper > div > div {
+    &:first-of-type {
+      border: 1px solid #ebedf2;
+      font-family: "Rubik", sans-serif;
+      font-size: 0.8125rem;
+      font-weight: 400;
+      height: 2.875rem;
+      border-radius: 2px;
+    }
+  }
+}

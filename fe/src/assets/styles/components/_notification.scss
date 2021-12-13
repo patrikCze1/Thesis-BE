@@ -1,0 +1,14 @@
+.notification-row {
+  &.unread {
+    background-color: #ade0ff;
+  }
+
+  a {
+    text-decoration: underline;
+    color: $darkslategray;
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
+}

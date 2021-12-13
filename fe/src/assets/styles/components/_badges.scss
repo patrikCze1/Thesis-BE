@@ -1,0 +1,78 @@
+/* Badges */
+
+.badge {
+  border-radius: 0.125rem;
+  font-size: 11px;
+  line-height: 1;
+  padding: 5px 6px;
+  font-family: $type1;
+  &.badge-pill {
+    border-radius: 10rem;
+  }
+}
+
+/*Badge variations*/
+@each $color, $value in $theme-colors {
+  .badge-#{$color} {
+    @include badge-variations($value);
+  }
+}
+
+.badge-1 {
+  background-color: $dodger-blue;
+  color: $white;
+}
+
+.badge-prio-1 {
+  background-color: $green;
+  color: $white;
+}
+
+.badge-prio-2 {
+  background-color: $dodger-blue;
+  color: $white;
+}
+
+.badge-prio-3 {
+  background-color: $primary;
+  color: $white;
+}
+
+.badge-prio-4 {
+  background-color: $orange;
+  color: $white;
+}
+
+.badge-prio-5 {
+  background-color: $red;
+  color: $white;
+}
+
+.badge-5 {
+  background-color: $primary;
+  color: $white;
+}
+
+.badge-10 {
+  background-color: $green;
+  color: $white;
+}
+
+.badge-20 {
+  background-color: $red;
+  color: $white;
+}
+
+/*Badge outlined variations*/
+@each $color, $value in $theme-colors {
+  .badge-outline-#{$color} {
+    @include badge-outline-variations($value);
+  }
+}
+/*Badge inverse variations*/
+
+@each $color, $value in $theme-colors {
+  .badge-inverse-#{$color} {
+    @include badge-inverse-variations($value);
+  }
+}
