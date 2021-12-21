@@ -24,7 +24,7 @@ import { initIo } from "../utils/websocket.config";
 import { SOCKET } from "../utils/enum";
 import { socketNewNotification } from "./reducers/notification/notificationReducer";
 import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
-console.log("process", process.env);
+
 export default function App() {
   const location = useLocation();
   const history = useHistory();
@@ -58,12 +58,14 @@ export default function App() {
   //https://socket.io/docs/v4/
   const initWebsocket = () => {
     const socket = initIo();
-
-    socket.on(SOCKET.NOTIFICATION_NEW, (data) => {
-      console.log("SOCKET.NOTIFICATION_NEW", data);
-      dispatch(socketNewNotification(data.notification));
-    });
-    return () => socket.disconnect();
+    console.log("initWebsocket");
+    if (socket) {
+      socket.on(SOCKET.NOTIFICATION_NEW, (data) => {
+        console.log("SOCKET.NOTIFICATION_NEW", data);
+        dispatch(socketNewNotification(data.notification));
+      });
+      return () => socket.disconnect();
+    }
   };
 
   useEffect(() => {
@@ -74,40 +76,40 @@ export default function App() {
     initWebsocket();
     console.log("APP LOADED");
 
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        const status = error.response ? error.response.status : null;
-        const originalRequest = error.config;
-        console.log("err status", status);
-        console.log("originalRequest", originalRequest);
-        if (
-          status === 401 &&
-          !originalRequest.url.includes("/api/auth/refresh") &&
-          !originalRequest._retry
-        ) {
-          axios.interceptors.response.eject(interceptor);
-          console.log("refresh");
-          return axios
-            .post(`/api/auth/refresh`)
-            .then((res) => {
-              console.log("res", res);
-              originalRequest._retry = true;
-              return axios(originalRequest);
-            })
-            .catch((e) => {
-              console.log("e", e.response);
-              window.localStorage.removeItem("app-user");
-              Cookies.remove("Auth-Token");
-              Cookies.remove("Refresh-Token");
-              history.push(routeEnum.LOGIN);
-              return Promise.reject(error);
-            });
-        }
+    // const interceptor = axios.interceptors.response.use(
+    //   (response) => response,
+    //   (error) => {
+    //     const status = error.response ? error.response.status : null;
+    //     const originalRequest = error.config;
+    //     console.log("err status", status);
+    //     console.log("originalRequest", originalRequest);
+    //     if (
+    //       status === 401 &&
+    //       !originalRequest.url.includes("/api/auth/refresh") &&
+    //       !originalRequest._retry
+    //     ) {
+    //       axios.interceptors.response.eject(interceptor);
+    //       console.log("refresh");
+    //       return axios
+    //         .post(`/api/auth/refresh`)
+    //         .then((res) => {
+    //           console.log("res", res);
+    //           originalRequest._retry = true;
+    //           return axios(originalRequest);
+    //         })
+    //         .catch((e) => {
+    //           console.log("e", e.response);
+    //           window.localStorage.removeItem("app-user");
+    //           Cookies.remove("Auth-Token");
+    //           Cookies.remove("Refresh-Token");
+    //           history.push(routeEnum.LOGIN);
+    //           return Promise.reject(error);
+    //         });
+    //     }
 
-        return Promise.reject(error);
-      }
-    );
+    //     return Promise.reject(error);
+    //   }
+    // );
   }, []);
 
   useEffect(() => {

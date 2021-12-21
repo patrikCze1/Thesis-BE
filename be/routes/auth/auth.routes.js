@@ -44,15 +44,13 @@ router.post("/login", async (req, res) => {
           httpOnly: true,
         })
         .send({
-          user,
+          token,
         });
     } else {
-      return res
-        .status(400)
-        .json({ message: "Invalid Credentials", success: false });
+      return res.status(400).json({ message: "Invalid Credentials" });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message, success: false });
+    return res.status(500).json({ error: error.message });
   }
 });
 
@@ -74,7 +72,7 @@ router.post("/refresh", async (req, res) => {
       token: newToken,
     });
   } catch (error) {
-    res.status(400).send({ error: error.message, success: false });
+    res.status(400).send({ error: error.message });
   }
 });
 

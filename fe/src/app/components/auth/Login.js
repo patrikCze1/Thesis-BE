@@ -46,7 +46,7 @@ export default function Login() {
         }
       );
 
-      if (res?.status == 200) {
+      if (res?.status === 200) {
         setLoading(false);
         dispatch(loadCurrentUserAction(res.data));
         console.log(res);

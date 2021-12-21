@@ -1,6 +1,7 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
+import jwtDecode from "jwt-decode";
 
 import { routeEnum } from "./../../enums/navigation/navigation";
 import { getIo } from "../../../utils/websocket.config";
@@ -12,15 +13,40 @@ const initialState = {
   actionProcessing: false,
 };
 
+const now = new Date();
+let token = null;
 export default function currentUserReducer(state = initialState, action) {
   switch (action.type) {
     case "user/load":
-      return { ...state, user: action.payload.user };
+      const data = {
+        value: action.payload.token,
+        expiry: now.getTime() + 1000 * 60 * 60 * 12,
+      };
+
+      window.localStorage.setItem("app-user", JSON.stringify(data));
+
+      token = jwtDecode(action.payload.token);
+      console.log("token", token);
+
+      return { ...state, user: token.user };
 
     case "user/loadFromStorage":
+      const itemStr = window.localStorage.getItem("app-user");
+
+      if (!itemStr) return { ...state };
+
+      const item = JSON.parse(itemStr);
+
+      token = jwtDecode(item.value);
+      console.log("token", token);
+      if (!item.expiry || now.getTime() > item.expiry) {
+        window.localStorage.removeItem("app-user");
+        return { ...state };
+      }
+
       return {
         ...state,
-        user: JSON.parse(window.localStorage.getItem("app-user")),
+        user: token.user,
       };
 
     case "user/actionStart":
@@ -41,8 +67,6 @@ export default function currentUserReducer(state = initialState, action) {
 }
 
 export const loadCurrentUserAction = (data) => async (dispatch) => {
-  window.localStorage.setItem("app-user", JSON.stringify(data.user));
-
   dispatch({ type: "user/load", payload: data });
 };
 
