@@ -2,6 +2,7 @@ import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
 import jwtDecode from "jwt-decode";
+import Cookies from "js-cookie";
 
 import { routeEnum } from "./../../enums/navigation/navigation";
 import { getIo } from "../../../utils/websocket.config";
@@ -59,6 +60,15 @@ export default function currentUserReducer(state = initialState, action) {
       return { ...state, actionProcessing: false };
 
     case "user/logout":
+      Cookies.remove("Auth-Token");
+      Cookies.remove("Refresh-Token");
+      window.localStorage.removeItem("app-user");
+
+      //todo socket disconnect
+      //todo call endpoint?
+      // const socket = getIo();
+      document.title = "React app";
+
       return { ...initialState };
 
     default:
@@ -76,10 +86,6 @@ export const loadFromSessionAction = () => async (dispatch) => {
 
 export const logoutAction = (history) => async (dispatch) => {
   dispatch({ type: "user/logout" });
-  //todo socket disconnect
-  //todo call endpoint?
-  // const socket = getIo();
-  document.title = "React app";
   history.push(routeEnum.LOGIN);
 };
 

@@ -2,7 +2,7 @@ import React from "react";
 import { useHistory, NavLink } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { Trans } from "react-i18next";
-import Cookies from "js-cookie";
+
 import { useDispatch } from "react-redux";
 
 import logoMini from "./../../../assets/images/logo-mini.svg";
@@ -22,9 +22,6 @@ export default function Navigation() {
 
   const handleLogout = (e) => {
     e.preventDefault();
-    Cookies.remove("Auth-Token");
-    Cookies.remove("Refresh-Token");
-    window.localStorage.removeItem("app-user");
 
     dispatch(logoutAction(history));
   };
