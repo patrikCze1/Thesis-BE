@@ -83,7 +83,7 @@ export default function Dashboard() {
   };
 
   const groupTracks = () => {
-    const tracksArr = tracks.reduce((tracks, track) => {
+    const tracksObj = tracks.reduce((tracks, track) => {
       if (!tracks[track.project?.name || t("track.withoutProject")]) {
         tracks[track.project?.name || t("track.withoutProject")] = [];
       }
@@ -91,18 +91,19 @@ export default function Dashboard() {
       return tracks;
     }, {});
 
-    const weekTracks = Object.keys(tracksArr).map((project) => {
+    const weekTracks = Object.keys(tracksObj).map((project) => {
       let total = 0;
-      tracksArr[project].forEach((track) => {
+      tracksObj[project].forEach((track) => {
         total += getSecondsDiff(track.beginAt, track.endAt);
       });
       const hours = total / (60 * 60);
 
       return [project, hours];
     });
-    const todayTracks = Object.keys(tracksArr).map((project) => {
+
+    const todayTracks = Object.keys(tracksObj).map((project) => {
       let total = 0;
-      tracksArr[project].forEach((track) => {
+      tracksObj[project].forEach((track) => {
         if (isDateToday(track.beginAt))
           total += getSecondsDiff(track.beginAt, track.endAt);
       });
@@ -255,29 +256,34 @@ export default function Dashboard() {
                   </small>
                 </h4>
 
-                <Chart
-                  width={"500px"}
-                  height={"300px"}
-                  chartType="PieChart"
-                  loader={<Loader />}
-                  data={[
-                    [t("track.date"), t("track.hours")],
-                    ...todayTracksByProject,
-                  ]}
-                  options={{
-                    legend: { position: "none" },
-                  }}
-                  rootProps={{ "data-testid": "1" }}
-                />
-                <div>
-                  {todayTracksByProject.length > 0 &&
-                    todayTracksByProject.map((tracks, i) => (
-                      <div key={i}>
-                        {tracks[0]} - {tracks[1]}
-                      </div>
-                    ))}
-                </div>
+                {todayTracksByProject.length > 0 && (
+                  <>
+                    <Chart
+                      width={"500px"}
+                      height={"300px"}
+                      chartType="PieChart"
+                      loader={<Loader />}
+                      data={[
+                        [t("track.date"), t("track.hours")],
+                        ...todayTracksByProject,
+                      ]}
+                      options={{
+                        legend: { position: "none" },
+                      }}
+                      rootProps={{ "data-testid": "1" }}
+                    />
+                    {/* <div>
+                      {todayTracksByProject.length > 0 &&
+                        todayTracksByProject.map((tracks, i) => (
+                          <div key={i}>
+                            {tracks[0]} - {tracks[1]}
+                          </div>
+                        ))}
+                    </div> */}
+                  </>
+                )}
               </div>
+
               <div className="col-md-6">
                 <h4 className="d-flex justify-content-between">
                   <span>
@@ -288,28 +294,32 @@ export default function Dashboard() {
                   </small>
                 </h4>
 
-                <Chart
-                  width={"100%"}
-                  height={"300px"}
-                  chartType="PieChart"
-                  loader={<Loader />}
-                  data={[
-                    [t("track.date"), t("track.hours")],
-                    ...weekTracksByProject,
-                  ]}
-                  options={{
-                    legend: { position: "none" },
-                  }}
-                  rootProps={{ "data-testid": "1" }}
-                />
-                <div>
-                  {weekTracksByProject.length > 0 &&
-                    weekTracksByProject.map((tracks, i) => (
-                      <div key={i}>
-                        {tracks[0]} - {tracks[1]}
-                      </div>
-                    ))}
-                </div>
+                {weekTracksByProject.length > 0 && (
+                  <>
+                    <Chart
+                      width={"100%"}
+                      height={"300px"}
+                      chartType="PieChart"
+                      loader={<Loader />}
+                      data={[
+                        [t("track.date"), t("track.hours")],
+                        ...weekTracksByProject,
+                      ]}
+                      options={{
+                        legend: { position: "none" },
+                      }}
+                      rootProps={{ "data-testid": "1" }}
+                    />
+                    {/* <div>
+                      {weekTracksByProject.length > 0 &&
+                        weekTracksByProject.map((tracks, i) => (
+                          <div key={i}>
+                            {tracks[0]} - {tracks[1]}
+                          </div>
+                        ))}
+                    </div> */}
+                  </>
+                )}
               </div>
             </div>
           </div>

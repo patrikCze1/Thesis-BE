@@ -105,8 +105,8 @@ export default function TimeTrackListItem({
           onChange={handleProjectChange}
           disabled={!isEditable}
         >
-          {!isEditable && projectName ? (
-            <option>{projectName}</option>
+          {!isEditable ? (
+            <option>{projectName || ""}</option>
           ) : (
             projects &&
             projects.map((project, i) => {

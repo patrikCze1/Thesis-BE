@@ -18,6 +18,7 @@ import { loadProjectsAction } from "../../reducers/project/project.reducer";
 import { hasRole } from "../../service/role.service";
 import { ROLES } from "../../../utils/enum";
 import TimeTrackListItem from "./TimeTrackListItem";
+import { getTrackDatesByProjectForChart } from "../../service/project/project.service";
 
 const csvHaders = [
   { label: "Název", key: "name" },
@@ -51,6 +52,7 @@ export default function ReportScreen() {
   const [filteredProject, setFilteredProject] = useState();
   const [filteredUser, setFilteredUser] = useState();
   const [totalHours, setTotalHours] = useState(0);
+  const [tracksByProject, setTracksByProject] = useState([]);
   const csvData = useRef([]);
   const projectNames = useRef({});
 
@@ -138,9 +140,11 @@ export default function ReportScreen() {
       totalHours += hours;
       return [date, hours];
     });
+
     console.log("groupTracks", groupTracks);
     setGroupedTracks(groupTracks);
     setTotalHours(totalHours.toFixed(2));
+    setTracksByProject(getTrackDatesByProjectForChart(tracks, projects));
     setIsLoaded(true);
   };
 
@@ -238,59 +242,90 @@ export default function ReportScreen() {
             <div>
               {!isLoaded && toDate && <Loader />}
               {isLoaded && fromDate && toDate ? (
-                <Chart
-                  width={"100%"}
-                  height={"400px"}
-                  chartType="Bar" //ColumnChart
-                  loader={<Loader />}
-                  data={[[t("track.date"), t("track.hours")], ...groupedTracks]}
-                  options={{
-                    chart: {
-                      title: `${t("track.workedHours")}: ${totalHours}`,
-                    },
-                    vAxis: {
-                      title: t("track.hours"),
-                      minValue: 0,
-                    },
-                    hAxis: {
-                      title: t("track.date"),
-                      minValue: 0,
-                    },
-                    legend: { position: "none" },
-                  }}
-                />
-              ) : (
-                <p className="text-center">{t("track.chooseDate")}.</p>
-              )}
-            </div>
-
-            <div className="track-list">
-              {isLoaded && fromDate && toDate > 0 && (
                 <>
-                  <div className="d-flex mt-3">
-                    <div className="wrapper">
+                  <Chart
+                    width={"100%"}
+                    height={"400px"}
+                    chartType="Bar" //ColumnChart
+                    loader={<Loader />}
+                    data={[
+                      [t("track.date"), t("track.hours")],
+                      ...groupedTracks,
+                    ]}
+                    options={{
+                      chart: {
+                        title: `${t("track.workedHours")}: ${totalHours}`,
+                      },
+                      vAxis: {
+                        title: t("track.hours"),
+                        minValue: 0,
+                      },
+                      hAxis: {
+                        title: t("track.date"),
+                        minValue: 0,
+                      },
+                      legend: { position: "none" },
+                    }}
+                  />
+
+                  <div className="row">
+                    <div className="col-md-4 mt-3">
                       <h4 className="card-title">
-                        <Trans>track.records</Trans>
+                        <Trans>track.timesByProject</Trans>
                       </h4>
+                      <Chart
+                        width={"100%"}
+                        height={"300px"}
+                        chartType="PieChart"
+                        loader={<Loader />}
+                        data={[
+                          [t("track.date"), t("track.hours")],
+                          ...tracksByProject,
+                        ]}
+                        options={{
+                          legend: { position: "none" },
+                        }}
+                        rootProps={{ "data-testid": "1" }}
+                      />
+                    </div>
+
+                    <div className="col-md-8">
+                      <div className="track-list">
+                        {isLoaded && fromDate && toDate > 0 && (
+                          <>
+                            <div className="d-flex mt-3">
+                              <div className="wrapper">
+                                <h4 className="card-title">
+                                  <Trans>track.records</Trans>
+                                </h4>
+                              </div>
+                            </div>
+                            {tracks.length > 0 ? (
+                              tracks.map((track) => (
+                                <TimeTrackListItem
+                                  track={track}
+                                  key={track.id}
+                                  projects={projects}
+                                  isEditable={false}
+                                  showUser={true}
+                                  projectName={
+                                    projectNames.current[track.projectId]
+                                  }
+                                />
+                              ))
+                            ) : (
+                              <p className="text-center">
+                                <Trans>track.noRecords</Trans>.
+                              </p>
+                            )}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                  {tracks.length > 0 ? (
-                    tracks.map((track) => (
-                      <TimeTrackListItem
-                        track={track}
-                        key={track.id}
-                        projects={projects}
-                        isEditable={false}
-                        showUser={true}
-                        projectName={projectNames.current[track.projectId]}
-                      />
-                    ))
-                  ) : (
-                    <p className="text-center">
-                      <Trans>track.noRecords</Trans>.
-                    </p>
-                  )}
                 </>
+              ) : (
+                <p className="text-center">{t("track.chooseDate")}.</p>
               )}
             </div>
           </div>

@@ -108,6 +108,12 @@ export const getSecondsDiff = (begin, end) => {
   return (end - begin) / 1000;
 };
 
+/**
+ *
+ * @param {Number} seconds
+ * @param {boolean} showSeconds
+ * @returns {string}
+ */
 export const formatSecondsToString = (seconds, showSeconds = true) => {
   const h = Math.floor(seconds / 60 / 60)
     .toString()
@@ -128,6 +134,11 @@ export const formatSecondsToString = (seconds, showSeconds = true) => {
   return `${m}:${s}`;
 };
 
+/**
+ *
+ * @param {Date|string} date
+ * @returns {Date}
+ */
 export const getFirstDayOfWeek = (date) => {
   if (typeof date === "string") date = new Date(date);
   const day = date.getDay(),

@@ -162,6 +162,7 @@ i18n
             recordsOfThisWeek: "Záznamy tento týden",
             workingRecords: "Pracovní záznamy",
             withoutProject: "Bez projektu",
+            timesByProject: "Časy v projektu",
           },
           todo: {
             name: "Název",
