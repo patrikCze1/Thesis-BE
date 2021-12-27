@@ -1,5 +1,5 @@
 {
-    "error": {
-        "bad_credentials": "Špatné přihlašovací údaje"
-    }
+  "error": {
+    "badCredentials": "Špatné přihlašovací údaje"
+  }
 }

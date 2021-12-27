@@ -12,7 +12,6 @@ export default function NotificationListItem({
   setSeen,
   onClick,
 }) {
-  console.log(notification);
   return (
     <div
       className={`list d-flex align-items-center border-bottom p-3 notification-row ${

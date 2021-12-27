@@ -16,6 +16,7 @@ import {
   deleteGroupAction,
 } from "./../../../reducers/user/groupReducer";
 import GroupForm from "./GroupForm";
+import Loader from "../../common/Loader";
 
 const { SearchBar } = Search;
 
@@ -101,7 +102,7 @@ export default function Groups() {
       if (result.value) dispatch(deleteGroupAction(id));
     });
   };
-
+  console.log("groupsLoaded", groupsLoaded);
   return (
     <div>
       <div className="page-header">
@@ -126,7 +127,7 @@ export default function Groups() {
             <div className="card-body">
               <div className="row">
                 <div className="col-12">
-                  {groupsLoaded && (
+                  {groupsLoaded ? (
                     <ToolkitProvider
                       keyField="id"
                       bootstrap4
@@ -151,6 +152,8 @@ export default function Groups() {
                         </div>
                       )}
                     </ToolkitProvider>
+                  ) : (
+                    <Loader />
                   )}
                 </div>
               </div>

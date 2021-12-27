@@ -15,7 +15,10 @@ import AppRoutes from "./AppRoutes";
 import { Sidebar, Navigation } from "./components/navigation";
 import Footer from "./components/common/Footer";
 import InfoBar from "./components/common/InfoBar";
-import { loadFromSessionAction } from "./reducers/user/currentUserReducer";
+import {
+  loadFromSessionAction,
+  logoutAction,
+} from "./reducers/user/currentUserReducer";
 import "./App.scss";
 import { routeEnum } from "./enums/navigation/navigation";
 import ErrorBoundary from "./../app/components/error/ErrorBoundary";
@@ -70,46 +73,50 @@ export default function App() {
 
   useEffect(() => {
     dispatch(loadFromSessionAction());
-    if (location.pathname !== routeEnum.TIME_TRACKS)
+    if (
+      location.pathname !== routeEnum.TIME_TRACKS &&
+      user &&
+      Object.keys(user).length > 0
+    )
       dispatch(loadMyTimeTracksAction(null, null, false, true));
     setLoaded(true);
     initWebsocket();
     console.log("APP LOADED");
 
-    // const interceptor = axios.interceptors.response.use(
-    //   (response) => response,
-    //   (error) => {
-    //     const status = error.response ? error.response.status : null;
-    //     const originalRequest = error.config;
-    //     console.log("err status", status);
-    //     console.log("originalRequest", originalRequest);
-    //     if (
-    //       status === 401 &&
-    //       !originalRequest.url.includes("/api/auth/refresh") &&
-    //       !originalRequest._retry
-    //     ) {
-    //       axios.interceptors.response.eject(interceptor);
-    //       console.log("refresh");
-    //       return axios
-    //         .post(`/api/auth/refresh`)
-    //         .then((res) => {
-    //           console.log("res", res);
-    //           originalRequest._retry = true;
-    //           return axios(originalRequest);
-    //         })
-    //         .catch((e) => {
-    //           console.log("e", e.response);
-    //           window.localStorage.removeItem("app-user");
-    //           Cookies.remove("Auth-Token");
-    //           Cookies.remove("Refresh-Token");
-    //           history.push(routeEnum.LOGIN);
-    //           return Promise.reject(error);
-    //         });
-    //     }
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const status = error?.response?.status;
+        const originalRequest = error.config;
+        console.log("err status", status);
+        console.log("originalRequest", originalRequest);
+        if (
+          status === 401 &&
+          !originalRequest.url.includes("/api/auth/refresh") &&
+          !originalRequest._retry
+        ) {
+          // debugger;
+          // axios.interceptors.response.eject(interceptor);
+          console.log("refresh");
+          return axios
+            .post(`/api/auth/refresh`)
+            .then((res) => {
+              // debugger;
+              console.log("res", res);
+              originalRequest._retry = true;
+              return axios(originalRequest);
+            })
+            .catch((e) => {
+              // debugger;
+              console.error("e", e);
+              dispatch(logoutAction(history));
+              return Promise.reject(e);
+            });
+        }
 
-    //     return Promise.reject(error);
-    //   }
-    // );
+        return Promise.reject(error);
+      }
+    );
   }, []);
 
   useEffect(() => {
@@ -119,6 +126,7 @@ export default function App() {
   }, [user]);
 
   if (!loaded) {
+    // todo logo fullscreen
     return <></>;
   }
 

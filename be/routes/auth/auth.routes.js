@@ -17,7 +17,7 @@ router.post("/login", async (req, res) => {
 
   if (!email || !password) {
     res.status(400).json({
-      message: req.t("error.bad_credentials"),
+      message: req.t("error.badCredentials"),
     });
     return;
   }
@@ -57,22 +57,24 @@ router.post("/login", async (req, res) => {
 router.post("/refresh", async (req, res) => {
   const token = req.cookies["Refresh-Token"];
   console.log("refresh req", token);
-  if (token == null) return res.sendStatus(401);
-
-  const data = decodeToken(token);
-  // if (!data.user || !isRefreshTokenValid(data.user.id, token))
-  //   return res.sendStatus(400); // todo store in db
+  if (token == null) return res.sendStatus(403);
 
   try {
     jwt.verify(token, process.env.REFRESH_TOKEN); //todo
 
+    const data = decodeToken(token);
     const newToken = generateToken(data.user);
 
-    res.send({
-      token: newToken,
-    });
+    res
+      .cookie("Auth-Token", newToken, {
+        secure: process.env.NODE_ENV === "production",
+        httpOnly: true,
+      })
+      .send({
+        token: newToken,
+      });
   } catch (error) {
-    res.status(400).send({ error: error.message });
+    res.status(400).json({ message: error.message });
   }
 });
 

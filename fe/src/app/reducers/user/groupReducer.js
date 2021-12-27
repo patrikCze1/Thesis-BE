@@ -69,7 +69,9 @@ export const loadGroupsAction =
       const response = await axios.get(`/api/groups${params}`);
       dispatch({ type: "group/listLoaded", payload: response.data });
     } catch (error) {
-      toast.error(error.message);
+      dispatch({ type: "group/listLoaded", payload: { groups: [] } });
+      console.error(error);
+      // toast.error(error.message);
     }
   };
 
@@ -79,7 +81,7 @@ export const loadGroupDetailAction = (id) => async (dispatch) => {
     const response = await axios.get(`/api/groups/${id}`);
     dispatch({ type: "group/detail", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -94,7 +96,7 @@ export const createGroupAction = (data) => async (dispatch) => {
     dispatch({ type: "group/create", payload: response.data });
     toast.success(i18next.t("Group created"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -105,7 +107,7 @@ export const editGroupAction = (id, data) => async (dispatch) => {
     dispatch({ type: "group/edit", payload: response.data });
     toast.success(i18next.t("Group edited"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -116,6 +118,6 @@ export const deleteGroupAction = (id) => async (dispatch) => {
     dispatch({ type: "group/delete", payload: id });
     toast.success(i18next.t("Group deleted"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };

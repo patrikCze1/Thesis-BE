@@ -16,7 +16,7 @@ export default function TodoListItem({ todo, onDelete, onComplete }) {
             className="checkbox"
             type="checkbox"
             checked={isCompleted}
-            onInput={handleComplete}
+            onChange={handleComplete}
           />
           {todo.name}
           <i className="input-helper"></i>

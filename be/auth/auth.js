@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-require("dotenv/config");
+
+const { TokenExpiredError } = jwt;
 
 let refreshTokens = {}; //todo je toto dobre?
 
@@ -20,13 +21,14 @@ const generateRefreshToken = (user) => {
 const authenticateToken = function (req, res, next) {
   const token = req.cookies["Auth-Token"];
 
-  if (!token) return res.sendStatus(401);
+  if (!token) return res.sendStatus(403);
 
   try {
     jwt.verify(token, process.env.TOKEN_SECRET);
     next();
   } catch (error) {
-    res.status(401).send({ message: error.message });
+    if (error instanceof TokenExpiredError) res.sendStatus(401);
+    else res.status(401).json({ message: error.message });
   }
 };
 

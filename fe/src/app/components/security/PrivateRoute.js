@@ -18,7 +18,7 @@ export default function PrivateRoute({ children, roles, ...rest }) {
       />
     );
   }
-  console.log("roles", roles, user.roles, hasRole(roles, user.roles));
+
   if (roles && !hasRole(roles, user.roles)) return <AccessDenied />;
 
   return <Route render={({ location }) => children} {...rest} />;

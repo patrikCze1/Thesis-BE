@@ -102,6 +102,7 @@ export default function Login() {
                   className="h-auto"
                   required
                   onInput={(e) => handleInputChange(e)}
+                  autoComplete="on"
                 />
               </Form.Group>
               <Form.Group className="d-flex search-field">
@@ -113,6 +114,7 @@ export default function Login() {
                   className="h-auto"
                   required
                   onInput={(e) => handleInputChange(e)}
+                  autoComplete="on"
                 />
               </Form.Group>
               <div className="mt-3">

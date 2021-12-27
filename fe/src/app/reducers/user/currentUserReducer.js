@@ -9,8 +9,6 @@ import { getIo } from "../../../utils/websocket.config";
 
 const initialState = {
   user: {},
-  token: null,
-  refreshToken: null,
   actionProcessing: false,
 };
 
@@ -63,7 +61,8 @@ export default function currentUserReducer(state = initialState, action) {
       Cookies.remove("Auth-Token");
       Cookies.remove("Refresh-Token");
       window.localStorage.removeItem("app-user");
-
+      const socket = getIo();
+      socket.disconnect();
       //todo socket disconnect
       //todo call endpoint?
       // const socket = getIo();
