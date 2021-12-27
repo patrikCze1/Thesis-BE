@@ -34,19 +34,23 @@ export default function Projects() {
   selectedProject.current = params.get("upravit");
 
   const handleWebsockets = () => {
-    const socket = getIo();
-    socket.on(ioEnum.PROJECT_NEW, (data) => {
-      console.log("project new", data);
-      dispatch(socketNewProject(data.project));
-    });
-    socket.on(ioEnum.PROJECT_EDIT, (data) => {
-      console.log("project edit", data);
-      dispatch(socketEditProject(data.project));
-    });
-    socket.on(ioEnum.PROJECT_DELETE, (data) => {
-      console.log("project delete", data);
-      dispatch(socketDeleteProject(data.id));
-    });
+    try {
+      const socket = getIo();
+      socket.on(ioEnum.PROJECT_NEW, (data) => {
+        console.log("project new", data);
+        dispatch(socketNewProject(data.project));
+      });
+      socket.on(ioEnum.PROJECT_EDIT, (data) => {
+        console.log("project edit", data);
+        dispatch(socketEditProject(data.project));
+      });
+      socket.on(ioEnum.PROJECT_DELETE, (data) => {
+        console.log("project delete", data);
+        dispatch(socketDeleteProject(data.id));
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   useEffect(() => {
