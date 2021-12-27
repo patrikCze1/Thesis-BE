@@ -65,28 +65,33 @@ export default function KanbanTable() {
   const [filterQuery, setFilterQuery] = useState(null);
 
   const handleWebsockets = () => {
-    const socket = getIo();
-    socket.on(ioEnum.TASK_NEW, (data) => {
-      console.log("TASK_NEW", data);
-      if (data.task.projectId == id) dispatch(socketNewTask(data.task));
-    });
-    socket.on(ioEnum.TASK_EDIT, (data) => {
-      console.log("TASK_EDIT");
-      if (data.task.projectId == id) dispatch(socketEditTask(data.task));
-    });
-    socket.on(ioEnum.TASK_DELETE, (data) => {
-      dispatch(socketDeleteTask(data.id));
-    });
-    socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
-      if (data.stage.projectId == id) dispatch(socketNewStage(data.stage));
-    });
-    socket.on(SOCKET.PROJECT_STAGE_EDIT, (data) => {
-      if (data.projectId == id)
-        dispatch(socketEditStages([stageZero, ...data.stages]));
-    });
-    socket.on(SOCKET.PROJECT_STAGE_DELETE, (data) => {
-      dispatch(socketDeleteStage(data.id));
-    });
+    try {
+      const socket = getIo();
+
+      socket.on(ioEnum.TASK_NEW, (data) => {
+        console.log("TASK_NEW", data);
+        if (data.task.projectId == id) dispatch(socketNewTask(data.task));
+      });
+      socket.on(ioEnum.TASK_EDIT, (data) => {
+        console.log("TASK_EDIT");
+        if (data.task.projectId == id) dispatch(socketEditTask(data.task));
+      });
+      socket.on(ioEnum.TASK_DELETE, (data) => {
+        dispatch(socketDeleteTask(data.id));
+      });
+      socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
+        if (data.stage.projectId == id) dispatch(socketNewStage(data.stage));
+      });
+      socket.on(SOCKET.PROJECT_STAGE_EDIT, (data) => {
+        if (data.projectId == id)
+          dispatch(socketEditStages([stageZero, ...data.stages]));
+      });
+      socket.on(SOCKET.PROJECT_STAGE_DELETE, (data) => {
+        dispatch(socketDeleteStage(data.id));
+      });
+    } catch (error) {
+      console.error(error);
+    }
   };
   console.log("projectStages", stages);
   useEffect(() => {

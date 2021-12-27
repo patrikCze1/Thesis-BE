@@ -74,7 +74,7 @@ router.post("/refresh", async (req, res) => {
         token: newToken,
       });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(400).json({ message: error.message }); // Token expired, please again
   }
 });
 

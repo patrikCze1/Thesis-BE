@@ -38,7 +38,6 @@ import { hasRole } from "../../service/role.service";
 import TaskCommentItem from "./TaskCommentItem";
 import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
-import { getServerFileUrl } from "../../service/file.service";
 import AttachmentItem from "../common/AttachmentItem";
 
 export default function TaskForm({ task, hideModal }) {
@@ -69,15 +68,19 @@ export default function TaskForm({ task, hideModal }) {
   const MySwal = withReactContent(Swal);
   console.log("task attachments", attachments);
   const handleWebsockets = () => {
-    const socket = getIo();
-    socket.on(SOCKET.TASK_COMMENT_NEW, (data) => {
-      if (data.comment.taskId == task.id)
-        dispatch(socketNewComment(data.comment));
-    });
-    // socket.on(SOCKET.TASK_COMMENT_DELETE, (data) => {
-    //   console.log("TASK_COMMENT_DELETE", data);
-    //   dispatch(socketDeleteComment(data.id));
-    // });
+    try {
+      const socket = getIo();
+      socket.on(SOCKET.TASK_COMMENT_NEW, (data) => {
+        if (data.comment.taskId == task.id)
+          dispatch(socketNewComment(data.comment));
+      });
+      // socket.on(SOCKET.TASK_COMMENT_DELETE, (data) => {
+      //   console.log("TASK_COMMENT_DELETE", data);
+      //   dispatch(socketDeleteComment(data.id));
+      // });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const canDelete =

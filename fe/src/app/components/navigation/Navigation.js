@@ -11,12 +11,14 @@ import { logoutAction } from "./../../reducers/user/currentUserReducer";
 import NavigationNotifications from "./../notification/nav/NavigationNotifications";
 import NavigationActiveTtrack from "../timeTrack/NavigationActiveTtrack";
 import { routeEnum } from "../../enums/navigation/navigation";
+import { useEffect } from "react";
 
 export default function Navigation() {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const toggleOffcanvas = () => {
+  const toggleOffcanvas = (e) => {
+    e.stopPropagation();
     document.querySelector(".sidebar-offcanvas").classList.toggle("active");
   };
 
@@ -30,6 +32,10 @@ export default function Navigation() {
     e.preventDefault();
     history.push(path);
   };
+
+  useEffect(() => {
+    document.querySelector(".sidebar-offcanvas").classList.remove("active");
+  }, [window.location]);
 
   return (
     <nav className="navbar col-lg-12 col-12 p-lg-0 fixed-top d-flex flex-row">

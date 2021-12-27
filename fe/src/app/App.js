@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import Particles from "react-particles-js";
 import { useDispatch, useSelector } from "react-redux";
@@ -35,6 +35,7 @@ export default function App() {
   const [showMenu, setShowMenu] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const { user } = useSelector((state) => state.currentUserReducer);
+  const sidebarRef = useRef(null);
 
   registerLocale("cs", cs); // register it with the name you want
 
@@ -58,6 +59,21 @@ export default function App() {
     }
   }, [location]);
 
+  const handleClickOutside = (event) => {
+    if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+      const sidebar = document.querySelector(".sidebar-offcanvas");
+      if (sidebar?.classList?.contains("active"))
+        sidebar.classList.remove("active");
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("click", handleClickOutside, false);
+    return () => {
+      document.removeEventListener("click", handleClickOutside, false);
+    };
+  }, []);
+
   //https://socket.io/docs/v4/
   const initWebsocket = () => {
     const socket = initIo();
@@ -73,12 +89,7 @@ export default function App() {
 
   useEffect(() => {
     dispatch(loadFromSessionAction());
-    if (
-      location.pathname !== routeEnum.TIME_TRACKS &&
-      user &&
-      Object.keys(user).length > 0
-    )
-      dispatch(loadMyTimeTracksAction(null, null, false, true));
+
     setLoaded(true);
     initWebsocket();
     console.log("APP LOADED");
@@ -95,19 +106,16 @@ export default function App() {
           !originalRequest.url.includes("/api/auth/refresh") &&
           !originalRequest._retry
         ) {
-          // debugger;
           // axios.interceptors.response.eject(interceptor);
           console.log("refresh");
           return axios
             .post(`/api/auth/refresh`)
             .then((res) => {
-              // debugger;
               console.log("res", res);
               originalRequest._retry = true;
               return axios(originalRequest);
             })
             .catch((e) => {
-              // debugger;
               console.error("e", e);
               dispatch(logoutAction(history));
               return Promise.reject(e);
@@ -121,8 +129,11 @@ export default function App() {
 
   useEffect(() => {
     console.log("APP user", user);
-    if (user && Object.keys(user).length > 0) setShowMenu(true);
-    else setShowMenu(false);
+    if (user && Object.keys(user).length > 0) {
+      setShowMenu(true);
+      if (location.pathname !== routeEnum.TIME_TRACKS)
+        dispatch(loadMyTimeTracksAction(null, null, false, true));
+    } else setShowMenu(false);
   }, [user]);
 
   if (!loaded) {
@@ -136,7 +147,7 @@ export default function App() {
         <div className="container-scroller">
           <Navigation />
           <div className="container-fluid page-body-wrapper">
-            <Sidebar />
+            <Sidebar ref={sidebarRef} />
             <div className="main-panel">
               <div className="content-wrapper">
                 <AppRoutes />

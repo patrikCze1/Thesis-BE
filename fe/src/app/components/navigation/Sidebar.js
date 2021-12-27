@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Collapse } from "react-bootstrap";
 import { Trans } from "react-i18next";
@@ -11,7 +11,7 @@ import { routeEnum } from "../../enums/navigation/navigation";
 import { hasRole } from "../../service/role.service";
 import { ROLES } from "../../../utils/enum";
 
-export default function Sidebar() {
+const Sidebar = forwardRef(({}, ref) => {
   let location = useLocation();
   const [menuOpen, setMenuOpen] = useState({});
   const { user: currentUser } = useSelector(
@@ -63,10 +63,11 @@ export default function Sidebar() {
         setMenuOpen({ [obj.state]: true });
       }
     });
+    document.querySelector(".sidebar-offcanvas").classList.remove("active");
   }, [location]);
 
   return (
-    <nav className="sidebar sidebar-offcanvas" id="sidebar">
+    <nav className="sidebar sidebar-offcanvas" id="sidebar" ref={ref}>
       <div className="text-center sidebar-brand-wrapper d-flex align-items-center">
         <NavLink className="sidebar-brand brand-logo" to={routeEnum.HOME}>
           <img src={logo} alt="logo" />
@@ -265,4 +266,5 @@ export default function Sidebar() {
       </ul>
     </nav>
   );
-}
+});
+export default Sidebar;
