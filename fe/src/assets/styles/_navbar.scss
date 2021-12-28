@@ -318,6 +318,11 @@
         @media (max-width: 576px) {
           border: none;
         }
+        &.mobile-search-toggler {
+          @media (min-width: 768px) {
+            display: none;
+          }
+        }
       }
       &.navbar-nav-right {
         @media (min-width: 992px) {
@@ -416,6 +421,63 @@
     background: $black;
     padding-bottom: 0;
     padding-top: 0;
+  }
+  @media (max-width: 767px) {
+    height: auto;
+  }
+  .mobile-search {
+    width: 100%;
+    form {
+      margin-top: 0;
+    }
+    .input-group {
+      width: 100%;
+      .input-group-append {
+        background: transparent;
+      }
+      .form-control {
+        background: $navbar-item-bg;
+        border: 0;
+        color: $white;
+        padding: 0.5rem 1rem;
+        border-top-left-radius: 50px;
+        border-bottom-left-radius: 50px;
+        height: auto;
+        .rtl & {
+          border-top-left-radius: 0px;
+          border-bottom-left-radius: 0px;
+          border-top-right-radius: 50px;
+          border-bottom-right-radius: 50px;
+        }
+      }
+      .input-group-text {
+        background: $navbar-item-bg;
+        border: 0;
+        color: $white;
+        padding: 0.5rem 1rem;
+        border-top-right-radius: 50px;
+        border-bottom-right-radius: 50px;
+        i {
+          color: $light-gray;
+        }
+        .rtl & {
+          border-top-right-radius: 0px;
+          border-bottom-right-radius: 0px;
+          border-top-left-radius: 50px;
+          border-bottom-left-radius: 50px;
+        }
+      }
+
+      .react-autosuggest__container {
+        flex-grow: 1;
+        input {
+          width: 100%;
+        }
+      }
+    }
+    @media (min-width: 768px) {
+      display: none;
+    }
   }
 }
 @media (max-width: 991px) {

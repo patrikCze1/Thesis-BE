@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useHistory, NavLink } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { Trans } from "react-i18next";
@@ -17,6 +17,8 @@ export default function Navigation() {
   const history = useHistory();
   const dispatch = useDispatch();
 
+  const [showMobileSearch, setShowMobileSearch] = useState(false);
+
   const toggleOffcanvas = (e) => {
     e.stopPropagation();
     document.querySelector(".sidebar-offcanvas").classList.toggle("active");
@@ -31,6 +33,10 @@ export default function Navigation() {
   const handleRedirect = (e, path) => {
     e.preventDefault();
     history.push(path);
+  };
+
+  const handleToggleMobileSearch = () => {
+    setShowMobileSearch(!showMobileSearch);
   };
 
   useEffect(() => {
@@ -61,10 +67,21 @@ export default function Navigation() {
           <li className="nav-item navbar-dropdown-large nav-tracker">
             <NavigationActiveTtrack />
           </li>
+          <li className="nav-item navbar-dropdown-large mobile-search-toggler">
+            <div className="dropdown">
+              <button
+                className="nav-link count-indicator border-0 dropdown-toggle btn"
+                onClick={handleToggleMobileSearch}
+              >
+                <i class="mdi mdi-magnify"></i>
+              </button>
+            </div>
+          </li>
           <li className="nav-item nav-search border-0 ml-1 ml-md-3 ml-lg-5 d-none d-md-flex">
             <SearchBar />
           </li>
         </ul>
+
         <ul className="navbar-nav navbar-nav-right">
           {/* <li className="nav-item d-none d-xl-flex border-0">
             <Dropdown>
@@ -126,6 +143,7 @@ export default function Navigation() {
           <span className="mdi mdi-menu"></span>
         </button>
       </div>
+      <div className="mobile-search">{showMobileSearch && <SearchBar />}</div>
     </nav>
   );
 }
