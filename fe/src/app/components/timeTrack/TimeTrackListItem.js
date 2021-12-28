@@ -105,6 +105,7 @@ export default function TimeTrackListItem({
           onChange={handleProjectChange}
           disabled={!isEditable}
         >
+          <option>{t("track.selectProject")}</option>
           {!isEditable ? (
             <option>{projectName || ""}</option>
           ) : (
