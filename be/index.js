@@ -3,11 +3,12 @@ require("dotenv/config");
 const app = express();
 const server = require("http").createServer(app);
 const cors = require("cors");
-const csrf = require("csurf"); //csrf??
+const csrf = require("csurf"); // todo csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
 const path = require("path");
+const Backend = require("i18next-node-fs-backend");
 
 const io = require("./service/io").init(server);
 const sequelize = require("./models/index");
@@ -32,9 +33,16 @@ const { connect, disconnect } = require("./service/io");
 
 sequelize.sync();
 
-i18next.use(i18Middleware.LanguageDetector).init({
-  preload: ["cs", "en"],
-});
+i18next
+  .use(Backend)
+  .use(i18Middleware.LanguageDetector)
+  .init({
+    preload: ["cs", "en"],
+    backend: {
+      loadPath: __dirname + "/locales/{{lng}}/{{ns}}.json",
+    },
+    fallbackLng: "en",
+  });
 
 if (process.env.NODE_ENV !== "production") {
   app.use(
@@ -94,5 +102,5 @@ const port = process.env.PORT || 8080;
 server.listen(port, () => {
   console.log(`listening on port ${port}...`);
 });
-
-// todo role, nastaveni notifikaci, notifikace, socket, xss, cors, save date as utc
+console.log(i18next.t("test"));
+// nastaveni notifikaci, xss, cors, save date as utc

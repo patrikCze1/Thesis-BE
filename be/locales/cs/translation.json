@@ -1,5 +1,6 @@
 {
   "error": {
     "badCredentials": "Špatné přihlašovací údaje"
-  }
+  },
+  "test": "rtetik"
 }
