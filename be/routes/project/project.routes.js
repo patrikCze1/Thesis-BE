@@ -63,8 +63,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
       if (!result) {
         res.status(403).json({
-          success: false,
-          message: "Uživatel nemá přístup k tomuto projektu.",
+          message: req.t("project.error.userHasNotAccessToThisProject"),
         });
         return;
       }
@@ -82,7 +81,9 @@ router.get("/:id", authenticateToken, async (req, res) => {
     });
 
     if (!project) {
-      res.status(404).json({ message: "Projekt neexistuje" });
+      res
+        .status(404)
+        .json({ message: req.t("project.error.projectDoesNotExist") });
       return;
     }
 
@@ -99,7 +100,7 @@ router.post("/", authenticateToken, async (req, res) => {
     !user.roles.includes(ROLE.ADMIN) &&
     !user.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res.status(403).json({ message: req.t("error.insufficientPermissions") });
     return;
   }
 
@@ -107,7 +108,9 @@ router.post("/", authenticateToken, async (req, res) => {
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).json({
-      message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
+      message:
+        req.t("error.theseFieldsAreRequired") +
+        result.requiredFields.join(", "),
     });
     return;
   }
@@ -145,7 +148,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
     if (!project) {
-      res.status(404).json({ message: "Projekt neexistuje" });
+      res
+        .status(404)
+        .json({ message: req.t("project.error.projectDoesNotExist") });
       return;
     }
 
@@ -190,7 +195,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   try {
     const project = await Project.findByPk(req.params.id);
     if (!project) {
-      res.status(404).json({ message: "Projekt neexistuje" });
+      res
+        .status(404)
+        .json({ message: req.t("project.error.projectDoesNotExist") });
       return;
     }
 
@@ -205,7 +212,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     await project.destroy(); // soft delete (paranoid)
 
     io.emit(SOCKET_EMIT.PROJECT_DELETE, { id: req.params.id });
-    res.json({ message: "Projekt smazán" });
+    res.json({ message: req.t("project.message.projectDeleted") });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

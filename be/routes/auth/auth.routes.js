@@ -47,10 +47,10 @@ router.post("/login", async (req, res) => {
           token,
         });
     } else {
-      return res.status(400).json({ message: "Invalid Credentials" });
+      return res.status(400).json({ message: req.t("error.badCredentials") });
     }
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    return res.status(500).json({ message: error.message });
   }
 });
 

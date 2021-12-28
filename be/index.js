@@ -39,7 +39,7 @@ i18next
   .init({
     preload: ["cs", "en"],
     backend: {
-      loadPath: __dirname + "/locales/{{lng}}/{{ns}}.json",
+      loadPath: path.join(__dirname + "/locales/{{lng}}/{{ns}}.json"),
     },
     fallbackLng: "en",
   });
@@ -100,7 +100,7 @@ app.use("/api/search", searchRoutes);
 
 const port = process.env.PORT || 8080;
 server.listen(port, () => {
-  console.log(`listening on port ${port}...`);
+  console.log(`Listening on port ${port}...`);
 });
-console.log(i18next.t("test"));
+
 // nastaveni notifikaci, xss, cors, save date as utc

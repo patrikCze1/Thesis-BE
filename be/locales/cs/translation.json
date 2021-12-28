@@ -1,6 +1,17 @@
 {
   "error": {
-    "badCredentials": "Špatné přihlašovací údaje"
+    "badCredentials": "Špatné přihlašovací údaje",
+    "insufficientPermissions": "Nedostatečné oprávnění",
+    "theseFieldsAreRequired": "Tyto pole jsou povinná"
   },
-  "test": "rtetik"
+  "project": {
+    "error": {
+      "userHasNotAccessToThisProject": "Uživatel nemá přístup k tomuto projektu.",
+      "projectDoesNotExist": "Projekt neexistuje"
+    },
+    "message": {
+      "projectDeleted": "Projekt smazán"
+    }
+  },
+  "field": {}
 }
