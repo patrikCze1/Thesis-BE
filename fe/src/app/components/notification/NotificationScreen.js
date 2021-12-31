@@ -16,7 +16,7 @@ import { routeEnum } from "../../enums/navigation/navigation";
 export default function NotificationScreen() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const paginationLimit = 5;
+  const paginationLimit = 20;
   const currentPageRef = useRef(1);
   const [paginationOffset, setPaginationOffset] = useState(0);
   const { notifications, loaded, count, unreadCount } = useSelector(

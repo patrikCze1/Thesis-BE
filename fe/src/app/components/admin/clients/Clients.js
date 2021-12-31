@@ -11,7 +11,7 @@ import Pagination from "./../../common/Pagination";
 
 export default function Clients() {
   const dispatch = useDispatch();
-  const paginationLimit = 5;
+  const paginationLimit = 20;
 
   const currentPageRef = useRef(1);
   const [showClientForm, setShowClientForm] = useState(false);

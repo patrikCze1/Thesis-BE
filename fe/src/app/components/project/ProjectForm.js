@@ -289,7 +289,7 @@ export default function ProjectForm({ projectId }) {
               <Form.Row>
                 <Form.Group as={Col} md="12">
                   <Form.Label>
-                    <Trans>Assigned users</Trans>
+                    <Trans>Assign employee</Trans>
                   </Form.Label>
                   <Typeahead
                     id="projectUsers"
