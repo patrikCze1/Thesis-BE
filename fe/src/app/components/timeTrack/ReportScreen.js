@@ -239,10 +239,17 @@ export default function ReportScreen() {
                 </>
               )}
             </div>
-            <div>
-              {!isLoaded && toDate && <Loader />}
-              {isLoaded && fromDate && toDate ? (
-                <>
+          </div>
+        </div>
+      </div>
+
+      {!isLoaded && toDate && <Loader />}
+      {isLoaded && fromDate && toDate ? (
+        <>
+          <div className="col-md-12 mt-3">
+            <div className="card">
+              <div className="card-body">
+                {groupedTracks.length > 0 ? (
                   <Chart
                     width={"100%"}
                     height={"400px"}
@@ -267,70 +274,86 @@ export default function ReportScreen() {
                       legend: { position: "none" },
                     }}
                   />
-
-                  <div className="row">
-                    <div className="col-md-4 mt-3">
-                      <h4 className="card-title">
-                        <Trans>track.timesByProject</Trans>
-                      </h4>
-                      <Chart
-                        width={"100%"}
-                        height={"300px"}
-                        chartType="PieChart"
-                        loader={<Loader />}
-                        data={[
-                          [t("track.date"), t("track.hours")],
-                          ...tracksByProject,
-                        ]}
-                        options={{
-                          legend: { position: "none" },
-                        }}
-                        rootProps={{ "data-testid": "1" }}
-                      />
-                    </div>
-
-                    <div className="col-md-8">
-                      <div className="track-list">
-                        {isLoaded && fromDate && toDate > 0 && (
-                          <>
-                            <div className="d-flex mt-3">
-                              <div className="wrapper">
-                                <h4 className="card-title">
-                                  <Trans>track.records</Trans>
-                                </h4>
-                              </div>
-                            </div>
-                            {tracks.length > 0 ? (
-                              tracks.map((track) => (
-                                <TimeTrackListItem
-                                  track={track}
-                                  key={track.id}
-                                  projects={projects}
-                                  isEditable={false}
-                                  showUser={true}
-                                  projectName={
-                                    projectNames.current[track.projectId]
-                                  }
-                                />
-                              ))
-                            ) : (
-                              <p className="text-center">
-                                <Trans>track.noRecords</Trans>.
-                              </p>
-                            )}
-                          </>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <p className="text-center">{t("track.chooseDate")}.</p>
-              )}
+                ) : (
+                  <p className="text-center mb-0">
+                    <Trans>track.noRecords</Trans>.
+                  </p>
+                )}
+              </div>
             </div>
           </div>
+
+          <div className="col-lg-4 mt-3">
+            <div className="card">
+              <div className="card-body">
+                <h4 className="card-title">
+                  <Trans>track.timesByProject</Trans>
+                </h4>
+                {tracksByProject.length > 0 ? (
+                  <Chart
+                    width={"100%"}
+                    height={"300px"}
+                    chartType="PieChart"
+                    loader={<Loader />}
+                    data={[
+                      [t("track.date"), t("track.hours")],
+                      ...tracksByProject,
+                    ]}
+                    options={{
+                      legend: { position: "bottom" },
+                    }}
+                    rootProps={{ "data-testid": "1" }}
+                  />
+                ) : (
+                  <p className="text-center">
+                    <Trans>track.noRecords</Trans>.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="col-lg-8 mt-3">
+            <div className="card">
+              <div className="card-body">
+                <div className="track-list">
+                  {isLoaded && fromDate && toDate > 0 && (
+                    <>
+                      <div className="d-flex">
+                        <div className="wrapper">
+                          <h4 className="card-title">
+                            <Trans>track.records</Trans>
+                          </h4>
+                        </div>
+                      </div>
+                      {tracks.length > 0 ? (
+                        tracks.map((track) => (
+                          <TimeTrackListItem
+                            track={track}
+                            key={track.id}
+                            projects={projects}
+                            isEditable={false}
+                            showUser={true}
+                            projectName={projectNames.current[track.projectId]}
+                          />
+                        ))
+                      ) : (
+                        <p className="text-center">
+                          <Trans>track.noRecords</Trans>.
+                        </p>
+                      )}
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="col-md-12 mt-3">
+          <p className="text-center mt-4">{t("track.chooseDate")}.</p>
         </div>
-      </div>
+      )}
     </div>
   );
 }

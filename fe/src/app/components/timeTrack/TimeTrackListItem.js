@@ -74,7 +74,7 @@ export default function TimeTrackListItem({
   };
 
   return (
-    <div className="track-item">
+    <div className={`track-item ${!isEditable && "disabled"}`}>
       {showUser && (
         <div className="track-info mr-2">
           <OverlayTrigger

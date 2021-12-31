@@ -161,6 +161,13 @@
       }
     }
   }
+  &.disabled {
+    .track-info {
+      .track-info-total {
+        justify-content: left;
+      }
+    }
+  }
 }
 
 .nav-tracker {
