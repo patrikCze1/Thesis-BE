@@ -221,7 +221,15 @@ export default function Dashboard() {
                 </thead>
                 <tbody>
                   {tasksLoaded ? (
-                    taskComponents
+                    taskComponents.length > 0 ? (
+                      taskComponents
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="text-center">
+                          {t("label.noRecords")}
+                        </td>
+                      </tr>
+                    )
                   ) : (
                     <tr>
                       <td colSpan={4}>
@@ -252,7 +260,10 @@ export default function Dashboard() {
                     <Trans>date.today</Trans>
                   </span>
                   <small>
-                    {formatSecondsToString(secondsWorkedTodayRef.current)}
+                    {formatSecondsToString(
+                      secondsWorkedTodayRef.current,
+                      false
+                    )}
                   </small>
                 </h4>
 
@@ -268,7 +279,7 @@ export default function Dashboard() {
                         ...todayTracksByProject,
                       ]}
                       options={{
-                        legend: { position: "none" },
+                        legend: { position: "bottom" },
                       }}
                       rootProps={{ "data-testid": "1" }}
                     />
@@ -290,7 +301,10 @@ export default function Dashboard() {
                     <Trans>date.thisWeek</Trans>
                   </span>
                   <small>
-                    {formatSecondsToString(secondsWorkedThisWeekRef.current)}
+                    {formatSecondsToString(
+                      secondsWorkedThisWeekRef.current,
+                      false
+                    )}
                   </small>
                 </h4>
 
@@ -306,7 +320,7 @@ export default function Dashboard() {
                         ...weekTracksByProject,
                       ]}
                       options={{
-                        legend: { position: "none" },
+                        legend: { position: "bottom" },
                       }}
                       rootProps={{ "data-testid": "1" }}
                     />

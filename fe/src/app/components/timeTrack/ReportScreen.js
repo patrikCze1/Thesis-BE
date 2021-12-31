@@ -138,7 +138,15 @@ export default function ReportScreen() {
       });
       const hours = total / (60 * 60);
       totalHours += hours;
-      return [date, hours];
+
+      return [
+        new Intl.DateTimeFormat("cs-CZ", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "numeric",
+        }).format(new Date(date)),
+        hours,
+      ];
     });
 
     console.log("groupTracks", groupTracks);

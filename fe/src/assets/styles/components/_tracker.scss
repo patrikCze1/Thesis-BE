@@ -160,11 +160,12 @@
         padding: 0;
       }
     }
-  }
-  &.disabled {
-    .track-info {
-      .track-info-total {
-        justify-content: left;
+    &.disabled {
+      .track-info {
+        &.track-info-total {
+          justify-content: left;
+          min-width: 40px;
+        }
       }
     }
   }

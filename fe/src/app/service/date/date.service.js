@@ -126,7 +126,7 @@ export const formatSecondsToString = (seconds, showSeconds = true) => {
     .padStart(2, "0");
 
   if (!showSeconds) {
-    if (h == 0 && m == 0) return "00:01";
+    if (h == 0 && m == 0 && s > 0) return "00:01";
     return `${h}:${m}`;
   }
 

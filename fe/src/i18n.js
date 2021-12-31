@@ -185,6 +185,7 @@ i18n
             files: "Soubory",
             upload: "Nahrát",
             hide: "Skrýt",
+            change: "Změnit",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -193,9 +194,10 @@ i18n
             priority: "Priorita",
             delete: "Odstranit",
             completeTask: "Dokončit úkol",
+            unCompleteTask: "Změnit stav na nedokončeno",
             deleteTask: "Odstranit úkol",
             taskWillBeDeleted:
-              "Úkol bude ostraněn a nebude dmožné se k němu vrátit",
+              "Úkol bude ostraněn a nebude možné se k němu vrátit",
             taskCompleted: "Úkol dokončen",
             taskDeleted: "Úkol odstraněn",
             description: "Popis",

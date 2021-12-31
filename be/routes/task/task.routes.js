@@ -329,9 +329,8 @@ router.patch(
         io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
           notification: newNotification,
         });
-
-        await task.save();
       }
+      await task.save();
 
       res.json({ task });
     } catch (error) {
