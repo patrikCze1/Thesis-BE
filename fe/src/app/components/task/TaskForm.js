@@ -6,6 +6,7 @@ import { Trans, useTranslation } from "react-i18next";
 import Mentions from "rc-mentions";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { GithubPicker } from "react-color";
 
 import {
   deleteTaskAction,
@@ -53,6 +54,7 @@ export default function TaskForm({ task, hideModal }) {
   const [deadline, setDeadline] = useState(task.deadline);
   const [projectUsers, setProjectUsers] = useState([]); //todo users
   const [showFileForm, setShowFileForm] = useState(false);
+  const [showColorPicker, setShowColorPicker] = useState(false);
   const { checks } = useSelector((state) => state.taskCheckReducer);
   const { comments } = useSelector((state) => state.taskCommentReducer);
   const { project } = useSelector((state) => state.projectReducer);
@@ -320,15 +322,16 @@ export default function TaskForm({ task, hideModal }) {
             {uploading && <Loader />}
 
             <ul className="comment-attachment-list">
-              {attachments.map((file, i) => {
-                return (
-                  <AttachmentItem
-                    key={file.id}
-                    file={file}
-                    onDelete={canEdit && handleDeleteAttachment}
-                  />
-                );
-              })}
+              {attachments?.length > 0 &&
+                attachments.map((file, i) => {
+                  return (
+                    <AttachmentItem
+                      key={file.id}
+                      file={file}
+                      onDelete={canEdit && handleDeleteAttachment}
+                    />
+                  );
+                })}
             </ul>
             {canEdit && (
               <>
@@ -555,6 +558,37 @@ export default function TaskForm({ task, hideModal }) {
                   );
                 })}
             </select>
+          </Form.Group>
+
+          <Form.Group>
+            <label>
+              <Trans>label.color</Trans>
+            </label>
+            <button
+              className="form-control w-100 p-2"
+              onClick={() => setShowColorPicker(!showColorPicker)}
+            >
+              <div
+                style={{
+                  backgroundColor: formData.colorCode,
+                  borderRadius: "4px",
+                  margin: "10px",
+                  width: "100%",
+                  height: "100%",
+                }}
+              ></div>
+              {showColorPicker && (
+                <GithubPicker
+                  onChangeComplete={(val) => {
+                    handleChangeAndSave({
+                      target: { name: "colorCode", value: val?.hex },
+                    });
+                    setShowColorPicker(false);
+                  }}
+                  color={formData.colorCode}
+                />
+              )}
+            </button>
           </Form.Group>
 
           <Form.Group className="react-datepicker-flex">

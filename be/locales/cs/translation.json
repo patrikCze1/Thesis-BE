@@ -13,5 +13,10 @@
       "projectDeleted": "Projekt smazán"
     }
   },
+  "task": {
+    "message": {
+      "created": "Vytvoření úkolu"
+    }
+  },
   "field": {}
 }

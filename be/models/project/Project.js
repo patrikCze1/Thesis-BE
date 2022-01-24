@@ -14,6 +14,9 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      key: {
+        type: DataTypes.STRING(10),
+      },
       description: {
         type: DataTypes.TEXT,
       },
@@ -37,6 +40,7 @@ module.exports = (sequelize) => {
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
       timeBudget: {
+        // hours
         type: DataTypes.FLOAT,
       },
       priceBudget: {

@@ -186,6 +186,7 @@ i18n
             upload: "Nahrát",
             hide: "Skrýt",
             change: "Změnit",
+            color: "Barva",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -213,6 +214,7 @@ i18n
             stageRemoved: "Fáze odstraněna",
             addPhase: "Přidat fázi",
             title: "Projekt",
+            key: "Zkratka",
             state: {
               active: "Aktivní",
               planned: "Plánovaný",

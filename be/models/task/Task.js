@@ -13,6 +13,10 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      number: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
       description: {
         type: DataTypes.TEXT,
       },
@@ -23,6 +27,9 @@ module.exports = (sequelize) => {
       },
       deadline: {
         type: DataTypes.DATE,
+      },
+      colorCode: {
+        type: DataTypes.STRING(7),
       },
       solverId: {
         type: DataTypes.INTEGER,

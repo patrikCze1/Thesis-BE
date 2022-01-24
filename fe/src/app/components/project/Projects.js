@@ -129,7 +129,7 @@ export default function Projects() {
             <button
               type="button"
               className="close close-modal"
-              onClick={() => setShowForm(false)}
+              onClick={handleHideForm}
             >
               <span aria-hidden="true">×</span>
               <span className="sr-only">

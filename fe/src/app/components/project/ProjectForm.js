@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Col, Button } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { Typeahead } from "react-bootstrap-typeahead";
-import { NavLink, useHistory } from "react-router-dom";
 import Dragula from "react-dragula";
 import { toast } from "react-toastify";
 
@@ -12,10 +11,7 @@ import {
   editProjectAction,
   loadProjectAction,
 } from "./../../reducers/project/project.reducer";
-import {
-  clientDetailAction,
-  loadClietntsAction,
-} from "./../../reducers/common/clientReducer";
+import { loadClietntsAction } from "./../../reducers/common/clientReducer";
 import { loadGroupsAction } from "./../../reducers/user/groupReducer";
 import { loadUsersAction } from "./../../reducers/user/userReducer";
 
@@ -56,8 +52,9 @@ export default function ProjectForm({ projectId }) {
       setFormData({
         ...formData,
         name: project.name,
-        description: project.description,
-        client: project.clientId
+        description: project.description || "",
+        key: project.key || "",
+        clientId: project.clientId
           ? [{ value: project.clientId, label: project.Client.name }]
           : [],
         groups: project.groups
@@ -88,7 +85,7 @@ export default function ProjectForm({ projectId }) {
     if (form.checkValidity() === true) {
       const data = {
         ...formData,
-        client: formData.client.length ? formData.client[0].value : null,
+        clientId: formData.clientId.length ? formData.clientId[0].value : null,
         users: formData.users.map((user) => user.value),
         groups: formData.groups.map((group) => group.value),
       };
@@ -118,10 +115,10 @@ export default function ProjectForm({ projectId }) {
   });
 
   const handleClientSelectChange = (value) => {
-    console.log(value);
+    console.log("handleClientSelectChange", value);
     setFormData({
       ...formData,
-      client: value,
+      clientId: value,
     });
   };
 
@@ -225,11 +222,11 @@ export default function ProjectForm({ projectId }) {
   return (
     <div className="row">
       <div className="col-md-12 grid-margin">
-        <div className="">
+        <div>
           <div className="card-body">
             <Form onSubmit={handleSubmit}>
               <Form.Row>
-                <Form.Group as={Col} md="6">
+                <Form.Group as={Col} md="5">
                   <Form.Label>
                     <Trans>project.name</Trans>
                   </Form.Label>
@@ -241,17 +238,32 @@ export default function ProjectForm({ projectId }) {
                     name="name"
                     value={formData.name}
                     onChange={handleInputChange}
+                    maxLength={255}
                   />
                 </Form.Group>
-                <Form.Group as={Col} md="6">
+                <Form.Group as={Col} md="2">
+                  <Form.Label>
+                    <Trans>project.key</Trans>
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    placeholder=""
+                    defaultValue=""
+                    name="key"
+                    value={formData.key}
+                    onChange={handleInputChange}
+                    maxLength={10}
+                  />
+                </Form.Group>
+                <Form.Group as={Col} md="5">
                   <Form.Label>
                     <Trans>Client</Trans>
                   </Form.Label>
                   <Typeahead
                     id="projectClient"
                     options={clietnsArr}
-                    name="client"
-                    selected={formData.client}
+                    name="clientId"
+                    selected={formData.clientId}
                     onChange={handleClientSelectChange}
                   />
                 </Form.Group>

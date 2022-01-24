@@ -19,6 +19,7 @@ export default function ProjectListItem({ project }) {
   const { t } = useTranslation();
   const MySwal = withReactContent(Swal);
   const { user } = useSelector((state) => state.currentUserReducer);
+  const { clients } = useSelector((state) => state.clientReducer);
 
   const handleEditClick = () => {
     history.push({
@@ -48,6 +49,7 @@ export default function ProjectListItem({ project }) {
           to={`${routeEnum.PROJECTS}/${project.id}`}
           className="project-title"
         >
+          {project.key && `[${project.key}] `}
           {project.name}
         </NavLink>
       </td>

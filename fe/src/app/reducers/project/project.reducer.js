@@ -71,10 +71,10 @@ export default function projectReducer(state = initialState, action) {
         ...state,
         projects: state.projects.map((project) => {
           if (project.id === action.payload.project.id)
-            return action.payload.project;
+            return { ...project, ...action.payload.project };
           else return project;
         }),
-      }; //todo
+      };
 
     case "project/socketEdit":
       return {

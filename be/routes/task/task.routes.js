@@ -9,6 +9,7 @@ const {
   TaskCommentAttachment,
   TaskCheck,
   TaskChangeLog,
+  Project,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator, notificationService } = require("../../service");
@@ -153,11 +154,17 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   data.createdById = user.id;
 
   try {
-    const newTask = await Task.create(data);
-    await TaskChangeLog.create({
+    const projectTasksCount = await Task.count({
+      where: { projectId: projectId },
+    });
+    const newTask = await Task.create({
+      ...data,
+      number: projectTasksCount + 1,
+    });
+    TaskChangeLog.create({
       taskId: newTask.id,
       userId: user.id,
-      name: "Vytvoření úkolu",
+      name: req.t("task.message.created"),
     });
 
     const projectUsers = await findUsersByProject(projectId);

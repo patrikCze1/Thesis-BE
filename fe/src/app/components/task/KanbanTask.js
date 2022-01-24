@@ -17,6 +17,7 @@ export default function KanbanTask({ task, index }) {
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
+  const { project } = useSelector((state) => state.projectReducer);
 
   const handleClick = () => {
     dispatch(loadTaskDetailAction(task.projectId, task.id));
@@ -106,7 +107,7 @@ export default function KanbanTask({ task, index }) {
       </div>
     );
   }
-
+  //todo pocet komentu + souboru
   return (
     <Draggable draggableId={`draggableTask-${task.id}`} index={index}>
       {(provided) => (
@@ -119,7 +120,11 @@ export default function KanbanTask({ task, index }) {
         >
           <ul id="portlet-card-list-1" className="portlet-card-list">
             <li className="portlet-card">
-              {/* <ProgressBar variant={`${props.task.progressVariant}`} now={25}/> */}
+              <div
+                className="d-flex progress"
+                style={{ backgroundColor: task.colorCode, height: "5px" }}
+              ></div>
+
               <div className="d-flex justify-content-between w-100">
                 {task.deadline && (
                   <p
@@ -155,9 +160,10 @@ export default function KanbanTask({ task, index }) {
                   </Dropdown.Menu>
                 </Dropdown> */}
               </div>
-              <div>
-                <h4 className="text-dark">{task.title}</h4>
+              <div className="d-flex">
+                <h5 className="text-dark">{task.title}</h5>
               </div>
+
               <div className="">
                 {task.solver && (
                   <span
@@ -178,6 +184,9 @@ export default function KanbanTask({ task, index }) {
                 )}
               </div>
               <div className="d-flex justify-content-between">
+                <small>{`${project.key && `${project.key}-`}${
+                  task.number
+                }`}</small>
                 {renderBadget()}
 
                 {task.isCompleted && (

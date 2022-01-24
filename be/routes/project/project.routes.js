@@ -116,16 +116,17 @@ router.post("/", authenticateToken, async (req, res) => {
   }
 
   const data = {
-    name: req.body.name,
-    description: req.body.description,
+    ...req.body,
     createdById: user.id,
-    status: req.body.status,
-    clientId: req.body.client,
   };
 
   try {
     const newProject = await Project.create(data);
+    if (data.clientId) {
+      newProject.setDataValue("Client", await Client.findByPk(data.clientId));
+    }
 
+    //todo create stages
     for (let groupId of req.body.groups) {
       await ProjectGroup.create({ projectId: newProject.id, groupId });
     }
@@ -163,10 +164,14 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     }
     const data = {
       ...req.body,
-      clientId: req.body.client,
+      clientId: req.body.clientId || null,
     };
 
     const updated = await project.update(data);
+
+    if (data.clientId) {
+      updated.setDataValue("Client", await Client.findByPk(data.clientId));
+    }
 
     await ProjectGroup.destroy({ where: { projectId: project.id } });
     await ProjectUser.destroy({ where: { projectId: project.id } });
