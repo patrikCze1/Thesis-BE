@@ -85,7 +85,7 @@ export default function ProjectForm({ projectId }) {
     if (form.checkValidity() === true) {
       const data = {
         ...formData,
-        clientId: formData.clientId.length ? formData.clientId[0].value : null,
+        clientId: formData.clientId?.length ? formData.clientId[0].value : null,
         users: formData.users.map((user) => user.value),
         groups: formData.groups.map((group) => group.value),
       };
@@ -218,9 +218,11 @@ export default function ProjectForm({ projectId }) {
   if (!projectLoaded && !projectId) {
     return <Loader />;
   }
-
+  //todo after create reload and stages will import automatically
   return (
     <div className="row">
+      todo show here
+      {JSON.stringify(project.creator)}
       <div className="col-md-12 grid-margin">
         <div>
           <div className="card-body">

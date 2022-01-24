@@ -30,6 +30,7 @@ router.get("/", authenticateToken, async (req, res) => {
           {
             model: Client,
           },
+          { model: User, as: "creator" },
         ],
         limit: filter.limit ? parseInt(filter.limit) : null,
         offset: filter.offset ? parseInt(filter.offset) : 0,
@@ -125,6 +126,22 @@ router.post("/", authenticateToken, async (req, res) => {
     if (data.clientId) {
       newProject.setDataValue("Client", await Client.findByPk(data.clientId));
     }
+
+    ProjectStage.create({
+      name: req.t("projectStage.todo"),
+      order: 1,
+      projectId: newProject.id,
+    });
+    ProjectStage.create({
+      name: req.t("projectStage.workInProgress"),
+      order: 2,
+      projectId: newProject.id,
+    });
+    ProjectStage.create({
+      name: req.t("projectStage.complete"),
+      order: 3,
+      projectId: newProject.id,
+    });
 
     //todo create stages
     for (let groupId of req.body.groups) {

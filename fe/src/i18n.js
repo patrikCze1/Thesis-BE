@@ -215,6 +215,7 @@ i18n
             addPhase: "Přidat fázi",
             title: "Projekt",
             key: "Zkratka",
+            creator: "Zadavetel",
             state: {
               active: "Aktivní",
               planned: "Plánovaný",

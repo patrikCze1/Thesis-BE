@@ -14,6 +14,9 @@ export default function ProjectList({ projects }) {
                 <Trans>Title</Trans>
               </th>
               <th>
+                <Trans>project.creator</Trans>
+              </th>
+              <th>
                 <Trans>Client</Trans>
               </th>
               <th>

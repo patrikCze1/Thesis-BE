@@ -572,7 +572,7 @@ export default function TaskForm({ task, hideModal }) {
                 style={{
                   backgroundColor: formData.colorCode,
                   borderRadius: "4px",
-                  margin: "10px",
+
                   width: "100%",
                   height: "100%",
                 }}
@@ -580,9 +580,10 @@ export default function TaskForm({ task, hideModal }) {
               {showColorPicker && (
                 <GithubPicker
                   onChangeComplete={(val) => {
-                    handleChangeAndSave({
-                      target: { name: "colorCode", value: val?.hex },
-                    });
+                    if (val?.hex != formData.colorCode)
+                      handleChangeAndSave({
+                        target: { name: "colorCode", value: val?.hex },
+                      });
                     setShowColorPicker(false);
                   }}
                   color={formData.colorCode}

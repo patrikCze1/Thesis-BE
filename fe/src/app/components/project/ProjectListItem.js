@@ -12,6 +12,7 @@ import { routeEnum } from "../../enums/navigation/navigation";
 import { PROJECT_STATE } from "../../enums";
 import { hasRole } from "../../service/role.service";
 import { ROLES } from "../../../utils/enum";
+import { getFullName } from "../../service/user/user.service";
 
 export default function ProjectListItem({ project }) {
   const history = useHistory();
@@ -53,6 +54,7 @@ export default function ProjectListItem({ project }) {
           {project.name}
         </NavLink>
       </td>
+      <td>{getFullName(project.creator)}</td>
       <td>{project.Client && project.Client.name}</td>
       <td>
         <label className={`badge badge-${project.status}`}>
