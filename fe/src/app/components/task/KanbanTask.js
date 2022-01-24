@@ -129,6 +129,9 @@ export default function KanbanTask({ task, index }) {
                         : "task-date"
                     }
                   >
+                    {task.deadline && now > new Date(task.deadline) && (
+                      <i className="fa fa-exclamation-circle mr-1"></i>
+                    )}
                     {task.deadline &&
                       new Intl.DateTimeFormat("cs-CZ", {
                         year: "numeric",
