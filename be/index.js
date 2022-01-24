@@ -3,7 +3,7 @@ require("dotenv/config");
 const app = express();
 const server = require("http").createServer(app);
 const cors = require("cors");
-const csrf = require("csurf"); // todo csrf??
+// const csrf = require("csurf"); // todo csrf??
 const cookieParser = require("cookie-parser");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");

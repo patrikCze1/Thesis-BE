@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
 import { createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
-import { BrowserRouter } from "react-router-dom";
+import { Router } from "react-router";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { createBrowserHistory } from "history";
 
@@ -16,13 +16,13 @@ require("dotenv").config({ path: "./../.env" });
 const composedEnhancer = composeWithDevTools(applyMiddleware(thunkMiddleware));
 
 const store = createStore(reducers, composedEnhancer);
-const history = createBrowserHistory({ forceRefresh: true });
+const history = createBrowserHistory();
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter history={history}>
+    <Router history={history}>
       <App />
-    </BrowserRouter>
+    </Router>
   </Provider>,
   document.getElementById("root")
 );

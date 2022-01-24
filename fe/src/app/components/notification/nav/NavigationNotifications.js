@@ -29,7 +29,8 @@ export default function NavigationNotifications() {
       dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
       const { projectId, id } = notification.TaskNotification.task;
-      window.location = `${routeEnum.PROJECTS}/${projectId}?ukol=${id}`;
+      // window.location = `${routeEnum.PROJECTS}/${projectId}?ukol=${id}`;
+      history.push(`${routeEnum.PROJECTS}/${projectId}?ukol=${id}`);
     }
   };
 

@@ -73,7 +73,7 @@ export default function Navigation() {
                 className="nav-link count-indicator border-0 dropdown-toggle btn"
                 onClick={handleToggleMobileSearch}
               >
-                <i class="mdi mdi-magnify"></i>
+                <i className="mdi mdi-magnify"></i>
               </button>
             </div>
           </li>

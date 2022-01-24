@@ -37,7 +37,7 @@ export default function KanbanTable() {
   const dispatch = useDispatch();
   const history = useHistory();
   const { t } = useTranslation();
-  const { id } = useParams(); // project id
+  const { id: projectId } = useParams();
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
@@ -70,20 +70,23 @@ export default function KanbanTable() {
 
       socket.on(ioEnum.TASK_NEW, (data) => {
         console.log("TASK_NEW", data);
-        if (data.task.projectId == id) dispatch(socketNewTask(data.task));
+        if (data.task.projectId == projectId)
+          dispatch(socketNewTask(data.task));
       });
       socket.on(ioEnum.TASK_EDIT, (data) => {
         console.log("TASK_EDIT");
-        if (data.task.projectId == id) dispatch(socketEditTask(data.task));
+        if (data.task.projectId == projectId)
+          dispatch(socketEditTask(data.task));
       });
       socket.on(ioEnum.TASK_DELETE, (data) => {
         dispatch(socketDeleteTask(data.id));
       });
       socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
-        if (data.stage.projectId == id) dispatch(socketNewStage(data.stage));
+        if (data.stage.projectId == projectId)
+          dispatch(socketNewStage(data.stage));
       });
       socket.on(SOCKET.PROJECT_STAGE_EDIT, (data) => {
-        if (data.projectId == id)
+        if (data.projectId == projectId)
           dispatch(socketEditStages([stageZero, ...data.stages]));
       });
       socket.on(SOCKET.PROJECT_STAGE_DELETE, (data) => {
@@ -95,15 +98,21 @@ export default function KanbanTable() {
   };
   console.log("projectStages", stages);
   useEffect(() => {
-    dispatch(loadProjectAction(id));
-    dispatch(loadTasksAction(id));
-    dispatch(loadUsersByProject(id));
-    handleWebsockets();
+    dispatch(loadProjectAction(projectId));
+    dispatch(loadTasksAction(projectId));
+    dispatch(loadUsersByProject(projectId));
+    handleWebsockets(); //todo unsibcribe
 
     if (selectedTask) {
-      dispatch(loadTaskDetailAction(id, selectedTask));
+      dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
-  }, []);
+  }, [projectId]);
+
+  useEffect(() => {
+    if (selectedTask) {
+      dispatch(loadTaskDetailAction(projectId, selectedTask));
+    }
+  }, [selectedTask]);
 
   // useEffect(() => {
   //   if (project.projectStages)
@@ -178,7 +187,7 @@ export default function KanbanTable() {
           ...task,
           projectStageId: tableState.columns[destination.droppableId].id,
         };
-        dispatch(editTaskAction(id, updatedTask.id, updatedTask));
+        dispatch(editTaskAction(projectId, updatedTask.id, updatedTask));
         return updatedTask;
       }
       return task;
@@ -192,10 +201,10 @@ export default function KanbanTable() {
 
   const handleCreateTask = () => {
     dispatch(
-      createTaskAction(id, {
+      createTaskAction(projectId, {
         title: i18next.t("New task"),
         description: i18next.t("Description"),
-        projectId: id,
+        projectId,
       })
     );
 
@@ -281,7 +290,7 @@ export default function KanbanTable() {
               className="btn btn-primary btn-icon-text d-flex align-items-center"
               onClick={handleCreateTask}
             >
-              <i class="mdi mdi-plus btn-icon-prepend"></i>
+              <i className="mdi mdi-plus btn-icon-prepend"></i>
               <Trans>label.add</Trans>
             </button>
           </div>

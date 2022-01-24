@@ -4,14 +4,14 @@ import Particles from "react-particles-js";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import { registerLocale } from "react-datepicker";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import cs from "date-fns/locale/cs"; // the locale you want
 
 import "react-toastify/dist/ReactToastify.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 
-import AppRoutes from "./AppRoutes";
+import AppRoutes from "./router/AppRoutes";
 import { Sidebar, Navigation } from "./components/navigation";
 import Footer from "./components/common/Footer";
 import InfoBar from "./components/common/InfoBar";
@@ -27,6 +27,7 @@ import { initIo } from "../utils/websocket.config";
 import { SOCKET } from "../utils/enum";
 import { socketNewNotification } from "./reducers/notification/notificationReducer";
 import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
+import AnonymRoutes from "./router/AnonymRoutes";
 
 export default function App() {
   const location = useLocation();
@@ -189,7 +190,7 @@ export default function App() {
         <div className="container-fluid page-body-wrapper full-page-wrapper">
           <div className="main-panel">
             <div className="content-wrapper">
-              <AppRoutes />
+              <AnonymRoutes />
             </div>
             <Footer />
           </div>
