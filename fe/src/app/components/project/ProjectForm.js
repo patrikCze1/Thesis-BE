@@ -3,8 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Form, Col, Button } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { Typeahead } from "react-bootstrap-typeahead";
-import Dragula from "react-dragula";
-import { toast } from "react-toastify";
 
 import {
   createProjectAction,
@@ -16,12 +14,14 @@ import { loadGroupsAction } from "./../../reducers/user/groupReducer";
 import { loadUsersAction } from "./../../reducers/user/userReducer";
 
 import Loader from "./../common/Loader";
-import axios from "./../../../utils/axios.config";
+import { getFullName } from "../../service/user/user.service";
+import LoaderTransparent from "../common/LoaderTransparent";
+import { PROJECT_STATE } from "../../enums";
+import ProjectStageForm from "./ProjectStageForm";
 
 export default function ProjectForm({ projectId }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-
   const [formData, setFormData] = useState({
     name: null,
     description: null,
@@ -29,21 +29,22 @@ export default function ProjectForm({ projectId }) {
     groups: [],
     users: [],
   });
-  const [stages, setStages] = useState([]);
   const { clients } = useSelector((state) => state.clientReducer);
   const { groups } = useSelector((state) => state.groupReducer);
   const { users } = useSelector((state) => state.userReducer);
-  const { project, projectLoaded } = useSelector(
+  const { project, projectLoaded, savingProject } = useSelector(
     (state) => state.projectReducer
   );
+  const { user: currentUser } = useSelector(
+    (state) => state.currentUserReducer
+  );
   const [isEdit, setIsEdit] = useState(projectId ? true : false);
-  console.log("projectId", projectId);
-  console.log("project", project);
+
   useEffect(() => {
+    console.log("projectId project", projectId, project);
     dispatch(loadClietntsAction());
     dispatch(loadGroupsAction());
     dispatch(loadUsersAction());
-    console.log("projectId", projectId);
     if (projectId) dispatch(loadProjectAction(projectId));
   }, []);
 
@@ -71,8 +72,9 @@ export default function ProjectForm({ projectId }) {
               };
             })
           : [],
+        createdById: project.createdById,
+        status: project.status,
       });
-      if (project.projectStages) setStages(project.projectStages);
     }
 
     if (projectId || Object.keys(project).length > 0) setIsEdit(true);
@@ -98,15 +100,10 @@ export default function ProjectForm({ projectId }) {
     }
   };
 
-  const handleInputChange = (e) => {
-    const target = e.target;
-
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
-
+  const handleChange = (prop, val) => {
     setFormData({
       ...formData,
-      [name]: value,
+      [prop]: val,
     });
   };
 
@@ -114,23 +111,9 @@ export default function ProjectForm({ projectId }) {
     return { value: client.id, label: client.name };
   });
 
-  const handleClientSelectChange = (value) => {
-    console.log("handleClientSelectChange", value);
-    setFormData({
-      ...formData,
-      clientId: value,
-    });
-  };
-
   const groupsArr = groups.map((group) => {
     return { value: group.id, label: group.name };
   });
-  const handleGroupSelectChange = (values) => {
-    setFormData({
-      ...formData,
-      groups: values,
-    });
-  };
 
   const usersArr = users.map((user) => {
     return {
@@ -139,94 +122,17 @@ export default function ProjectForm({ projectId }) {
       lastName: user.lastName,
     };
   });
-  const handleUserSelectChange = (values) => {
-    setFormData({
-      ...formData,
-      users: values,
-    });
-  };
-
-  const dragulaDecorator = (componentBackingInstance) => {
-    if (componentBackingInstance) {
-      const options = {};
-      const dragula = Dragula([componentBackingInstance], options);
-
-      dragula.on("drop", (el, target, source, sibling) => {
-        const elements = document.getElementsByClassName("stage-el");
-        const stageList = Array.from(elements).map((element, i) => {
-          return {
-            id: Number(element.dataset.id),
-            name: element.dataset.name,
-            order: i + 1,
-            projectId: Number(projectId),
-          };
-        });
-        let uniqueStages = [];
-        stageList.forEach(function (item) {
-          var i = uniqueStages.findIndex((x) => x.id == item.id);
-          if (i <= -1) {
-            uniqueStages.push(item);
-          }
-        });
-
-        setStages(uniqueStages);
-      });
-    }
-  };
-
-  const handleSaveOrder = async (e) => {
-    console.log("handleSaveOrder", stages);
-    try {
-      await axios.patch(`/api/projects/${projectId}/stages/`, { stages });
-      toast.success(t("project.changesSaved"));
-    } catch (error) {
-      toast.error(t(error.message));
-    }
-  };
-
-  const handleRenameStage = (e, id) => {
-    const editedStages = stages.map((stage) => {
-      if (stage.id == id) stage.name = e.target.value;
-      return stage;
-    });
-    setStages(editedStages);
-  };
-
-  const handleRemoveStage = async (id) => {
-    setStages(stages.filter((stage) => stage.id !== id));
-    try {
-      await axios.delete(`/api/projects/stages/${id}`);
-      toast.success(t("project.stageRemoved"));
-    } catch (error) {
-      toast.error(t(error.message));
-    }
-  };
-
-  const handleAddStage = async () => {
-    const newStage = { name: "Nová fáze", order: stages.length + 1, id: null };
-    try {
-      const res = await axios.post(`/api/projects/${project.id}/stages`, {
-        ...newStage,
-      });
-      setStages([...stages, res.data.stage]);
-      toast.success(t("project.stageAdded"));
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
 
   if (!projectLoaded && !projectId) {
     return <Loader />;
   }
-  //todo after create reload and stages will import automatically
+
   return (
     <div className="row">
-      todo show here
-      {JSON.stringify(project.creator)}
       <div className="col-md-12 grid-margin">
         <div>
           <div className="card-body">
-            <Form onSubmit={handleSubmit}>
+            <Form onSubmit={handleSubmit} className="position-relative">
               <Form.Row>
                 <Form.Group as={Col} md="5">
                   <Form.Label>
@@ -236,28 +142,54 @@ export default function ProjectForm({ projectId }) {
                     required
                     type="text"
                     placeholder=""
-                    defaultValue=""
                     name="name"
                     value={formData.name}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                     maxLength={255}
                   />
                 </Form.Group>
-                <Form.Group as={Col} md="2">
+
+                <Form.Group as={Col} md="3">
                   <Form.Label>
                     <Trans>project.key</Trans>
                   </Form.Label>
                   <Form.Control
                     type="text"
                     placeholder=""
-                    defaultValue=""
                     name="key"
                     value={formData.key}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                     maxLength={10}
                   />
                 </Form.Group>
-                <Form.Group as={Col} md="5">
+
+                <Form.Group as={Col} md="4">
+                  <Form.Label>
+                    <Trans>project.status</Trans>
+                  </Form.Label>
+                  <select
+                    className="form-control"
+                    name="status"
+                    value={formData.status}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
+                  >
+                    {Object.keys(PROJECT_STATE).map((key, i) => {
+                      return (
+                        <option value={key} key={i}>
+                          {t(PROJECT_STATE[key])}
+                        </option>
+                      );
+                    })}
+                  </select>
+                </Form.Group>
+
+                <Form.Group as={Col} md="6">
                   <Form.Label>
                     <Trans>Client</Trans>
                   </Form.Label>
@@ -266,10 +198,36 @@ export default function ProjectForm({ projectId }) {
                     options={clietnsArr}
                     name="clientId"
                     selected={formData.clientId}
-                    onChange={handleClientSelectChange}
+                    onChange={(val) => handleChange("clientId", val)}
                   />
                 </Form.Group>
+
+                <Form.Group as={Col} md="6">
+                  <Form.Label>
+                    <Trans>project.creator</Trans>
+                  </Form.Label>
+                  <select
+                    className="form-control"
+                    name="createdById"
+                    value={formData.createdById}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
+                    disabled={currentUser.id != formData.createdById}
+                  >
+                    <option>{t("project.creator")}</option>
+                    {users &&
+                      users.map((user, i) => {
+                        return (
+                          <option value={user.id} key={i}>
+                            {getFullName(user)}
+                          </option>
+                        );
+                      })}
+                  </select>
+                </Form.Group>
               </Form.Row>
+
               <Form.Row>
                 <Form.Group as={Col} md="12" controlId="validationCustom05">
                   <Form.Label>
@@ -281,10 +239,13 @@ export default function ProjectForm({ projectId }) {
                     name="description"
                     rows="4"
                     value={formData.description}
-                    onChange={handleInputChange}
+                    onChange={(e) =>
+                      handleChange(e.target.name, e.target.value)
+                    }
                   ></textarea>
                 </Form.Group>
               </Form.Row>
+
               <Form.Row>
                 <Form.Group as={Col} md="12" controlId="validationCustom03">
                   <Form.Label>
@@ -296,10 +257,11 @@ export default function ProjectForm({ projectId }) {
                     options={groupsArr}
                     name="groups"
                     selected={formData.groups}
-                    onChange={handleGroupSelectChange}
+                    onChange={(val) => handleChange("groups", val)}
                   />
                 </Form.Group>
               </Form.Row>
+
               <Form.Row>
                 <Form.Group as={Col} md="12">
                   <Form.Label>
@@ -314,7 +276,7 @@ export default function ProjectForm({ projectId }) {
                     options={usersArr}
                     name="users"
                     selected={formData.users}
-                    onChange={handleUserSelectChange}
+                    onChange={(val) => handleChange("users", val)}
                   />
                 </Form.Group>
               </Form.Row>
@@ -322,57 +284,10 @@ export default function ProjectForm({ projectId }) {
               <Button type="submit">
                 <Trans>{isEdit ? "Edit" : "Create"}</Trans>
               </Button>
+              {savingProject && <LoaderTransparent />}
             </Form>
-            {/* {actionProcessing && <Loader />} */}
 
-            {isEdit && (
-              <div className="row mt-5">
-                <div className="col-md-12">
-                  <h3 className="d-flex">
-                    <Trans>Stage settings</Trans>
-
-                    <button
-                      onClick={handleAddStage}
-                      className="btn btn-outline-primary d-block ml-auto"
-                    >
-                      <Trans>project.addPhase</Trans>
-                    </button>
-                  </h3>
-                  <div
-                    className="container dragula-container"
-                    ref={dragulaDecorator}
-                  >
-                    {stages &&
-                      stages.map((stage) => (
-                        <div key={stage.id} className="dragula-element">
-                          <i className="fa fa-bars"></i>
-                          <span
-                            data-id={stage.id}
-                            data-name={stage.name}
-                            className="stage-el dragula-order"
-                          ></span>
-                          <input
-                            type="text"
-                            value={stage.name}
-                            onChange={(e) => handleRenameStage(e, stage.id)}
-                          />
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveStage(stage.id)}
-                            className="btn btn-danger btn-rounded btn-icon"
-                          >
-                            <i className="fa fa-times"></i>
-                          </button>
-                        </div>
-                      ))}
-                  </div>
-
-                  <Button type="button" onClick={handleSaveOrder}>
-                    <Trans>Edit changes</Trans>
-                  </Button>
-                </div>
-              </div>
-            )}
+            {isEdit && <ProjectStageForm projectId={projectId} />}
           </div>
         </div>
       </div>

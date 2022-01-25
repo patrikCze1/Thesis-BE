@@ -78,9 +78,9 @@ export default function KanbanTable() {
   const [filterObject, setFilterObject] = useState({});
 
   const handleWebsockets = () => {
-    try {
-      const socket = getIo();
+    const socket = getIo();
 
+    try {
       socket.on(ioEnum.TASK_NEW, (data) => {
         console.log("TASK_NEW", data);
         if (data.task.projectId == projectId)
@@ -108,6 +108,8 @@ export default function KanbanTable() {
     } catch (error) {
       console.error(error);
     }
+
+    return socket;
   };
   console.log("projectStages", stages);
 
@@ -115,11 +117,15 @@ export default function KanbanTable() {
     dispatch(loadProjectAction(projectId));
     dispatch(loadTasksAction(projectId));
     dispatch(loadUsersByProject(projectId));
-    handleWebsockets(); //todo unsibcribe
+    const io = handleWebsockets(); //todo unsibcribe
 
     if (selectedTask) {
       dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
+
+    return () => {
+      io?.close();
+    };
   }, [projectId]);
 
   useEffect(() => {
@@ -292,15 +298,17 @@ export default function KanbanTable() {
                     </Tooltip>
                   }
                 >
-                  {/* <a
+                  <a
                     href="#!"
-                    className={`text-avatar ${
-                      filteredUser?.id === user.id ? "highlited" : ""
-                    }`}
-                    onClick={(e) => handleClickUserIcon(e, user)}
-                  > */}
-                  <span>{getShortName(user)}</span>
-                  {/* </a> */}
+                    className="text-avatar"
+                    // className={`text-avatar ${
+                    //   filteredUser?.id === user.id ? "highlited" : ""
+                    // }`}
+                    onClick={(e) => e.preventDefault()}
+                    // onClick={(e) => handleClickUserIcon(e, user)}
+                  >
+                    <span>{getShortName(user)}</span>
+                  </a>
                 </OverlayTrigger>
               ))}
           </div>

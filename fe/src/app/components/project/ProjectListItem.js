@@ -20,7 +20,6 @@ export default function ProjectListItem({ project }) {
   const { t } = useTranslation();
   const MySwal = withReactContent(Swal);
   const { user } = useSelector((state) => state.currentUserReducer);
-  const { clients } = useSelector((state) => state.clientReducer);
 
   const handleEditClick = () => {
     history.push({

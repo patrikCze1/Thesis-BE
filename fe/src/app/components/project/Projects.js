@@ -23,7 +23,7 @@ import { ROLES } from "../../../utils/enum";
 export default function Projects() {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { projects, projectsLoaded } = useSelector(
+  const { projects, projectsLoaded, project } = useSelector(
     (state) => state.projectReducer
   );
   const { user } = useSelector((state) => state.currentUserReducer);
@@ -65,6 +65,14 @@ export default function Projects() {
       setShowForm(true);
     }
   }, [params]);
+
+  useEffect(() => {
+    if (!selectedProject.current && Object.keys(project).length > 0) {
+      history.push({
+        search: `?upravit=${project.id}`,
+      });
+    }
+  }, [project]);
 
   const handleShowForm = (projectId = null) => {
     setShowForm(true);
@@ -136,7 +144,10 @@ export default function Projects() {
                 <Trans>Close</Trans>
               </span>
             </button>
-            <ProjectForm projectId={selectedProject.current} />
+            <ProjectForm
+              projectId={selectedProject.current}
+              closeForm={handleHideForm}
+            />
           </Modal.Body>
         </Modal>
       )}

@@ -217,6 +217,7 @@ i18n
             title: "Projekt",
             key: "Zkratka",
             creator: "Zadavetel",
+            status: "Status",
             state: {
               active: "Aktivní",
               planned: "Plánovaný",
@@ -224,6 +225,7 @@ i18n
               cancelled: "Zrušený",
             },
             description: "Popis",
+            newPhase: "Nová fáze",
           },
           pagiantion: {
             previous: "Předchozí",

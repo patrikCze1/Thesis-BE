@@ -21,10 +21,10 @@ export default function AnonymRoutes() {
       {
         //todo fix
       }
-      {/* <Route exact path="/">
-        <Redirect to={routeEnum.LOGIN} />
+      <Route exact path="/">
+        <Login />
       </Route>
-      <Route>
+      {/* <Route>
         <Redirect to={routeEnum.LOGIN} />
       </Route> */}
     </Switch>

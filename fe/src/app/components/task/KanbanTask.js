@@ -127,23 +127,28 @@ export default function KanbanTask({ task, index }) {
 
               <div className="d-flex justify-content-between w-100">
                 {task.deadline && (
-                  <p
-                    className={
-                      task.deadline && now > new Date(task.deadline)
-                        ? "task-date text-danger"
-                        : "task-date"
-                    }
-                  >
-                    {task.deadline && now > new Date(task.deadline) && (
-                      <i className="fa fa-exclamation-circle mr-1"></i>
-                    )}
-                    {task.deadline &&
-                      new Intl.DateTimeFormat("cs-CZ", {
-                        year: "numeric",
-                        month: "2-digit",
-                        day: "2-digit",
-                      }).format(new Date(task.deadline))}
-                  </p>
+                  <>
+                    <p
+                      className={
+                        task.deadline && now > new Date(task.deadline)
+                          ? "task-date text-danger"
+                          : "task-date"
+                      }
+                    >
+                      {task.deadline && now > new Date(task.deadline) && (
+                        <i className="fa fa-exclamation-circle mr-1"></i>
+                      )}
+                      {task.deadline &&
+                        new Intl.DateTimeFormat("cs-CZ", {
+                          year: "numeric",
+                          month: "2-digit",
+                          day: "2-digit",
+                        }).format(new Date(task.deadline))}
+                    </p>
+                    <small>{`${project.key && `${project.key}-`}${
+                      task.number
+                    }`}</small>
+                  </>
                 )}
 
                 {/* <Dropdown variant="p-0" alignRight>
@@ -184,9 +189,6 @@ export default function KanbanTask({ task, index }) {
                 )}
               </div>
               <div className="d-flex justify-content-between">
-                <small>{`${project.key && `${project.key}-`}${
-                  task.number
-                }`}</small>
                 {renderBadget()}
 
                 {task.isCompleted && (

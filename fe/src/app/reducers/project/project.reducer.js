@@ -9,6 +9,7 @@ const initialState = {
   projectLoaded: false,
   errorMessage: null,
   stages: [],
+  savingProject: false,
 };
 
 const stageZero = {
@@ -30,7 +31,12 @@ export default function projectReducer(state = initialState, action) {
       };
 
     case "project/clearProject":
-      return { ...state, project: {}, projectLoaded: true };
+      return {
+        ...state,
+        project: {},
+        projectLoaded: true,
+        savingProject: false,
+      };
 
     case "project/loadDetail":
       return { ...state, projectLoaded: false };
@@ -43,12 +49,26 @@ export default function projectReducer(state = initialState, action) {
         stages: [stageZero, ...action.payload.project.projectStages],
       };
 
+    case "project/saving":
+      return { ...state, savingProject: true };
+
+    case "project/stopSaving":
+      return { ...state, savingProject: false };
+
     case "project/create":
       toast.success(i18next.t("Project created"));
       return {
         ...state,
         projects: [...state.projects, action.payload.project],
         project: action.payload.project,
+        savingProject: false,
+      };
+
+    case "project/createStage":
+      toast.success(i18next.t("project.stageAdded"));
+      return {
+        ...state,
+        stages: [...state.stages, action.payload.stage],
       };
 
     case "project/socketNew":
@@ -69,11 +89,19 @@ export default function projectReducer(state = initialState, action) {
       toast.success(i18next.t("Project updated"));
       return {
         ...state,
+        savingProject: false,
         projects: state.projects.map((project) => {
           if (project.id === action.payload.project.id)
             return { ...project, ...action.payload.project };
           else return project;
         }),
+      };
+
+    case "project/editStages":
+      toast.success(i18next.t("project.changesSaved"));
+      return {
+        ...state,
+        stages: action.payload,
       };
 
     case "project/socketEdit":
@@ -98,6 +126,13 @@ export default function projectReducer(state = initialState, action) {
         projects: state.projects.filter(
           (project) => project.id != action.payload
         ),
+      };
+
+    case "project/deleteStage":
+      toast.success(i18next.t("project.stageRemoved"));
+      return {
+        ...state,
+        stages: state.stages.filter((stage) => stage.id != action.payload),
       };
 
     case "project/socketDelete":
@@ -146,9 +181,20 @@ export const clearProjectAction = () => async (dispatch) => {
 };
 
 export const createProjectAction = (project) => async (dispatch) => {
+  dispatch({ type: "project/saving" });
   try {
     const response = await axios.post(`/api/projects`, project);
     dispatch({ type: "project/create", payload: response.data });
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+    dispatch({ type: "project/stopSaving" });
+  }
+};
+
+export const createStageAction = (projectId, stage) => async (dispatch) => {
+  try {
+    const res = await axios.post(`/api/projects/${projectId}/stages`, stage);
+    dispatch({ type: "project/createStage", payload: res.data });
   } catch (error) {
     toast.error(error.response?.data?.message);
   }
@@ -163,9 +209,22 @@ export const socketNewStage = (stage) => (dispatch) => {
 };
 
 export const editProjectAction = (id, data) => async (dispatch) => {
+  dispatch({ type: "project/saving" });
   try {
     const response = await axios.patch(`/api/projects/${id}`, data);
     dispatch({ type: "project/edit", payload: response.data });
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+    dispatch({ type: "project/stopSaving" });
+  }
+};
+
+export const editStagesAction = (projectId, stages) => async (dispatch) => {
+  try {
+    await axios.patch(`/api/projects/${projectId}/stages`, {
+      stages,
+    });
+    dispatch({ type: "project/editStages", payload: stages });
   } catch (error) {
     toast.error(error.response?.data?.message);
   }
@@ -183,6 +242,15 @@ export const deleteProjectAction = (id) => async (dispatch) => {
   try {
     await axios.delete(`/api/projects/${id}`);
     dispatch({ type: "project/delete", payload: id });
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+  }
+};
+
+export const deleteStageAction = (id) => async (dispatch) => {
+  try {
+    await axios.delete(`/api/projects/stages/${id}`);
+    dispatch({ type: "project/deleteStage", payload: id });
   } catch (error) {
     toast.error(error.response?.data?.message);
   }
