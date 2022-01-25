@@ -187,6 +187,7 @@ i18n
             hide: "Skrýt",
             change: "Změnit",
             color: "Barva",
+            filter: "Filtr",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -271,6 +272,16 @@ i18n
           date: {
             today: "Dnes",
             thisWeek: "Tento týden",
+          },
+          filter: {
+            deadline: "Termín",
+            afterDeadline: "Po termínu",
+            deadlineIn24Hours: "Během 24 hodin",
+            members: "Členové",
+            myTasks: "Moje úkoly",
+            tasksWithoutUser: "Nezařazené",
+            clearFilter: "Smazat filtr",
+            taskQuery: "Vyhledejte dle názvu nebo čísla...",
           },
         },
       },

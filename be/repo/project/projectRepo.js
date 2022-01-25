@@ -31,7 +31,6 @@ exports.findByUser = async (user, filter) => {
       {
         model: User,
         as: "creator",
-        attributes: [],
       },
       {
         model: User,
@@ -40,6 +39,7 @@ exports.findByUser = async (user, filter) => {
       },
       {
         model: Client,
+        // as: "client",
       },
     ],
     limit: filter.limit ? parseInt(filter.limit) : null,

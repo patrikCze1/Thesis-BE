@@ -18,13 +18,15 @@ export default function AnonymRoutes() {
       <Route path={routeEnum.RESET_PASSWORD}>
         <ResetPassword />
       </Route>
-
-      <Route exact path="/">
+      {
+        //todo fix
+      }
+      {/* <Route exact path="/">
         <Redirect to={routeEnum.LOGIN} />
       </Route>
       <Route>
         <Redirect to={routeEnum.LOGIN} />
-      </Route>
+      </Route> */}
     </Switch>
   );
 }

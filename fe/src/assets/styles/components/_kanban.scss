@@ -193,3 +193,30 @@
     min-width: 250px;
   }
 }
+
+.kanban-filter {
+  position: absolute;
+  background: $content-bg;
+  min-width: 236px;
+  max-width: 450px;
+  width: 100%;
+  padding: 20px;
+  top: 0;
+  right: 1.5rem;
+  -webkit-box-shadow: 0px 10px 22px 0px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 10px 22px 0px rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+
+  .form-group {
+    margin-bottom: 0;
+    .form-check {
+      margin-top: 0;
+    }
+  }
+
+  .filter-group-title {
+    margin-bottom: 12px;
+    margin-top: 10px;
+    display: inline-block;
+  }
+}

@@ -40,6 +40,7 @@ import TaskCommentItem from "./TaskCommentItem";
 import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
+import { TASK_COLORS } from "../../enums";
 
 export default function TaskForm({ task, hideModal }) {
   const dispatch = useDispatch();
@@ -336,7 +337,7 @@ export default function TaskForm({ task, hideModal }) {
             {canEdit && (
               <>
                 <button
-                  className="btn btn-outline-primary btn-icon-text mb-2 d-block ml-auto"
+                  className="btn btn-outline-primary btn-icon-text mb-2 d-block"
                   onClick={() => setShowFileForm(!showFileForm)}
                 >
                   {showFileForm ? (
@@ -587,6 +588,7 @@ export default function TaskForm({ task, hideModal }) {
                     setShowColorPicker(false);
                   }}
                   color={formData.colorCode}
+                  colors={TASK_COLORS}
                 />
               )}
             </button>

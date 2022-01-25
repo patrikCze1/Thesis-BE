@@ -90,10 +90,7 @@ export default function App() {
 
   useEffect(() => {
     dispatch(loadFromSessionAction());
-
-    setLoaded(true);
     initWebsocket();
-    console.log("APP LOADED");
 
     const interceptor = axios.interceptors.response.use(
       (response) => response,
@@ -126,6 +123,10 @@ export default function App() {
         return Promise.reject(error);
       }
     );
+
+    console.log("APP LOADED");
+
+    //return interceptor
   }, []);
 
   useEffect(() => {
@@ -135,11 +136,12 @@ export default function App() {
       if (location.pathname !== routeEnum.TIME_TRACKS)
         dispatch(loadMyTimeTracksAction(null, null, false, true));
     } else setShowMenu(false);
+    setLoaded(true);
   }, [user]);
 
   if (!loaded) {
     // todo logo fullscreen
-    return <></>;
+    return <>Logo...</>;
   }
 
   if (showMenu) {

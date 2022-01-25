@@ -32,6 +32,16 @@ import {
 import { getIo } from "../../../utils/websocket.config";
 import { ioEnum } from "../../enums/websocket/io";
 import { SOCKET } from "../../../utils/enum";
+import KanbanFilter from "./component/KanbanFilter";
+
+const initialFilter = {
+  query: "",
+  color: "",
+  afterDeadline: false,
+  beforeDeadline: false,
+  assignedMe: false,
+  notAssigned: false,
+};
 
 export default function KanbanTable() {
   const dispatch = useDispatch();
@@ -48,6 +58,9 @@ export default function KanbanTable() {
   );
   const { tasks, task, taskLoaded } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
+  const { user: currentUser } = useSelector(
+    (state) => state.currentUserReducer
+  );
 
   const stageZero = {
     id: null,
@@ -61,8 +74,8 @@ export default function KanbanTable() {
     columns: {},
     columnOrder: [],
   });
-  const [filteredUser, setFilteredUser] = useState(null);
-  const [filterQuery, setFilterQuery] = useState(null);
+  const [showFilter, setShowFilter] = useState(false);
+  const [filterObject, setFilterObject] = useState({});
 
   const handleWebsockets = () => {
     try {
@@ -97,6 +110,7 @@ export default function KanbanTable() {
     }
   };
   console.log("projectStages", stages);
+
   useEffect(() => {
     dispatch(loadProjectAction(projectId));
     dispatch(loadTasksAction(projectId));
@@ -109,9 +123,7 @@ export default function KanbanTable() {
   }, [projectId]);
 
   useEffect(() => {
-    if (selectedTask) {
-      dispatch(loadTaskDetailAction(projectId, selectedTask));
-    }
+    if (selectedTask) dispatch(loadTaskDetailAction(projectId, selectedTask));
   }, [selectedTask]);
 
   // useEffect(() => {
@@ -122,6 +134,7 @@ export default function KanbanTable() {
   useEffect(() => {
     refreshTableState();
   }, [tasks, stages]);
+
   console.log("tasks", tasks);
   const refreshTableState = () => {
     if (stages?.length) {
@@ -223,15 +236,39 @@ export default function KanbanTable() {
     }
   };
 
-  const handleClickUserIcon = (e, user) => {
-    e.preventDefault();
-    console.log(user);
+  // const handleClickUserIcon = (e, user) => {
+  //   e.preventDefault();
+  //   console.log("handleClickUserIcon", user);
 
-    if (user.id === filteredUser?.id) {
-      setFilteredUser(null);
-    } else {
-      setFilteredUser(user);
+  //   if (user.id === filteredUser?.id) {
+  //     setFilteredUser(null);
+  //   } else {
+  //     setFilteredUser(user);
+  //   }
+  // };
+
+  const handleShowFilter = () => {
+    setShowFilter(!showFilter);
+  };
+
+  const handleClearFilter = () => {
+    setFilterObject({});
+    setShowFilter(false);
+  };
+
+  const handleUpdateFilter = (prop, val) => {
+    console.log("handleUpdateFilter", prop, val);
+    if (prop === "color" && val === "#ffffff") val = null;
+    setFilterObject({ ...filterObject, [prop]: val });
+  };
+
+  const isFiltered = () => {
+    for (const key in filterObject) {
+      if (filterObject[key]) {
+        return true;
+      }
     }
+    return false;
   };
 
   if (!projectLoaded) {
@@ -255,22 +292,22 @@ export default function KanbanTable() {
                     </Tooltip>
                   }
                 >
-                  <a
+                  {/* <a
                     href="#!"
                     className={`text-avatar ${
                       filteredUser?.id === user.id ? "highlited" : ""
                     }`}
                     onClick={(e) => handleClickUserIcon(e, user)}
-                  >
-                    <span>{getShortName(user)}</span>
-                  </a>
+                  > */}
+                  <span>{getShortName(user)}</span>
+                  {/* </a> */}
                 </OverlayTrigger>
               ))}
           </div>
         </div>
         <div className="wrapper ml-auto  d-lg-flex flex-column flex-md-row kanban-toolbar my-2">
           <div className="d-flex mt-4 mt-md-0">
-            <div className="input-group">
+            {/* <div className="input-group">
               <input
                 type="search"
                 onInput={(e) => setFilterQuery(e.target.value)}
@@ -283,7 +320,26 @@ export default function KanbanTable() {
                   <i className="mdi mdi-magnify"></i>
                 </span>
               </div>
-            </div>
+            </div> */}
+
+            <button
+              type="button"
+              className={`btn btn-icon bg-white  ${
+                isFiltered() && "btn-inverse-primary"
+              }`}
+              onClick={handleShowFilter}
+            >
+              <i className="mdi mdi-filter-outline text-primary"></i>
+            </button>
+            {isFiltered() && (
+              <button
+                type="button"
+                className={`btn btn-icon ml-0 `}
+                onClick={() => handleClearFilter()}
+              >
+                <i className="mdi mdi-filter-remove text-danger"></i>
+              </button>
+            )}
 
             <button
               type="button"
@@ -297,6 +353,16 @@ export default function KanbanTable() {
         </div>
       </div>
 
+      {showFilter && (
+        <div style={{ position: "relative" }}>
+          <KanbanFilter
+            onChange={handleUpdateFilter}
+            filter={filterObject}
+            onClear={handleClearFilter}
+          />
+        </div>
+      )}
+
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="kanban-wrapper">
           {projectLoaded &&
@@ -305,15 +371,28 @@ export default function KanbanTable() {
               const column =
                 tableState.columns[`droppableCol-${columnOrder.id}`];
               const columnTasks = tableState.tasks.filter((task) => {
-                if (filteredUser)
+                if (isFiltered())
                   return (
                     task.projectStageId == column.id &&
-                    task.solver?.id === filteredUser.id
-                  );
-                if (filterQuery)
-                  return (
-                    task.projectStageId == column.id &&
-                    task.title.toLowerCase().includes(filterQuery.toLowerCase())
+                    ((filterObject.notAssigned && task.solverId === null) ||
+                      (filterObject.assignedMe &&
+                        task.solverId === currentUser.id) ||
+                      (filterObject.query &&
+                        task.title
+                          .toLowerCase()
+                          .includes(filterObject.query?.toLowerCase())) ||
+                      (filterObject.query &&
+                        String(task.number).includes(filterObject.query)) ||
+                      (filterObject.color &&
+                        filterObject.color === task.colorCode) ||
+                      (filterObject.afterDeadline &&
+                        task.deadline != null &&
+                        new Date() > new Date(task.deadline)) ||
+                      (filterObject.beforeDeadline &&
+                        task.deadline != null &&
+                        new Date(Date.now() - 86400000) <
+                          new Date(task.deadline)))
+                    // task.solver?.id === filteredUser.id
                   );
                 else return task.projectStageId == column.id;
               });

@@ -180,7 +180,7 @@ export default function Dashboard() {
             )}
             <NavLink
               to={routeEnum.NOTIFICATIONS}
-              className="text-black mt-3 mb-0 d-block h6"
+              className="text-black mt-3 mb-0 d-inline-block h6"
             >
               <Trans>label.showAll</Trans>
               <i className="mdi mdi-chevron-right"></i>
