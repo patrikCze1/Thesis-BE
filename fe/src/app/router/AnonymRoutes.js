@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 
 import Login from "../components/auth/Login";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
@@ -17,6 +17,13 @@ export default function AnonymRoutes() {
       </Route>
       <Route path={routeEnum.RESET_PASSWORD}>
         <ResetPassword />
+      </Route>
+
+      <Route exact path="/">
+        <Redirect to={routeEnum.LOGIN} />
+      </Route>
+      <Route>
+        <Redirect to={routeEnum.LOGIN} />
       </Route>
     </Switch>
   );
