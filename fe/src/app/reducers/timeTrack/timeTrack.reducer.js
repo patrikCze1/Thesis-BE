@@ -26,12 +26,12 @@ export default function timeTrackReducer(state = initialState, action) {
           : state.activeTrack,
       };
 
-    case "tracks/loadOlder":
-      return {
-        ...state,
-        loaded: true,
-        tracks: [...state.tracks, ...action.payload.tracks],
-      };
+    // case "tracks/loadOlder":
+    //   return {
+    //     ...state,
+    //     loaded: true,
+    //     tracks: [...state.tracks, ...action.payload.tracks],
+    //   };
 
     case "tracks/start":
       return { ...state, activeTrack: action.payload.track };
@@ -92,19 +92,19 @@ export const loadAllTimeTracksAction =
     }
   };
 
-export const loadMyOlderTracks =
-  (from = "", to = "") =>
-  async (dispatch) => {
-    dispatch({ type: "tracks/loadStart", payload: null });
-    try {
-      const response = await axios.get(
-        `/api/tracks/me/?from=${from}&to=${to}&returnActive=false&returnTracks=true`
-      );
-      dispatch({ type: "tracks/loadOlder", payload: response.data });
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
+// export const loadMyOlderTracks =
+//   (from = "", to = "") =>
+//   async (dispatch) => {
+//     dispatch({ type: "tracks/loadStart", payload: null });
+//     try {
+//       const response = await axios.get(
+//         `/api/tracks/me/?from=${from}&to=${to}&returnActive=false&returnTracks=true`
+//       );
+//       dispatch({ type: "tracks/loadOlder", payload: response.data });
+//     } catch (error) {
+//       toast.error(error.message);
+//     }
+//   };
 
 export const startTimeTrackAction = (data) => async (dispatch) => {
   try {

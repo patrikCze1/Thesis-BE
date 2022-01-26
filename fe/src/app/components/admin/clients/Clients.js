@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { Trans } from "react-i18next";
@@ -7,18 +7,20 @@ import ClientForm from "./ClientForm";
 import ClientTableRow from "./ClientTableRow";
 import Loader from "./../../common/Loader";
 import { loadClietntsAction } from "./../../../reducers/common/clientReducer";
-import Pagination from "./../../common/Pagination";
+import { usePagination } from "../../../hooks/usePagination";
 
 export default function Clients() {
   const dispatch = useDispatch();
   const paginationLimit = 20;
 
-  const currentPageRef = useRef(1);
   const [showClientForm, setShowClientForm] = useState(false);
-  const [paginationOffset, setPaginationOffset] = useState(0);
-
   const { clients, clientsLoaded, clientsCount } = useSelector(
     (state) => state.clientReducer
+  );
+  const [paginationOffset, renderPagination] = usePagination(
+    paginationLimit,
+    0,
+    clientsCount
   );
 
   useEffect(() => {
@@ -27,27 +29,6 @@ export default function Clients() {
 
   const handleShowClientForm = () => {
     setShowClientForm(!showClientForm);
-  };
-
-  const handleNextPage = (e) => {
-    e.preventDefault();
-    if (paginationOffset + paginationLimit <= clientsCount) {
-      setPaginationOffset(paginationOffset + paginationLimit);
-      currentPageRef.current = ++currentPageRef.current;
-    }
-  };
-
-  const handlePrevPage = (e) => {
-    e.preventDefault();
-    if (paginationOffset >= paginationLimit) {
-      setPaginationOffset(paginationOffset - paginationLimit);
-      currentPageRef.current = --currentPageRef.current;
-    }
-  };
-
-  const handlePageSelect = (page) => {
-    currentPageRef.current = page;
-    setPaginationOffset(paginationLimit * (page - 1));
   };
 
   const renderedClients =
@@ -102,17 +83,7 @@ export default function Clients() {
                   </thead>
                   <tbody>{clientsLoaded && renderedClients}</tbody>
                 </table>
-                {clientsLoaded ? (
-                  <Pagination
-                    pages={Math.ceil(clientsCount / paginationLimit)}
-                    currentPage={currentPageRef.current}
-                    onClickNext={handleNextPage}
-                    onClickPrev={handlePrevPage}
-                    onClick={handlePageSelect}
-                  />
-                ) : (
-                  <Loader />
-                )}
+                {clientsLoaded ? renderPagination() : <Loader />}
               </div>
             </div>
           </div>

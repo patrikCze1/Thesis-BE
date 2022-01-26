@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Trans } from "react-i18next";
 
@@ -6,20 +6,18 @@ import { loadProjectsAction } from "../../reducers/project/project.reducer";
 import {
   deleteTimeTrackAction,
   editTimeTrackAction,
-  loadMyOlderTracks,
   loadMyTimeTracksAction,
 } from "../../reducers/timeTrack/timeTrack.reducer";
 import {
   formatSecondsToString,
   getDayMonthShort,
-  getFirstDayOfWeek,
   getSecondsDiff,
 } from "../../service/date/date.service";
 
 import TimeTrackListItem from "./TimeTrackListItem";
 import Starter from "./Starter";
 import Loader from "./../common/Loader";
-import Pagination from "../common/Pagination";
+import { usePagination } from "../../hooks/usePagination";
 
 export default function TimeTrackScreen() {
   const dispatch = useDispatch();
@@ -29,8 +27,11 @@ export default function TimeTrackScreen() {
     (state) => state.timeTrackReducer
   );
   const [groupedTracks, setGroupedTracks] = useState(null);
-  const [paginationOffset, setPaginationOffset] = useState(0);
-  const currentPageRef = useRef(1);
+  const [paginationOffset, renderPagination] = usePagination(
+    paginationLimit,
+    0,
+    tracksCount
+  );
 
   useEffect(() => {
     dispatch(loadProjectsAction());
@@ -43,27 +44,6 @@ export default function TimeTrackScreen() {
   useEffect(() => {
     dispatch(loadMyTimeTracksAction(paginationOffset, paginationLimit));
   }, [paginationOffset]);
-
-  const handleNextPage = (e) => {
-    e.preventDefault();
-    if (paginationOffset + paginationLimit <= tracksCount) {
-      setPaginationOffset(paginationOffset + paginationLimit);
-      currentPageRef.current = ++currentPageRef.current;
-    }
-  };
-
-  const handlePrevPage = (e) => {
-    e.preventDefault();
-    if (paginationOffset >= paginationLimit) {
-      setPaginationOffset(paginationOffset - paginationLimit);
-      currentPageRef.current = --currentPageRef.current;
-    }
-  };
-
-  const handlePageSelect = (page) => {
-    currentPageRef.current = page;
-    setPaginationOffset(paginationLimit * (page - 1));
-  };
 
   const handleUpdateTrack = (track) => {
     dispatch(editTimeTrackAction(track));
@@ -88,7 +68,7 @@ export default function TimeTrackScreen() {
   //     loadMyOlderTracks(firstDayOfWeekRef.current, new Date(timestampTo))
   //   );
   // };
-  //todo group only new tracks???
+
   const prepareData = (tracks) => {
     const tracksArr = tracks.reduce((tracks, track) => {
       const date = track.beginAt.split("T")[0];
@@ -114,10 +94,6 @@ export default function TimeTrackScreen() {
 
     setGroupedTracks(groupTracks);
   };
-  console.log(
-    "Math.ceil(tracksCount / paginationLimit)",
-    Math.ceil(tracksCount / paginationLimit)
-  );
 
   return (
     <div className="row">
@@ -164,15 +140,7 @@ export default function TimeTrackScreen() {
       ) : (
         <Loader />
       )}
-      <div className="col-md-12 text-center">
-        <Pagination
-          pages={Math.ceil(tracksCount / paginationLimit)}
-          currentPage={currentPageRef.current}
-          onClickNext={handleNextPage}
-          onClickPrev={handlePrevPage}
-          onClick={handlePageSelect}
-        />
-      </div>
+      <div className="col-md-12 text-center">{renderPagination()}</div>
     </div>
   );
 }
