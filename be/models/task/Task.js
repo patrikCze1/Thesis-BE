@@ -30,7 +30,7 @@ module.exports = (sequelize) => {
       },
       colorCode: {
         type: DataTypes.STRING(7),
-        defaultValue: "#fff",
+        defaultValue: "#ffffff",
       },
       solverId: {
         type: DataTypes.INTEGER,

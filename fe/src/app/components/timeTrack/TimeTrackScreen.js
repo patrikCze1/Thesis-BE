@@ -19,27 +19,51 @@ import {
 import TimeTrackListItem from "./TimeTrackListItem";
 import Starter from "./Starter";
 import Loader from "./../common/Loader";
+import Pagination from "../common/Pagination";
 
 export default function TimeTrackScreen() {
   const dispatch = useDispatch();
+  const paginationLimit = 40;
   const { projects } = useSelector((state) => state.projectReducer);
-  const { tracks, activeTrack, loaded } = useSelector(
+  const { tracks, activeTrack, loaded, tracksCount } = useSelector(
     (state) => state.timeTrackReducer
   );
   const [groupedTracks, setGroupedTracks] = useState(null);
-  const firstDayOfWeekRef = useRef(getFirstDayOfWeek(new Date()));
+  const [paginationOffset, setPaginationOffset] = useState(0);
+  const currentPageRef = useRef(1);
 
   useEffect(() => {
-    const today = new Date();
-    firstDayOfWeekRef.current = getFirstDayOfWeek(new Date());
-    firstDayOfWeekRef.current.setHours(0, 0, 0);
     dispatch(loadProjectsAction());
-    dispatch(loadMyTimeTracksAction(firstDayOfWeekRef.current, today));
   }, []);
 
   useEffect(() => {
     prepareData(tracks);
   }, [tracks]);
+
+  useEffect(() => {
+    dispatch(loadMyTimeTracksAction(paginationOffset, paginationLimit));
+  }, [paginationOffset]);
+
+  const handleNextPage = (e) => {
+    e.preventDefault();
+    if (paginationOffset + paginationLimit <= tracksCount) {
+      setPaginationOffset(paginationOffset + paginationLimit);
+      currentPageRef.current = ++currentPageRef.current;
+    }
+  };
+
+  const handlePrevPage = (e) => {
+    e.preventDefault();
+    if (paginationOffset >= paginationLimit) {
+      setPaginationOffset(paginationOffset - paginationLimit);
+      currentPageRef.current = --currentPageRef.current;
+    }
+  };
+
+  const handlePageSelect = (page) => {
+    currentPageRef.current = page;
+    setPaginationOffset(paginationLimit * (page - 1));
+  };
 
   const handleUpdateTrack = (track) => {
     dispatch(editTimeTrackAction(track));
@@ -51,19 +75,19 @@ export default function TimeTrackScreen() {
 
   //todo handle copy track
 
-  const handleLoadOlder = () => {
-    const date1 = new Date(firstDayOfWeekRef.current);
-    const date2 = new Date(firstDayOfWeekRef.current);
-    const timestamp = date1.setTime(date1.getTime() - 7 * 24 * 60 * 60 * 1000);
-    const timestampTo = date2.setTime(
-      date2.getTime() - 1 * 24 * 60 * 60 * 1000
-    );
-    firstDayOfWeekRef.current = new Date(timestamp);
+  // const handleLoadOlder = () => {
+  //   const date1 = new Date(firstDayOfWeekRef.current);
+  //   const date2 = new Date(firstDayOfWeekRef.current);
+  //   const timestamp = date1.setTime(date1.getTime() - 7 * 24 * 60 * 60 * 1000);
+  //   const timestampTo = date2.setTime(
+  //     date2.getTime() - 1 * 24 * 60 * 60 * 1000
+  //   );
+  //   firstDayOfWeekRef.current = new Date(timestamp);
 
-    dispatch(
-      loadMyOlderTracks(firstDayOfWeekRef.current, new Date(timestampTo))
-    );
-  };
+  //   dispatch(
+  //     loadMyOlderTracks(firstDayOfWeekRef.current, new Date(timestampTo))
+  //   );
+  // };
   //todo group only new tracks???
   const prepareData = (tracks) => {
     const tracksArr = tracks.reduce((tracks, track) => {
@@ -90,6 +114,10 @@ export default function TimeTrackScreen() {
 
     setGroupedTracks(groupTracks);
   };
+  console.log(
+    "Math.ceil(tracksCount / paginationLimit)",
+    Math.ceil(tracksCount / paginationLimit)
+  );
 
   return (
     <div className="row">
@@ -137,9 +165,13 @@ export default function TimeTrackScreen() {
         <Loader />
       )}
       <div className="col-md-12 text-center">
-        <button className="btn btn-link" onClick={handleLoadOlder}>
-          <Trans>track.loadOlder</Trans>
-        </button>
+        <Pagination
+          pages={Math.ceil(tracksCount / paginationLimit)}
+          currentPage={currentPageRef.current}
+          onClickNext={handleNextPage}
+          onClickPrev={handlePrevPage}
+          onClick={handlePageSelect}
+        />
       </div>
     </div>
   );

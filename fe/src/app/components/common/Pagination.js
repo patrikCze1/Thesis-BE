@@ -18,8 +18,10 @@ export default function Pagination({
   const getPaginationItems = () => {
     const paginationItems = [...Array(pages).keys()].map((i) => (
       <li
-        className={`page-item ${currentPage === i + 1 ? "active" : null}`}
-        key={i + 1}
+        className={`page-item ${currentPage} ${i} ${
+          currentPage === i + 1 ? "active" : null
+        }`}
+        key={i}
       >
         <a
           className="page-link"
@@ -31,13 +33,12 @@ export default function Pagination({
         </a>
       </li>
     ));
-
     setPagination(paginationItems);
   };
 
   useEffect(() => {
     getPaginationItems();
-  }, [currentPage]);
+  }, [currentPage, pages]);
 
   if (pagination.length <= 1) return <></>;
 

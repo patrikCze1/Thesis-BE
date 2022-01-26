@@ -5,6 +5,7 @@ import i18next from "i18next";
 const initialState = {
   activeTrack: null,
   tracks: [],
+  tracksCount: 0,
   loaded: false,
 };
 
@@ -17,7 +18,9 @@ export default function timeTrackReducer(state = initialState, action) {
       return {
         ...state,
         loaded: true,
-        tracks: action.payload.tracks ? action.payload.tracks : state.tracks,
+        tracks:
+          action.payload.tracks?.rows || action.payload.tracks || state.tracks,
+        tracksCount: action.payload.tracks?.count || 0,
         activeTrack: action.payload.activeTrack
           ? action.payload.activeTrack
           : state.activeTrack,
@@ -34,6 +37,7 @@ export default function timeTrackReducer(state = initialState, action) {
       return { ...state, activeTrack: action.payload.track };
 
     case "tracks/stop":
+      toast.success(i18next.t("track.created"));
       return {
         ...state,
         activeTrack: null,
@@ -61,12 +65,12 @@ export default function timeTrackReducer(state = initialState, action) {
 }
 
 export const loadMyTimeTracksAction =
-  (from = "", to = "", returnTracks = true, returnActive = true) =>
+  (offset = 0, limit = 40, returnTracks = true, returnActive = true) =>
   async (dispatch) => {
     dispatch({ type: "tracks/loadStart", payload: null });
     try {
       const response = await axios.get(
-        `/api/tracks/me?from=${from}&to=${to}&returnActive=${returnActive}&returnTracks=${returnTracks}`
+        `/api/tracks/me?offset=${offset}&limit=${limit}&returnActive=${returnActive}&returnTracks=${returnTracks}`
       );
       dispatch({ type: "tracks/loaded", payload: response.data });
     } catch (error) {

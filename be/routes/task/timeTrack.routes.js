@@ -59,18 +59,18 @@ router.get("/me/", authenticateToken, async (req, res) => {
     },
   };
 
-  if (req.query.from && req.query.to) {
-    const to = new Date(req.query.to);
-    to.setHours(23, 59, 59);
-    where.beginAt = {
-      [Op.between]: [new Date(req.query.from), to],
-    };
-  }
-  console.log("where.beginAt", where.beginAt);
+  // if (req.query.from && req.query.to) {
+  //   const to = new Date(req.query.to);
+  //   to.setHours(23, 59, 59);
+  //   where.beginAt = {
+  //     [Op.between]: [new Date(req.query.from), to],
+  //   };
+  // }
+  // console.log("where.beginAt", where.beginAt);
   try {
     let tracks, activeTrack;
-    if (req.query.returnTracks === "true") {
-      tracks = await TimeTrack.findAll({
+    if (Boolean(req.query.returnTracks) === true) {
+      tracks = await TimeTrack.findAndCountAll({
         where,
         include: [
           {
@@ -80,7 +80,7 @@ router.get("/me/", authenticateToken, async (req, res) => {
           {
             model: Project,
             as: "project",
-            attributes: ["name"],
+            attributes: ["name", "id"],
           },
         ],
         limit: req.query.limit ? parseInt(req.query.limit) : null,
@@ -94,7 +94,7 @@ router.get("/me/", authenticateToken, async (req, res) => {
       });
     }
 
-    if (req.query.returnActive === "true") {
+    if (Boolean(req.query.returnActive) === true) {
       activeTrack = await TimeTrack.findOne({
         where: { userId: user.id, endAt: null },
       });

@@ -10,6 +10,7 @@ import cs from "date-fns/locale/cs"; // the locale you want
 import "react-toastify/dist/ReactToastify.css";
 import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
+import "./App.scss";
 
 import AppRoutes from "./router/AppRoutes";
 import { Sidebar, Navigation } from "./components/navigation";
@@ -19,7 +20,6 @@ import {
   loadFromSessionAction,
   logoutAction,
 } from "./reducers/user/currentUserReducer";
-import "./App.scss";
 import { routeEnum } from "./enums/navigation/navigation";
 import ErrorBoundary from "./../app/components/error/ErrorBoundary";
 import axios from "./../utils/axios.config";
