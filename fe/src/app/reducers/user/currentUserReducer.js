@@ -7,6 +7,7 @@ import Cookies from "js-cookie";
 import { routeEnum } from "./../../enums/navigation/navigation";
 import { getIo } from "../../../utils/websocket.config";
 import i18n from "../../../i18n";
+import { parseUserFromJwt } from "../../service/user/user.service";
 
 const initialState = {
   user: {},
@@ -31,23 +32,27 @@ export default function currentUserReducer(state = initialState, action) {
       return { ...state, user: token.user };
 
     case "user/loadFromStorage":
-      const itemStr = window.localStorage.getItem("app-user");
+      // const itemStr = window.localStorage.getItem("app-user");
 
-      if (!itemStr) return { ...state };
+      // if (!itemStr) return { ...state };
 
-      const item = JSON.parse(itemStr);
+      // const item = JSON.parse(itemStr);
 
-      token = jwtDecode(item.value);
-      console.log("token", token);
-      if (!item.expiry || now.getTime() > item.expiry) {
-        window.localStorage.removeItem("app-user");
-        return { ...state };
-      }
+      // token = jwtDecode(item.value);
+      // console.log("token", token);
+      // if (!item.expiry || now.getTime() > item.expiry) {
+      //   window.localStorage.removeItem("app-user");
+      //   return { ...state };
+      // }
 
-      return {
-        ...state,
-        user: token.user,
-      };
+      token = parseUserFromJwt();
+
+      if (token)
+        return {
+          ...state,
+          user: token.user,
+        };
+      else return { ...state };
 
     case "user/actionStart":
       return { ...state, actionProcessing: true };

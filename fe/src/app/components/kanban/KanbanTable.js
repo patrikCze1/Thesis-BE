@@ -79,15 +79,15 @@ export default function KanbanTable() {
 
   const handleWebsockets = () => {
     const socket = getIo();
-
+    console.log("handleWebsockets");
     try {
       socket.on(ioEnum.TASK_NEW, (data) => {
-        console.log("TASK_NEW", data);
+        console.log("socket TASK_NEW", data);
         if (data.task.projectId == projectId)
           dispatch(socketNewTask(data.task));
       });
       socket.on(ioEnum.TASK_EDIT, (data) => {
-        console.log("TASK_EDIT");
+        console.log("socket TASK_EDIT");
         if (data.task.projectId == projectId)
           dispatch(socketEditTask(data.task));
       });
@@ -117,15 +117,15 @@ export default function KanbanTable() {
     dispatch(loadProjectAction(projectId));
     dispatch(loadTasksAction(projectId));
     dispatch(loadUsersByProject(projectId));
-    const io = handleWebsockets(); //todo unsibcribe
+    const io = handleWebsockets();
 
     if (selectedTask) {
       dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
 
-    return () => {
-      io?.close();
-    };
+    // return () => {
+    //   io?.close();
+    // };
   }, [projectId]);
 
   useEffect(() => {

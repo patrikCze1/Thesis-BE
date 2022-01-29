@@ -31,11 +31,11 @@ export default function Projects() {
   const selectedProject = useRef(null);
   const search = window.location.search;
   const params = new URLSearchParams(search);
-  selectedProject.current = params.get("upravit");
 
   const handleWebsockets = () => {
+    const socket = getIo();
+
     try {
-      const socket = getIo();
       socket.on(ioEnum.PROJECT_NEW, (data) => {
         console.log("project new", data);
         dispatch(socketNewProject(data.project));
@@ -51,11 +51,17 @@ export default function Projects() {
     } catch (error) {
       console.error(error);
     }
+
+    return socket;
   };
 
   useEffect(() => {
     dispatch(loadProjectsAction());
-    handleWebsockets();
+    const io = handleWebsockets();
+    selectedProject.current = params.get("upravit");
+    // return () => {
+    //   io?.close();
+    // };
   }, []);
 
   useEffect(() => {
@@ -67,7 +73,7 @@ export default function Projects() {
   }, [params]);
 
   useEffect(() => {
-    if (!selectedProject.current && Object.keys(project).length > 0) {
+    if (selectedProject.current && Object.keys(project).length > 0) {
       history.push({
         search: `?upravit=${project.id}`,
       });

@@ -93,7 +93,7 @@ export default function ProjectForm({ projectId }) {
       };
 
       if (projectId || project.id) {
-        dispatch(editProjectAction(projectId, data));
+        dispatch(editProjectAction(projectId || project.id, data));
       } else {
         dispatch(createProjectAction(data));
       }

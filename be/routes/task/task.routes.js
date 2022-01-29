@@ -193,7 +193,9 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     });
 
     const projectUsers = await findUsersByProject(projectId);
+    console.log("findUsersByProject", projectUsers);
     for (const u of projectUsers) {
+      console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
       io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
 
