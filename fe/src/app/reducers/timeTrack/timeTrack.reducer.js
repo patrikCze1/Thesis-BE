@@ -65,12 +65,19 @@ export default function timeTrackReducer(state = initialState, action) {
 }
 
 export const loadMyTimeTracksAction =
-  (offset = 0, limit = 40, returnTracks = true, returnActive = true) =>
+  (
+    offset = 0,
+    limit = 40,
+    returnTracks = true,
+    returnActive = true,
+    from = null,
+    to = null
+  ) =>
   async (dispatch) => {
     dispatch({ type: "tracks/loadStart", payload: null });
     try {
       const response = await axios.get(
-        `/api/tracks/me?offset=${offset}&limit=${limit}&returnActive=${returnActive}&returnTracks=${returnTracks}`
+        `/api/tracks/me?offset=${offset}&limit=${limit}&returnActive=${returnActive}&returnTracks=${returnTracks}&from=${from}&to=${to}`
       );
       dispatch({ type: "tracks/loaded", payload: response.data });
     } catch (error) {

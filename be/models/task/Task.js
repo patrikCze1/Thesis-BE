@@ -62,6 +62,9 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
+      // completedAt: {
+      //   type: DataTypes.DATE,
+      // },
       //begin / hours
       //budget - time,price
       //muted, favourites...

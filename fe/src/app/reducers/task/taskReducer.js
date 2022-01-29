@@ -138,7 +138,7 @@ export const loadTasksAction =
       );
       dispatch({ type: "tasks/loaded", payload: response.data });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message);
       dispatch({ type: "tasks/loadFail", payload: null });
     }
   };
@@ -151,7 +151,7 @@ export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
     );
     dispatch({ type: "task/loaded", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "task/loadFail", payload: null });
   }
 };
@@ -166,7 +166,7 @@ export const createTaskAction = (projectId, data) => async (dispatch) => {
     );
     dispatch({ type: "task/create", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "task/actionFail", payload: null });
   }
 };
@@ -186,7 +186,7 @@ export const editTaskAction = (projectId, taskId, data) => async (dispatch) => {
     dispatch({ type: "task/edit", payload: response.data });
     toast.success(i18next.t("project.changesSaved"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "task/actionFail", payload: null });
   }
 };
@@ -205,7 +205,7 @@ export const completeTaskAction = (projectId, taskId) => async (dispatch) => {
     dispatch({ type: "task/complete", payload: response.data.task });
     toast.success(i18next.t("project.changesSaved"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "task/actionFail", payload: null });
   }
 };
@@ -219,7 +219,7 @@ export const deleteTaskAction = (projectId, taskId) => async (dispatch) => {
     dispatch({ type: "task/delete", payload: taskId });
     toast.success(i18next.t("task.taskDeleted"));
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "task/actionFail", payload: null });
   }
 };

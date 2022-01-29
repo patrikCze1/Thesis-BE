@@ -104,7 +104,7 @@ export const loadNotificationsAction =
       );
       dispatch({ type: "notification/loaded", payload: response.data });
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -114,7 +114,7 @@ export const loadUnreadNotificationsAction = () => async (dispatch) => {
     const response = await axios.get(`/api/notifications/?seen=0`);
     dispatch({ type: "notification/unreadLoaded", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -123,7 +123,7 @@ export const setSeenAction = (id, notification) => async (dispatch) => {
     await axios.patch(`/api/notifications/${id}/seen`);
     dispatch({ type: "notification/seen", payload: { id, notification } });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -141,6 +141,6 @@ export const socketNewNotification = (notification) => async (dispatch) => {
     toast.info(notification.message);
     dispatch({ type: "notification/socketNew", payload: notification });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };

@@ -21,6 +21,7 @@ import NotificationListItem from "./../notification/NotificationListItem";
 import { levels } from "./../../models/task/priority";
 import { routeEnum } from "./../../enums/navigation/navigation";
 import { loadMyTimeTracksAction } from "../../reducers/timeTrack/timeTrack.reducer";
+import TaskTableItem from "../task/TaskTableItem";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -42,12 +43,12 @@ export default function Dashboard() {
 
   useEffect(() => {
     dispatch(loadNotificationsAction(0, 10));
-    dispatch(loadTasksAction(-1, `?solverId=${user.id}`));
+    dispatch(loadTasksAction(-1, `?solverId=${user.id}&isCompleted=false`));
 
     const firstDayOfWeek = getFirstDayOfWeek(new Date());
     firstDayOfWeek.setHours(0, 0, 0);
 
-    dispatch(loadMyTimeTracksAction(firstDayOfWeek, now));
+    dispatch(loadMyTimeTracksAction(0, "", true, false, firstDayOfWeek, now));
   }, []);
 
   useEffect(() => {
@@ -126,27 +127,7 @@ export default function Dashboard() {
   ));
 
   const taskComponents = tasks.map((task, i) => {
-    return (
-      <tr key={i}>
-        <td>
-          <NavLink
-            to={`${routeEnum.PROJECTS}/${task.projectId}/?ukol=${task.id}`}
-            className="project-title"
-          >
-            {task.title}
-          </NavLink>
-        </td>
-        <td>{task.projectId}</td>
-        <td>
-          <span className={`badge badge-prio-${task.priority}`}>
-            <Trans>{levels[task.priority]}</Trans>
-          </span>
-        </td>
-        <td className={now > new Date(task.deadline) ? "text-danger" : ""}>
-          {getMonthDayTime(task.deadline)}
-        </td>
-      </tr>
-    );
+    return <TaskTableItem task={task} key={i} />;
   });
 
   return (

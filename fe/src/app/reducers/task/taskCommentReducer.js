@@ -94,7 +94,7 @@ export const createAction = (taskId, data) => async (dispatch) => {
     });
     dispatch({ type: "comment/create", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "comment/actionFail", payload: null });
   }
 };
@@ -114,7 +114,7 @@ export const editAction = (taskId, comment) => async (dispatch) => {
 
     dispatch({ type: "comment/edit", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
     dispatch({ type: "comment/actionFail", payload: null });
   }
 };

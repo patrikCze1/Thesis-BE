@@ -97,6 +97,6 @@ export const changePasswordAction = (data) => async (dispatch) => {
     toast.success(i18next.t("Password changed"));
   } catch (e) {
     dispatch({ type: "user/actionFail" });
-    toast.error(e.response.data.message);
+    toast.error(e.response?.data?.message);
   }
 };

@@ -45,7 +45,7 @@ export const loadTodosAction = () => async (dispatch) => {
     });
     dispatch({ type: "todos/loaded", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -57,7 +57,7 @@ export const createTodoAction = (name) => async (dispatch) => {
     });
     dispatch({ type: "todos/created", payload: res.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -69,7 +69,7 @@ export const editTodoAction = (id, todo) => async (dispatch) => {
     });
     dispatch({ type: "todos/edited", payload: res.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -79,6 +79,6 @@ export const deleteTodoAction = (id) => async (dispatch) => {
     dispatch({ type: "todos/delete", payload: id });
     toast.success("Odstraněno");
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };

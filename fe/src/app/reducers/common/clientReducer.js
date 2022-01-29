@@ -106,7 +106,7 @@ export const createClientAction = (client) => async (dispatch) => {
     const response = await axios.post(`/api/clients`, client);
     dispatch({ type: "client/create", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -115,7 +115,7 @@ export const editClientAction = (id, data) => async (dispatch) => {
     const response = await axios.patch(`/api/clients/${id}`, data);
     dispatch({ type: "client/edit", payload: response.data });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -124,6 +124,6 @@ export const deleteClientAction = (id) => async (dispatch) => {
     await axios.delete(`/api/clients/${id}`);
     dispatch({ type: "client/delete", payload: id });
   } catch (error) {
-    toast.error(error.response.data.message);
+    toast.error(error.response?.data?.message);
   }
 };

@@ -59,14 +59,14 @@ router.get("/me/", authenticateToken, async (req, res) => {
     },
   };
 
-  // if (req.query.from && req.query.to) {
-  //   const to = new Date(req.query.to);
-  //   to.setHours(23, 59, 59);
-  //   where.beginAt = {
-  //     [Op.between]: [new Date(req.query.from), to],
-  //   };
-  // }
-  // console.log("where.beginAt", where.beginAt);
+  if (req.query.from && req.query.to) {
+    const to = new Date(req.query.to);
+    to.setHours(23, 59, 59);
+    where.beginAt = {
+      [Op.between]: [new Date(req.query.from), to],
+    };
+  }
+
   try {
     let tracks, activeTrack;
     if (Boolean(req.query.returnTracks) === true) {
@@ -104,8 +104,6 @@ router.get("/me/", authenticateToken, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// maybe findActive???
 
 router.post("/", authenticateToken, async (req, res) => {
   // create track

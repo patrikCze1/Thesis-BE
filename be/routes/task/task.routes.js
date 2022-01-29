@@ -37,6 +37,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
           as: "creator",
         },
         { model: User, as: "solver" },
+        { model: Project, as: "project" },
       ],
     });
     res.json({ tasks });
