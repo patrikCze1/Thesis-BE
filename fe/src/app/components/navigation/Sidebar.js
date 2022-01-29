@@ -4,8 +4,8 @@ import { Collapse } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import { useSelector } from "react-redux";
 
-import logo from "./../../../assets/images/logo.svg";
-import logoSmall from "./../../../assets/images/logo-mini.svg";
+import logo from "./../../../assets/images/logo_blue.svg";
+import logoSmall from "./../../../assets/images/logo_blue_small.svg";
 import { getFullName, getShortName } from "./../../service/user/user.service";
 import { routeEnum } from "../../enums/navigation/navigation";
 import { hasRole } from "../../service/role.service";

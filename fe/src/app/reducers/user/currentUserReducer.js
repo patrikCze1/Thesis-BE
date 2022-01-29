@@ -6,6 +6,7 @@ import Cookies from "js-cookie";
 
 import { routeEnum } from "./../../enums/navigation/navigation";
 import { getIo } from "../../../utils/websocket.config";
+import i18n from "../../../i18n";
 
 const initialState = {
   user: {},
@@ -66,7 +67,7 @@ export default function currentUserReducer(state = initialState, action) {
       //todo socket disconnect
       //todo call endpoint?
       // const socket = getIo();
-      document.title = "React app";
+      document.title = i18n.t("app.title");
 
       return { ...initialState };
 

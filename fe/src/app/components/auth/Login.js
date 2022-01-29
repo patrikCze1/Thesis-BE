@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from "./../../../utils/axios.config";
 import Loader from "./../common/Loader";
 import { loadCurrentUserAction } from "./../../reducers/user/currentUserReducer";
-import logo from "./../../../assets/images/logo.svg";
+import logo from "./../../../assets/images/logo_blue.svg";
 import { routeEnum } from "../../enums/navigation/navigation";
 import { initIo } from "../../../utils/websocket.config";
 

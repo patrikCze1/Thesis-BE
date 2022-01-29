@@ -74,7 +74,7 @@ export const loadMyTimeTracksAction =
       );
       dispatch({ type: "tracks/loaded", payload: response.data });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -88,7 +88,7 @@ export const loadAllTimeTracksAction =
       );
       dispatch({ type: "tracks/loaded", payload: response.data });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -102,7 +102,7 @@ export const loadAllTimeTracksAction =
 //       );
 //       dispatch({ type: "tracks/loadOlder", payload: response.data });
 //     } catch (error) {
-//       toast.error(error.message);
+//       toast.error(error.response?.data?.message);
 //     }
 //   };
 
@@ -111,7 +111,7 @@ export const startTimeTrackAction = (data) => async (dispatch) => {
     const response = await axios.post(`/api/tracks/start`, data);
     dispatch({ type: "tracks/start", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -120,7 +120,7 @@ export const stopTimeTrackAction = (track) => async (dispatch) => {
     const response = await axios.post(`/api/tracks/stop/${track.id}`, track);
     dispatch({ type: "tracks/stop", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -130,7 +130,7 @@ export const createTimeTrackAction = (data) => async (dispatch) => {
     toast.success(i18next.t("track.created"));
     dispatch({ type: "tracks/stop", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -141,7 +141,7 @@ export const editTimeTrackAction = (track) => async (dispatch) => {
     toast.success(i18next.t("track.edited"));
     dispatch({ type: "tracks/edit", payload: response.data });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };
 
@@ -151,6 +151,6 @@ export const deleteTimeTrackAction = (id) => async (dispatch) => {
     toast.success(i18next.t("track.removed"));
     dispatch({ type: "tracks/delete", payload: id });
   } catch (error) {
-    toast.error(error.message);
+    toast.error(error.response?.data?.message);
   }
 };

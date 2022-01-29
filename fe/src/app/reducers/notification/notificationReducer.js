@@ -1,5 +1,6 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
+import i18n from "../../../i18n";
 
 const initialState = {
   notifications: [],
@@ -24,7 +25,9 @@ export default function notificationReducer(state = initialState, action) {
 
     case "notification/unreadLoaded":
       if (action.payload.records.count > 0)
-        document.title = `(${action.payload.records.count}) React app`;
+        document.title = `(${action.payload.records.count}) ${i18n.t(
+          "app.title"
+        )}`;
       return {
         ...state,
         loaded: true,
@@ -34,7 +37,7 @@ export default function notificationReducer(state = initialState, action) {
 
     case "notification/seen":
       if (!action.payload.notification.seen) {
-        document.title = `(${state.unreadCount - 1}) React app`;
+        document.title = `(${state.unreadCount - 1}) ${i18n.t("app.title")}`;
         return {
           ...state,
           notifications: state.notifications.map((notif) => {
@@ -48,7 +51,7 @@ export default function notificationReducer(state = initialState, action) {
           unreadCount: --state.unreadCount,
         };
       } else {
-        document.title = `(${state.unreadCount + 1}) React app`;
+        document.title = `(${state.unreadCount + 1}) ${i18n.t("app.title")}`;
         return {
           ...state,
           notifications: state.notifications.map((notif) => {
@@ -65,7 +68,7 @@ export default function notificationReducer(state = initialState, action) {
       }
 
     case "notification/seeAll":
-      document.title = "React app";
+      document.title = i18n.t("app.title");
       return {
         ...state,
         loaded: true,
@@ -77,7 +80,7 @@ export default function notificationReducer(state = initialState, action) {
       };
 
     case "notification/socketNew":
-      document.title = `(${state.unreadCount + 1}) React app`;
+      document.title = `(${state.unreadCount + 1}) ${i18n.t("app.title")}`;
       return {
         ...state,
         unreadNotifications: [action.payload, ...state.unreadNotifications],

@@ -15,6 +15,9 @@ i18n
       },
       cs: {
         translation: {
+          app: {
+            title: "Jago",
+          },
           "All Projects": "Všechny projekty",
           Projects: "Projekty",
           Add: "Přidat",

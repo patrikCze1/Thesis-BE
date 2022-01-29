@@ -5,7 +5,7 @@ import { Trans } from "react-i18next";
 
 import { useDispatch } from "react-redux";
 
-import logoMini from "./../../../assets/images/logo-mini.svg";
+import logoMini from "./../../../assets/images/logo_blue_small.svg";
 import SearchBar from "../search/SearchBar";
 import { logoutAction } from "./../../reducers/user/currentUserReducer";
 import NavigationNotifications from "./../notification/nav/NavigationNotifications";

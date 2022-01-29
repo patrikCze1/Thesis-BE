@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import i18n from "../../../i18n";
 import { getDeltaTime } from "../../service/date/date.service";
 
 export default function DeltaTimer({ start }) {
@@ -9,8 +10,8 @@ export default function DeltaTimer({ start }) {
       const deltaTime = getDeltaTime(start);
       setTime(deltaTime);
 
-      if (start) document.title = deltaTime + " | React app";
-      else document.title = "React app";
+      if (start) document.title = deltaTime + " | " + i18n.t("app.title");
+      else document.title = i18n.t("app.title");
     }, 1000);
 
     return () => clearInterval(timer);

@@ -134,7 +134,7 @@ export default function App() {
     if (user && Object.keys(user).length > 0) {
       setShowMenu(true);
       if (location.pathname !== routeEnum.TIME_TRACKS)
-        dispatch(loadMyTimeTracksAction(null, null, false, true));
+        dispatch(loadMyTimeTracksAction(0, 0, false, true));
     } else setShowMenu(false);
     setLoaded(true);
   }, [user]);

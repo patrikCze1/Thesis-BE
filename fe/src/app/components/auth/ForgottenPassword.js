@@ -5,7 +5,7 @@ import { Trans, useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 
 import Loader from "./../common/Loader";
-import logo from "./../../../assets/images/logo.svg";
+import logo from "./../../../assets/images/logo_blue.svg";
 import { routeEnum } from "../../enums/navigation/navigation";
 import axios from "./../../../utils/axios.config";
 
