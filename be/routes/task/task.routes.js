@@ -17,6 +17,7 @@ const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, TASK_PRIORITY } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
+const sequelize = require("../../models");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -30,6 +31,18 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
     }
 
     const tasks = await Task.findAll({
+      attributes: {
+        include: [
+          [
+            sequelize.fn("COUNT", sequelize.col("attachments.id")),
+            "attachmentsCount",
+          ],
+          [
+            sequelize.fn("COUNT", sequelize.col("taskComments.id")),
+            "commentsCount",
+          ],
+        ],
+      },
       where,
       include: [
         {
@@ -38,7 +51,18 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         },
         { model: User, as: "solver" },
         { model: Project, as: "project" },
+        { model: TaskAttachment, as: "attachments", attributes: [] },
+        { model: TaskComment, as: "taskComments", attributes: [] },
       ],
+      limit: req.query.limit ? parseInt(req.query.limit) : null,
+      offset: req.query.offset ? parseInt(req.query.offset) : 0,
+      // order: [
+      //   [
+      //     req.query.orderBy ? req.query.orderBy : "createdAt",
+      //     req.query.sort ? req.query.sort : "DESC",
+      //   ],
+      // ],
+      group: ["Task.id"],
     });
     res.json({ tasks });
   } catch (error) {

@@ -169,6 +169,10 @@ export default function KanbanTask({ task, index }) {
                 <h5 className="text-dark">{task.title}</h5>
               </div>
 
+              <i className="fa fa-comments-o pr-1"></i>
+              {task.commentsCount}
+              <i className="fa fa-paperclip pr-1"></i>
+              {task.attachmentsCount}
               <div className="">
                 {task.solver && (
                   <span
