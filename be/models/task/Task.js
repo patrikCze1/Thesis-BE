@@ -21,7 +21,7 @@ module.exports = (sequelize) => {
         type: DataTypes.TEXT,
       },
       priority: {
-        type: DataTypes.INTEGER, //?model?
+        type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
       },
@@ -49,11 +49,6 @@ module.exports = (sequelize) => {
       projectStageId: {
         type: DataTypes.INTEGER,
       },
-      isCompleted: {
-        type: DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false,
-      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
@@ -62,11 +57,10 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      // completedAt: {
-      //   type: DataTypes.DATE,
-      // },
+      completedAt: {
+        type: DataTypes.DATE,
+      },
       //begin / hours
-      //budget - time,price
       //muted, favourites...
       // todo proverit taskId
     },

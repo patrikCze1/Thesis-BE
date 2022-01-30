@@ -41,11 +41,11 @@ export default function ProjectForm({ projectId }) {
   const [isEdit, setIsEdit] = useState(projectId ? true : false);
 
   useEffect(() => {
-    console.log("projectId project", projectId, project);
+    console.log("ProjectForm effect projectId project", projectId, project);
     dispatch(loadClietntsAction());
     dispatch(loadGroupsAction());
     dispatch(loadUsersAction());
-    if (projectId) dispatch(loadProjectAction(projectId));
+    // if (projectId) dispatch(loadProjectAction(projectId));
   }, []);
 
   useEffect(() => {

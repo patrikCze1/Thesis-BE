@@ -338,16 +338,17 @@ router.patch(
 
     try {
       const task = await Task.findByPk(req.params.id);
-      task.isCompleted = !task.isCompleted;
+      if (task.completedAt) task.completedAt = null;
+      else task.completedAt = new Date();
 
       await TaskChangeLog.create({
         taskId: req.params.id,
         userId: user.id,
         name:
-          "Změna stavu na: " + task.isCompleted ? "dokončeno" : "nedokončeno",
+          "Změna stavu na: " + task.completedAt ? "dokončeno" : "nedokončeno",
       });
 
-      if (task.isCompleted && task.createdById !== user.id) {
+      if (task.completedAt && task.createdById !== user.id) {
         const io = getIo();
         const newNotification =
           await notificationService.createTaskNotification(

@@ -7,7 +7,10 @@ import { Trans, useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-import { deleteProjectAction } from "./../../reducers/project/project.reducer";
+import {
+  deleteProjectAction,
+  loadProjectAction,
+} from "./../../reducers/project/project.reducer";
 import { PROJECT_STATE, ROLES, ROUTE } from "../../../utils/enum";
 import { hasRole } from "../../service/role.service";
 import { getFullName } from "../../service/user/user.service";
@@ -20,6 +23,7 @@ export default function ProjectListItem({ project }) {
   const { user } = useSelector((state) => state.currentUserReducer);
 
   const handleEditClick = () => {
+    // dispatch(loadProjectAction(project.id));
     history.push({
       search: `?upravit=${project.id}`,
     });

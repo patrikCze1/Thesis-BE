@@ -8,7 +8,6 @@ import ProjectList from "./ProjectList";
 import Loader from "./../common/Loader";
 
 import {
-  clearProjectAction,
   loadProjectsAction,
   socketDeleteProject,
   socketEditProject,
@@ -18,16 +17,16 @@ import { getIo } from "../../../utils/websocket.config";
 import ProjectForm from "./ProjectForm";
 import { hasRole } from "../../service/role.service";
 import { ROLES, SOCKET } from "../../../utils/enum";
+import { useShowProjectForm } from "../../hooks/useShowProjectForm";
 
 export default function Projects() {
   const dispatch = useDispatch();
-  const history = useHistory();
-  const { projects, projectsLoaded, project } = useSelector(
+  const { projects, projectsLoaded } = useSelector(
     (state) => state.projectReducer
   );
   const { user } = useSelector((state) => state.currentUserReducer);
-  const [showForm, setShowForm] = useState(false);
-  const selectedProject = useRef(null);
+  const [showForm, hideForm, formVisible] = useShowProjectForm();
+
   const search = window.location.search;
   const params = new URLSearchParams(search);
 
@@ -55,45 +54,29 @@ export default function Projects() {
   };
 
   useEffect(() => {
+    console.log("projects effect");
     dispatch(loadProjectsAction());
     const io = handleWebsockets();
-    selectedProject.current = params.get("upravit");
-    // return () => {
-    //   io?.close();
-    // };
+    if (params.has("upravit")) showForm(params.get("upravit"));
+
+    return () => {
+      io?.close();
+    };
   }, []);
 
   useEffect(() => {
-    const queryParams = new URLSearchParams(window.location.search);
-
-    if (queryParams.has("upravit")) {
-      setShowForm(true);
+    console.log('queryParams.get("upravit")', params.get("upravit"));
+    if (params.has("upravit") && params.get("upravit")) {
+      showForm(params.get("upravit"));
     }
-  }, [params]);
+  }, [search]);
 
-  useEffect(() => {
-    if (selectedProject.current && Object.keys(project).length > 0) {
-      history.push({
-        search: `?upravit=${project.id}`,
-      });
-    }
-  }, [project]);
-
-  const handleShowForm = (projectId = null) => {
-    setShowForm(true);
-    dispatch(clearProjectAction());
-    selectedProject.current = projectId;
+  const handleShowForm = () => {
+    showForm();
   };
 
   const handleHideForm = () => {
-    setShowForm(false);
-    const queryParams = new URLSearchParams(window.location.search);
-    if (queryParams.has("upravit")) {
-      queryParams.delete("upravit");
-      history.replace({
-        search: queryParams.toString(),
-      });
-    }
+    hideForm();
   };
 
   return (
@@ -105,7 +88,7 @@ export default function Projects() {
         {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
           <div className="d-flex">
             <button
-              onClick={() => handleShowForm(null)}
+              onClick={() => handleShowForm()}
               className="btn btn-sm ml-3 btn-primary mr-0"
             >
               <Trans>Add</Trans>
@@ -136,8 +119,8 @@ export default function Projects() {
         </div>
       </div>
 
-      {showForm && (
-        <Modal size="lg" show={showForm} onHide={handleHideForm}>
+      {formVisible && (
+        <Modal size="lg" show={formVisible} onHide={handleHideForm}>
           <Modal.Body>
             <button
               type="button"
@@ -149,10 +132,7 @@ export default function Projects() {
                 <Trans>Close</Trans>
               </span>
             </button>
-            <ProjectForm
-              projectId={selectedProject.current}
-              closeForm={handleHideForm}
-            />
+            <ProjectForm projectId={null} closeForm={handleHideForm} />
           </Modal.Body>
         </Modal>
       )}

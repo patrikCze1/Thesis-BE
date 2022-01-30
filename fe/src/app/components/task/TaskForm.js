@@ -231,11 +231,11 @@ export default function TaskForm({ task, hideModal }) {
 
   const handleCompleteClick = () => {
     MySwal.fire({
-      icon: task.isCompleted ? "warning" : "info",
-      title: task.isCompleted
+      icon: task.completedAt ? "warning" : "info",
+      title: task.completedAt
         ? t("task.unCompleteTask") + "?"
         : `${t("task.completeTask")}?`,
-      confirmButtonText: task.isCompleted
+      confirmButtonText: task.completedAt
         ? t("label.change")
         : t("label.complete"),
       showCancelButton: true,
@@ -614,7 +614,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>label.actions</Trans>
             </label>
 
-            {task.isCompleted ? (
+            {task.completedAt ? (
               <>
                 <span className="text-primary d-block">
                   <i className="mdi mdi-check btn-icon-prepend"></i>
