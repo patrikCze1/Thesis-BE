@@ -26,3 +26,41 @@ export const ROLES = Object.freeze({
   MANAGEMENT: "management",
   ADMIN: "admin",
 });
+
+export const ROUTE = Object.freeze({
+  HOME: "/",
+  LOGIN: "/prihlasit",
+  SEARCH: "/hledat",
+  PROJECTS: "/projekty",
+  PROJECTS_EDIT: "/projekty/upravit/:id",
+  PROJECTS_DETAIL: "/projekty/:id",
+  PROJECTS_NEW: "/projekty/novy",
+  USER_PROFIL: "/profil",
+  NOTIFICATIONS: "/oznameni",
+  FORGOTTEN_PASSWORD: "/zapomenute-heslo",
+  RESET_PASSWORD: "/obnovit-heslo",
+  TIME_TRACKS: "/zaznam-casu",
+  TIME_TRACKS_REPORT: "/zaznam-casu/report",
+  TODO: "/moje-todo",
+  ADMIN_CLIENT: "/administrace/klienti",
+  ADMIN_GROUP: "/administrace/skupiny",
+  ADMIN_USER: "/administrace/uzivatele",
+});
+
+export const TASK_COLORS = Object.freeze([
+  "#B80000",
+  "#DB3E00",
+  "#FCCB00",
+  "#008B02",
+  "#1273DE",
+  "#004DCF",
+  "#fff",
+]);
+
+export const TASK_PRIORITY = Object.freeze({
+  1: "priority.low",
+  2: "priority.medium",
+  3: "priority.high",
+  4: "priority.urgent",
+  5: "priority.critical",
+});

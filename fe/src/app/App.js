@@ -4,7 +4,6 @@ import Particles from "react-particles-js";
 import { useDispatch, useSelector } from "react-redux";
 import { ToastContainer } from "react-toastify";
 import { registerLocale } from "react-datepicker";
-// import Cookies from "js-cookie";
 import cs from "date-fns/locale/cs"; // the locale you want
 
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +11,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import "react-quill/dist/quill.snow.css";
 import "./App.scss";
 
+import logo from "./../assets/images/logo_blue.svg";
 import AppRoutes from "./router/AppRoutes";
 import { Sidebar, Navigation } from "./components/navigation";
 import Footer from "./components/common/Footer";
@@ -20,14 +20,14 @@ import {
   loadFromSessionAction,
   logoutAction,
 } from "./reducers/user/currentUserReducer";
-import { routeEnum } from "./enums/navigation/navigation";
 import ErrorBoundary from "./../app/components/error/ErrorBoundary";
 import axios from "./../utils/axios.config";
 import { initIo } from "../utils/websocket.config";
-import { SOCKET } from "../utils/enum";
+import { SOCKET, ROUTE } from "./../utils/enum";
 import { socketNewNotification } from "./reducers/notification/notificationReducer";
 import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
 import AnonymRoutes from "./router/AnonymRoutes";
+import i18n from "../i18n";
 
 export default function App() {
   const location = useLocation();
@@ -43,9 +43,9 @@ export default function App() {
   useEffect(() => {
     if (loaded) {
       if (
-        location.pathname === routeEnum.LOGIN ||
-        location.pathname === routeEnum.FORGOTTEN_PASSWORD ||
-        location.pathname === routeEnum.RESET_PASSWORD
+        location.pathname === ROUTE.LOGIN ||
+        location.pathname === ROUTE.FORGOTTEN_PASSWORD ||
+        location.pathname === ROUTE.RESET_PASSWORD
       ) {
         setShowMenu(false);
         document
@@ -133,15 +133,18 @@ export default function App() {
     console.log("APP user", user);
     if (user && Object.keys(user).length > 0) {
       setShowMenu(true);
-      if (location.pathname !== routeEnum.TIME_TRACKS)
+      if (location.pathname !== ROUTE.TIME_TRACKS)
         dispatch(loadMyTimeTracksAction(0, 0, false, true));
     } else setShowMenu(false);
     setLoaded(true);
   }, [user]);
 
   if (!loaded) {
-    // todo logo fullscreen
-    return <>Logo...</>;
+    return (
+      <div className="fullscreen-logo-wrapper">
+        <img src={logo} alt={i18n.t("app.title")} />
+      </div>
+    );
   }
 
   if (showMenu) {

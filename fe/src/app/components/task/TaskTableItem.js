@@ -2,8 +2,7 @@ import React from "react";
 import { NavLink } from "react-router-dom";
 import { Trans } from "react-i18next";
 
-import { routeEnum } from "../../enums/navigation/navigation";
-import { levels } from "../../models/task/priority";
+import { ROUTE, TASK_PRIORITY } from "../../../utils/enum";
 import { getMonthDayTime } from "../../service/date/date.service";
 
 export default function TaskTableItem({ task }) {
@@ -11,7 +10,7 @@ export default function TaskTableItem({ task }) {
     <tr>
       <td>
         <NavLink
-          to={`${routeEnum.PROJECTS}/${task.projectId}/?ukol=${task.id}`}
+          to={`${ROUTE.PROJECTS}/${task.projectId}/?ukol=${task.id}`}
           className="project-title p-0"
         >
           {task.title}
@@ -19,7 +18,7 @@ export default function TaskTableItem({ task }) {
       </td>
       <td>
         <NavLink
-          to={`${routeEnum.PROJECTS}/${task.projectId}`}
+          to={`${ROUTE.PROJECTS}/${task.projectId}`}
           className="project-title p-0"
         >
           {task.project && task.project.name}
@@ -27,7 +26,7 @@ export default function TaskTableItem({ task }) {
       </td>
       <td>
         <span className={`badge badge-prio-${task.priority}`}>
-          <Trans>{levels[task.priority]}</Trans>
+          <Trans>{TASK_PRIORITY[task.priority]}</Trans>
         </span>
       </td>
       {/*todo and completed after deadline */}

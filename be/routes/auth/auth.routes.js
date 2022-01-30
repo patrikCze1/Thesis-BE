@@ -56,11 +56,11 @@ router.post("/login", async (req, res) => {
 
 router.post("/refresh", async (req, res) => {
   const token = req.cookies["Refresh-Token"];
-  console.log("refresh req", token);
+
   if (token == null) return res.sendStatus(403);
 
   try {
-    jwt.verify(token, process.env.REFRESH_TOKEN); //todo
+    jwt.verify(token, process.env.REFRESH_TOKEN);
 
     const data = decodeToken(token);
     const newToken = generateToken(data.user);
@@ -74,7 +74,9 @@ router.post("/refresh", async (req, res) => {
         token: newToken,
       });
   } catch (error) {
-    res.status(400).json({ message: error.message }); // Token expired, please again
+    if (error.name === "TokenExpiredError")
+      return res.status(400).json({ message: req.t("auth.error.jwtExpired") });
+    res.status(400).json({ message: error.message });
   }
 });
 

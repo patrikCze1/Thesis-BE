@@ -10,7 +10,7 @@ import SearchBar from "../search/SearchBar";
 import { logoutAction } from "./../../reducers/user/currentUserReducer";
 import NavigationNotifications from "./../notification/nav/NavigationNotifications";
 import NavigationActiveTtrack from "../timeTrack/NavigationActiveTtrack";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 import { useEffect } from "react";
 
 export default function Navigation() {
@@ -48,7 +48,7 @@ export default function Navigation() {
       <div className="navbar-menu-wrapper d-flex align-items-stretch justify-content-between">
         <NavLink
           className="navbar-brand brand-logo-mini align-self-center d-lg-none"
-          to={routeEnum.HOME}
+          to={ROUTE.HOME}
         >
           <img src={logoMini} alt="logo" />
         </NavLink>

@@ -12,14 +12,12 @@ import { loadTasksAction } from "../../reducers/task/taskReducer";
 import {
   formatSecondsToString,
   getFirstDayOfWeek,
-  getMonthDayTime,
   getSecondsDiff,
   isDateToday,
 } from "../../service/date/date.service";
 import Loader from "./../common/Loader";
 import NotificationListItem from "./../notification/NotificationListItem";
-import { levels } from "./../../models/task/priority";
-import { routeEnum } from "./../../enums/navigation/navigation";
+import { ROUTE } from "./../../../utils/enum";
 import { loadMyTimeTracksAction } from "../../reducers/timeTrack/timeTrack.reducer";
 import TaskTableItem from "../task/TaskTableItem";
 
@@ -74,7 +72,7 @@ export default function Dashboard() {
     e.preventDefault();
     if (notification.TaskNotification) {
       const { projectId, id } = notification.TaskNotification.task;
-      history.push(`${routeEnum.PROJECTS}/${projectId}?ukol=${id}`);
+      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
     }
   };
 
@@ -160,7 +158,7 @@ export default function Dashboard() {
               <Loader />
             )}
             <NavLink
-              to={routeEnum.NOTIFICATIONS}
+              to={ROUTE.NOTIFICATIONS}
               className="text-black mt-3 mb-0 d-inline-block h6"
             >
               <Trans>label.showAll</Trans>

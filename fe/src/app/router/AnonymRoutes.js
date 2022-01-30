@@ -4,28 +4,28 @@ import { Switch, Route, Redirect } from "react-router-dom";
 import Login from "../components/auth/Login";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
 import ResetPassword from "../components/auth/ResetPassword";
-import { routeEnum } from "../enums/navigation/navigation";
+import { ROUTE } from "./../../utils/enum";
 
 export default function AnonymRoutes() {
   return (
     <Switch>
-      <Route path={routeEnum.LOGIN}>
+      <Route path={ROUTE.LOGIN}>
         <Login />
       </Route>
-      <Route path={routeEnum.FORGOTTEN_PASSWORD}>
+      <Route path={ROUTE.FORGOTTEN_PASSWORD}>
         <ForgottenPassword />
       </Route>
-      <Route path={routeEnum.RESET_PASSWORD}>
+      <Route path={ROUTE.RESET_PASSWORD}>
         <ResetPassword />
       </Route>
       {
         //todo fix
       }
-      <Route exact path="/">
+      <Route exact path={ROUTE.HOME}>
         <Login />
       </Route>
       {/* <Route>
-        <Redirect to={routeEnum.LOGIN} />
+        <Redirect to={ROUTE.LOGIN} />
       </Route> */}
     </Switch>
   );

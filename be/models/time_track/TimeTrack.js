@@ -27,7 +27,7 @@ module.exports = (sequelize) => {
     taskId: {
       type: DataTypes.INTEGER,
     },
-    // isBillable: {
+    // billable: {
     //   type:DataTypes.BOOLEAN,
     //   allowNull:false,
     //   defaultValue:false

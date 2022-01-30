@@ -7,9 +7,8 @@ import { useSelector } from "react-redux";
 import logo from "./../../../assets/images/logo_blue.svg";
 import logoSmall from "./../../../assets/images/logo_blue_small.svg";
 import { getFullName, getShortName } from "./../../service/user/user.service";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE, ROLES } from "../../../utils/enum";
 import { hasRole } from "../../service/role.service";
-import { ROLES } from "../../../utils/enum";
 
 const Sidebar = forwardRef(({}, ref) => {
   let location = useLocation();
@@ -69,12 +68,12 @@ const Sidebar = forwardRef(({}, ref) => {
   return (
     <nav className="sidebar sidebar-offcanvas" id="sidebar" ref={ref}>
       <div className="text-center sidebar-brand-wrapper d-flex align-items-center">
-        <NavLink className="sidebar-brand brand-logo" to={routeEnum.HOME}>
+        <NavLink className="sidebar-brand brand-logo" to={ROUTE.HOME}>
           <img src={logo} alt="logo" />
         </NavLink>
         <NavLink
           className="sidebar-brand brand-logo-mini pl-4 pt-3"
-          to={routeEnum.HOME}
+          to={ROUTE.HOME}
         >
           <img src={logoSmall} alt="logo" />
         </NavLink>
@@ -99,11 +98,9 @@ const Sidebar = forwardRef(({}, ref) => {
           </span>
         </li>
         <li
-          className={
-            isPathActive(routeEnum.HOME) ? "nav-item active" : "nav-item"
-          }
+          className={isPathActive(ROUTE.HOME) ? "nav-item active" : "nav-item"}
         >
-          <NavLink className="nav-link" to={routeEnum.HOME}>
+          <NavLink className="nav-link" to={ROUTE.HOME}>
             <i className="mdi mdi-home menu-icon"></i>
             <span className="menu-title">
               <Trans>Dashboard</Trans>
@@ -112,10 +109,10 @@ const Sidebar = forwardRef(({}, ref) => {
         </li>
         <li
           className={
-            isPathActive(routeEnum.PROJECTS) ? "nav-item active" : "nav-item"
+            isPathActive(ROUTE.PROJECTS) ? "nav-item active" : "nav-item"
           }
         >
-          <NavLink className="nav-link" to={routeEnum.PROJECTS}>
+          <NavLink className="nav-link" to={ROUTE.PROJECTS}>
             <i className="mdi mdi-format-list-bulleted menu-icon"></i>
             <span className="menu-title">
               <Trans>Projects</Trans>
@@ -159,11 +156,11 @@ const Sidebar = forwardRef(({}, ref) => {
                 <li className="nav-item subitem">
                   <NavLink
                     className={
-                      isPathActive(routeEnum.ADMIN_USER)
+                      isPathActive(ROUTE.ADMIN_USER)
                         ? "nav-link active"
                         : "nav-link"
                     }
-                    to={routeEnum.ADMIN_USER}
+                    to={ROUTE.ADMIN_USER}
                   >
                     <Trans>Users</Trans>
                   </NavLink>
@@ -186,7 +183,7 @@ const Sidebar = forwardRef(({}, ref) => {
         )}
         <li
           className={
-            isPathActive(routeEnum.TIME_TRACKS) ? "nav-item active" : "nav-item"
+            isPathActive(ROUTE.TIME_TRACKS) ? "nav-item active" : "nav-item"
           }
         >
           <div
@@ -207,11 +204,11 @@ const Sidebar = forwardRef(({}, ref) => {
               <li className="nav-item">
                 <NavLink
                   className={
-                    isPathActive(routeEnum.TIME_TRACKS)
+                    isPathActive(ROUTE.TIME_TRACKS)
                       ? "nav-link active"
                       : "nav-link"
                   }
-                  to={routeEnum.TIME_TRACKS}
+                  to={ROUTE.TIME_TRACKS}
                 >
                   <span className="menu-title subitem">
                     <Trans>menu.tracking</Trans>
@@ -221,11 +218,11 @@ const Sidebar = forwardRef(({}, ref) => {
               <li className="nav-item">
                 <NavLink
                   className={
-                    isPathActive(routeEnum.TIME_TRACKS_REPORT)
+                    isPathActive(ROUTE.TIME_TRACKS_REPORT)
                       ? "nav-link active"
                       : "nav-link"
                   }
-                  to={routeEnum.TIME_TRACKS_REPORT}
+                  to={ROUTE.TIME_TRACKS_REPORT}
                 >
                   <span className="menu-title subitem">
                     <Trans>menu.report</Trans>
@@ -237,11 +234,9 @@ const Sidebar = forwardRef(({}, ref) => {
         </li>
 
         <li
-          className={
-            isPathActive(routeEnum.TODO) ? "nav-item active" : "nav-item"
-          }
+          className={isPathActive(ROUTE.TODO) ? "nav-item active" : "nav-item"}
         >
-          <NavLink className="nav-link" to={routeEnum.TODO}>
+          <NavLink className="nav-link" to={ROUTE.TODO}>
             <i className="mdi mdi-playlist-check menu-icon"></i>
             <span className="menu-title">
               <Trans>menu.myTodos</Trans>
@@ -251,12 +246,10 @@ const Sidebar = forwardRef(({}, ref) => {
 
         <li
           className={
-            isPathActive(routeEnum.NOTIFICATIONS)
-              ? "nav-item active"
-              : "nav-item"
+            isPathActive(ROUTE.NOTIFICATIONS) ? "nav-item active" : "nav-item"
           }
         >
-          <NavLink className="nav-link" to={routeEnum.NOTIFICATIONS}>
+          <NavLink className="nav-link" to={ROUTE.NOTIFICATIONS}>
             <i className="mdi mdi-bell-ring menu-icon"></i>
             <span className="menu-title">
               <Trans>Notifications</Trans>

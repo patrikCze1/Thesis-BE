@@ -23,5 +23,10 @@
     "workInProgress": "Pracuje se",
     "complete": "Dokončeno"
   },
-  "field": {}
+  "field": {},
+  "auth": {
+    "error": {
+      "jwtExpired": "Byly jste odhlášeni."
+    }
+  }
 }

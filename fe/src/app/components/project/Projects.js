@@ -14,11 +14,10 @@ import {
   socketEditProject,
   socketNewProject,
 } from "./../../reducers/project/project.reducer";
-import { ioEnum } from "../../enums/websocket/io";
 import { getIo } from "../../../utils/websocket.config";
 import ProjectForm from "./ProjectForm";
 import { hasRole } from "../../service/role.service";
-import { ROLES } from "../../../utils/enum";
+import { ROLES, SOCKET } from "../../../utils/enum";
 
 export default function Projects() {
   const dispatch = useDispatch();
@@ -36,15 +35,15 @@ export default function Projects() {
     const socket = getIo();
 
     try {
-      socket.on(ioEnum.PROJECT_NEW, (data) => {
+      socket.on(SOCKET.PROJECT_NEW, (data) => {
         console.log("project new", data);
         dispatch(socketNewProject(data.project));
       });
-      socket.on(ioEnum.PROJECT_EDIT, (data) => {
+      socket.on(SOCKET.PROJECT_EDIT, (data) => {
         console.log("project edit", data);
         dispatch(socketEditProject(data.project));
       });
-      socket.on(ioEnum.PROJECT_DELETE, (data) => {
+      socket.on(SOCKET.PROJECT_DELETE, (data) => {
         console.log("project delete", data);
         dispatch(socketDeleteProject(data.id));
       });

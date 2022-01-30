@@ -30,17 +30,15 @@ import {
   setAttachmentsAction,
   uploadAction,
 } from "../../reducers/task/taskAttachmentReducer";
-import { levels as priorityLevels } from "./../../models/task/priority";
 import Editable from "../form/Editable";
 import { getIo } from "../../../utils/websocket.config";
-import { ROLES, SOCKET } from "../../../utils/enum";
+import { ROLES, SOCKET, TASK_COLORS, TASK_PRIORITY } from "../../../utils/enum";
 import { getFullName } from "../../service/user/user.service";
 import { hasRole } from "../../service/role.service";
 import TaskCommentItem from "./TaskCommentItem";
 import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
-import { TASK_COLORS } from "../../enums";
 
 export default function TaskForm({ task, hideModal }) {
   const dispatch = useDispatch();
@@ -485,10 +483,10 @@ export default function TaskForm({ task, hideModal }) {
               onChange={(e) => handleChangeAndSave(e)}
               disabled={!canEdit}
             >
-              {Object.keys(priorityLevels).map((key, i) => {
+              {Object.keys(TASK_PRIORITY).map((key, i) => {
                 return (
                   <option value={key} key={i}>
-                    {t(priorityLevels[key])}
+                    {t(TASK_PRIORITY[key])}
                   </option>
                 );
               })}

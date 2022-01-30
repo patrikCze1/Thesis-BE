@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Redirect } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-import { routeEnum } from "./../../enums/navigation/navigation";
+import { ROUTE } from "./../../../utils/enum";
 import { hasRole } from "../../service/role.service";
 import AccessDenied from "./../error/AccessDenied";
 
@@ -13,7 +13,7 @@ export default function PrivateRoute({ children, roles, ...rest }) {
     return (
       <Redirect
         to={{
-          pathname: routeEnum.LOGIN,
+          pathname: ROUTE.LOGIN,
         }}
       />
     );

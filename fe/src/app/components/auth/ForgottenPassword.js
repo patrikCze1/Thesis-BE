@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 
 import Loader from "./../common/Loader";
 import logo from "./../../../assets/images/logo_blue.svg";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 import axios from "./../../../utils/axios.config";
 
 export default function ForgottenPassword() {
@@ -66,7 +66,7 @@ export default function ForgottenPassword() {
                 </button>
               </div>
               <div className="my-2 d-flex justify-content-between align-items-center">
-                <NavLink to={routeEnum.LOGIN} className="auth-link text-black">
+                <NavLink to={ROUTE.LOGIN} className="auth-link text-black">
                   <Trans>goBack</Trans>
                 </NavLink>
               </div>

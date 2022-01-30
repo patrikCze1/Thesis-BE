@@ -288,6 +288,12 @@ i18n
             clearFilter: "Smazat filtr",
             taskQuery: "Vyhledejte dle názvu nebo čísla...",
           },
+          error: {
+            errorAppeared: "Nastala chyba",
+          },
+          message: {
+            goToMainPage: "Jít na hlavní stránku",
+          },
         },
       },
     },

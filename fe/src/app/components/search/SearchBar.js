@@ -4,7 +4,7 @@ import Autosuggest from "react-autosuggest";
 import { useHistory } from "react-router-dom";
 
 import axios from "./../../../utils/axios.config";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 
 const getSuggestionValue = (suggestion) => suggestion.text;
 
@@ -38,10 +38,10 @@ export default function SearchBar() {
     event.preventDefault();
     setSuggestions([]);
     if (sectionIndex === 0) {
-      history.push(`${routeEnum.PROJECTS}/${suggestion.id}`);
+      history.push(`${ROUTE.PROJECTS}/${suggestion.id}`);
     } else if (sectionIndex === 1) {
       history.push(
-        `${routeEnum.PROJECTS}/${suggestion.projectId}/?ukol=${suggestion.id}`
+        `${ROUTE.PROJECTS}/${suggestion.projectId}/?ukol=${suggestion.id}`
       );
     }
   };

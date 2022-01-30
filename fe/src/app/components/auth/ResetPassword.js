@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 import axios from "./../../../utils/axios.config";
 import Loader from "./../common/Loader";
 import logo from "./../../../assets/images/logo_blue.svg";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 
 export default function ResetPassword() {
   const [formData, setFormData] = useState(null);
@@ -46,7 +46,7 @@ export default function ResetPassword() {
         token,
       });
       toast.success(t("auth.passwordChanged"));
-      history.push(routeEnum.LOGIN);
+      history.push(ROUTE.LOGIN);
     } catch (error) {
       setError(error.response.data.message);
     }

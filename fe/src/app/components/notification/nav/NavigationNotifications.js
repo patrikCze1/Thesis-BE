@@ -4,7 +4,7 @@ import { Trans } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { routeEnum } from "../../../enums/navigation/navigation";
+import { ROUTE } from "./../../../../utils/enum";
 import {
   loadUnreadNotificationsAction,
   setSeenAction,
@@ -29,14 +29,14 @@ export default function NavigationNotifications() {
       dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
       const { projectId, id } = notification.TaskNotification.task;
-      // window.location = `${routeEnum.PROJECTS}/${projectId}?ukol=${id}`;
-      history.push(`${routeEnum.PROJECTS}/${projectId}?ukol=${id}`);
+      // window.location = `${ROUTE.PROJECTS}/${projectId}?ukol=${id}`;
+      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
     }
   };
 
   const navigateToNotifications = (e) => {
     e.preventDefault();
-    history.push(routeEnum.NOTIFICATIONS);
+    history.push(ROUTE.NOTIFICATIONS);
   };
 
   return (

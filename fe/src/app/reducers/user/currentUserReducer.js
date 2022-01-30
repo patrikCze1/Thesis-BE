@@ -4,7 +4,7 @@ import i18next from "i18next";
 import jwtDecode from "jwt-decode";
 import Cookies from "js-cookie";
 
-import { routeEnum } from "./../../enums/navigation/navigation";
+import { ROUTE } from "./../../../utils/enum";
 import { getIo } from "../../../utils/websocket.config";
 import i18n from "../../../i18n";
 import { parseUserFromJwt } from "../../service/user/user.service";
@@ -91,7 +91,7 @@ export const loadFromSessionAction = () => async (dispatch) => {
 
 export const logoutAction = (history) => async (dispatch) => {
   dispatch({ type: "user/logout" });
-  history.push(routeEnum.LOGIN);
+  history.push(ROUTE.LOGIN);
 };
 
 export const changePasswordAction = (data) => async (dispatch) => {

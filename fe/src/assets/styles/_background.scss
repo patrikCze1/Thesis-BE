@@ -3,3 +3,16 @@
     @include bg-inverse-icon($value);
   }
 }
+
+.fullscreen-logo-wrapper {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  img {
+    max-width: 400px;
+    width: 70%;
+  }
+}

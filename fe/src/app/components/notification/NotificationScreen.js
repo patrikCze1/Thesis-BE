@@ -11,7 +11,7 @@ import {
 import Loader from "../common/Loader";
 import Pagination from "../common/Pagination";
 import NotificationListItem from "./NotificationListItem";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 
 export default function NotificationScreen() {
   const dispatch = useDispatch();
@@ -31,7 +31,7 @@ export default function NotificationScreen() {
     e.preventDefault();
     if (notification.TaskNotification) {
       const { projectId, id } = notification.TaskNotification.task;
-      history.push(`${routeEnum.PROJECTS}/${projectId}?ukol=${id}`);
+      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
     }
   };
 

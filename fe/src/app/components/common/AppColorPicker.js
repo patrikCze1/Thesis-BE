@@ -1,7 +1,7 @@
 import React from "react";
 import { GithubPicker } from "react-color";
 
-import { TASK_COLORS } from "../../enums";
+import { TASK_COLORS } from "../../../utils/enum";
 
 export default function AppColorPicker({
   onChangeComplete,

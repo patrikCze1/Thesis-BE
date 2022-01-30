@@ -8,10 +8,8 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 import { deleteProjectAction } from "./../../reducers/project/project.reducer";
-import { routeEnum } from "../../enums/navigation/navigation";
-import { PROJECT_STATE } from "../../enums";
+import { PROJECT_STATE, ROLES, ROUTE } from "../../../utils/enum";
 import { hasRole } from "../../service/role.service";
-import { ROLES } from "../../../utils/enum";
 import { getFullName } from "../../service/user/user.service";
 
 export default function ProjectListItem({ project }) {
@@ -46,7 +44,7 @@ export default function ProjectListItem({ project }) {
     <tr>
       <td className="py-1">
         <NavLink
-          to={`${routeEnum.PROJECTS}/${project.id}`}
+          to={`${ROUTE.PROJECTS}/${project.id}`}
           className="project-title"
         >
           {project.key && `[${project.key}] `}

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 import { useHistory } from "react-router-dom";
-import { routeEnum } from "../../enums/navigation/navigation";
-import Particles from "react-particles-js";
 
 import axios from "./../../../utils/axios.config";
 import SearchResultItem from "./SearchResultItem";
+import { ROUTE } from "../../../utils/enum";
 
 export default function SearchResults() {
   const queryString = window.location.search;
@@ -41,12 +40,12 @@ export default function SearchResults() {
 
   const handleClickTask = (e, task) => {
     e.preventDefault();
-    history.push(`${routeEnum.PROJECTS}/${task.projectId}/?ukol=${task.id}`);
+    history.push(`${ROUTE.PROJECTS}/${task.projectId}/?ukol=${task.id}`);
   };
 
   const handleClickProject = (e, project) => {
     e.preventDefault();
-    history.push(`${routeEnum.PROJECTS}/${project.id}`);
+    history.push(`${ROUTE.PROJECTS}/${project.id}`);
   };
 
   return (

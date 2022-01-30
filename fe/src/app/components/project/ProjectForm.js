@@ -16,7 +16,7 @@ import { loadUsersAction } from "./../../reducers/user/userReducer";
 import Loader from "./../common/Loader";
 import { getFullName } from "../../service/user/user.service";
 import LoaderTransparent from "../common/LoaderTransparent";
-import { PROJECT_STATE } from "../../enums";
+import { PROJECT_STATE } from "../../../utils/enum";
 import ProjectStageForm from "./ProjectStageForm";
 
 export default function ProjectForm({ projectId }) {

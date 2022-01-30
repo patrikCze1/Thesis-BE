@@ -6,7 +6,7 @@ import { Trans } from "react-i18next";
 import { useHistory } from "react-router-dom";
 
 import { loadTaskDetailAction } from "./../../reducers/task/taskReducer";
-import { levels } from "./../../models/task/priority";
+import { TASK_PRIORITY } from "./../../../utils/enum";
 import { getFullName, getShortName } from "../../service/user/user.service";
 
 export default function KanbanTask({ task, index }) {
@@ -28,12 +28,12 @@ export default function KanbanTask({ task, index }) {
 
   function renderBadget() {
     switch (task.priority.toString()) {
-      case Object.keys(levels)[0]:
+      case Object.keys(TASK_PRIORITY)[0]:
         return (
           <OverlayTrigger
             overlay={
               <Tooltip id="tooltip-disabled">
-                <Trans>{levels[1]}</Trans>
+                <Trans>{TASK_PRIORITY[1]}</Trans>
               </Tooltip>
             }
           >
@@ -42,12 +42,12 @@ export default function KanbanTask({ task, index }) {
             </div>
           </OverlayTrigger>
         );
-      case Object.keys(levels)[1]:
+      case Object.keys(TASK_PRIORITY)[1]:
         return (
           <OverlayTrigger
             overlay={
               <Tooltip id="tooltip-disabled">
-                <Trans>{levels[2]}</Trans>
+                <Trans>{TASK_PRIORITY[2]}</Trans>
               </Tooltip>
             }
           >
@@ -56,12 +56,12 @@ export default function KanbanTask({ task, index }) {
             </div>
           </OverlayTrigger>
         );
-      case Object.keys(levels)[2]:
+      case Object.keys(TASK_PRIORITY)[2]:
         return (
           <OverlayTrigger
             overlay={
               <Tooltip id="tooltip-disabled">
-                <Trans>{levels[3]}</Trans>
+                <Trans>{TASK_PRIORITY[3]}</Trans>
               </Tooltip>
             }
           >
@@ -70,12 +70,12 @@ export default function KanbanTask({ task, index }) {
             </div>
           </OverlayTrigger>
         );
-      case Object.keys(levels)[3]:
+      case Object.keys(TASK_PRIORITY)[3]:
         return (
           <OverlayTrigger
             overlay={
               <Tooltip id="tooltip-disabled">
-                <Trans>{levels[4]}</Trans>
+                <Trans>{TASK_PRIORITY[4]}</Trans>
               </Tooltip>
             }
           >
@@ -84,12 +84,12 @@ export default function KanbanTask({ task, index }) {
             </div>
           </OverlayTrigger>
         );
-      case Object.keys(levels)[4]:
+      case Object.keys(TASK_PRIORITY)[4]:
         return (
           <OverlayTrigger
             overlay={
               <Tooltip id="tooltip-disabled">
-                <Trans>{levels[5]}</Trans>
+                <Trans>{TASK_PRIORITY[5]}</Trans>
               </Tooltip>
             }
           >

@@ -10,57 +10,56 @@ import Clients from "../components/admin/clients/Clients";
 import UserProfil from "../components/user/UserProfile";
 import PrivateRoute from "../components/security/PrivateRoute";
 import SearchResults from "../components/search/SearchResults";
-import { routeEnum } from "../enums/navigation/navigation";
 import NotificationScreen from "../components/notification/NotificationScreen";
 import TimeTrackScreen from "../components/timeTrack/TimeTrackScreen";
 import ReportScreen from "../components/timeTrack/ReportScreen";
 import TodoScreen from "../components/myTodo/TodoScreen";
-import { ROLES } from "../../utils/enum";
+import { ROLES, ROUTE } from "../../utils/enum";
 
 export default function AppRoutes() {
   return (
     <Switch>
-      <PrivateRoute path={routeEnum.PROJECTS_DETAIL}>
+      <PrivateRoute path={ROUTE.PROJECTS_DETAIL}>
         <KanbanTable />
       </PrivateRoute>
-      <PrivateRoute path={routeEnum.PROJECTS}>
+      <PrivateRoute path={ROUTE.PROJECTS}>
         <Projects />
       </PrivateRoute>
-      <PrivateRoute path={routeEnum.NOTIFICATIONS}>
+      <PrivateRoute path={ROUTE.NOTIFICATIONS}>
         <NotificationScreen />
       </PrivateRoute>
-      <PrivateRoute path={routeEnum.TIME_TRACKS_REPORT}>
+      <PrivateRoute path={ROUTE.TIME_TRACKS_REPORT}>
         <ReportScreen />
       </PrivateRoute>
-      <PrivateRoute path={routeEnum.TIME_TRACKS}>
+      <PrivateRoute path={ROUTE.TIME_TRACKS}>
         <TimeTrackScreen />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.TODO}>
+      <PrivateRoute path={ROUTE.TODO}>
         <TodoScreen />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.USER_PROFIL}>
+      <PrivateRoute path={ROUTE.USER_PROFIL}>
         <UserProfil />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.SEARCH}>
+      <PrivateRoute path={ROUTE.SEARCH}>
         <SearchResults />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.ADMIN_GROUP} roles={[ROLES.ADMIN]}>
+      <PrivateRoute path={ROUTE.ADMIN_GROUP} roles={[ROLES.ADMIN]}>
         <Groups />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.ADMIN_CLIENT} roles={[ROLES.ADMIN]}>
+      <PrivateRoute path={ROUTE.ADMIN_CLIENT} roles={[ROLES.ADMIN]}>
         <Clients />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.ADMIN_USER} roles={[ROLES.ADMIN]}>
+      <PrivateRoute path={ROUTE.ADMIN_USER} roles={[ROLES.ADMIN]}>
         <Users />
       </PrivateRoute>
 
-      <PrivateRoute path={routeEnum.HOME}>
+      <PrivateRoute path={ROUTE.HOME}>
         <Dashboard />
       </PrivateRoute>
     </Switch>

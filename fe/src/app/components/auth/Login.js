@@ -8,7 +8,7 @@ import axios from "./../../../utils/axios.config";
 import Loader from "./../common/Loader";
 import { loadCurrentUserAction } from "./../../reducers/user/currentUserReducer";
 import logo from "./../../../assets/images/logo_blue.svg";
-import { routeEnum } from "../../enums/navigation/navigation";
+import { ROUTE } from "../../../utils/enum";
 import { initIo } from "../../../utils/websocket.config";
 
 export default function Login() {
@@ -52,7 +52,7 @@ export default function Login() {
         console.log(res);
         initIo();
 
-        history.push(routeEnum.HOME);
+        history.push(ROUTE.HOME);
       }
     } catch (err) {
       console.error("login err ", err);
@@ -76,7 +76,7 @@ export default function Login() {
 
   useEffect(() => {
     if (user && Object.keys(user).length > 0) {
-      history.push(routeEnum.HOME);
+      history.push(ROUTE.HOME);
     }
   }, []);
 
@@ -134,7 +134,7 @@ export default function Login() {
                     </label>
                   </div> */}
                 <NavLink
-                  to={routeEnum.FORGOTTEN_PASSWORD}
+                  to={ROUTE.FORGOTTEN_PASSWORD}
                   className="auth-link text-black"
                 >
                   <Trans>Forgot password</Trans>?

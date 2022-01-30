@@ -30,7 +30,6 @@ import {
   socketNewTask,
 } from "./../../reducers/task/taskReducer";
 import { getIo } from "../../../utils/websocket.config";
-import { ioEnum } from "../../enums/websocket/io";
 import { SOCKET } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
 
@@ -81,17 +80,17 @@ export default function KanbanTable() {
     const socket = getIo();
     console.log("handleWebsockets");
     try {
-      socket.on(ioEnum.TASK_NEW, (data) => {
+      socket.on(SOCKET.TASK_NEW, (data) => {
         console.log("socket TASK_NEW", data);
         if (data.task.projectId == projectId)
           dispatch(socketNewTask(data.task));
       });
-      socket.on(ioEnum.TASK_EDIT, (data) => {
+      socket.on(SOCKET.TASK_EDIT, (data) => {
         console.log("socket TASK_EDIT");
         if (data.task.projectId == projectId)
           dispatch(socketEditTask(data.task));
       });
-      socket.on(ioEnum.TASK_DELETE, (data) => {
+      socket.on(SOCKET.TASK_DELETE, (data) => {
         dispatch(socketDeleteTask(data.id));
       });
       socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
