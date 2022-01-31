@@ -144,6 +144,7 @@ i18n
             tracking: "Měření",
             myTodos: "Moje Todo",
             tasks: "Úkoly",
+            userProfile: "Uživatelský profil",
           },
           track: {
             whatAreYouDoing: "Na čem pracujete...",
@@ -244,6 +245,9 @@ i18n
             role: "Role",
             groups: "Skupiny uživatele",
             userHasNotGroups: "Uživatel nemá žádné skupiny",
+            phone: "Telefon",
+            position: "Pozice",
+            email: "E-mail",
           },
           notification: {
             readAll: "Přečíst vše",

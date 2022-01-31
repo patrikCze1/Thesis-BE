@@ -82,9 +82,9 @@ export default function Projects() {
   return (
     <>
       <div className="page-header flex-wrap">
-        <h3 className="page-title">
+        <h4>
           <Trans>Projects</Trans>
-        </h3>
+        </h4>
         {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
           <div className="d-flex">
             <button

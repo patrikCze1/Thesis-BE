@@ -80,7 +80,7 @@ const Sidebar = forwardRef(({}, ref) => {
       </div>
       <ul className="nav">
         <li className="nav-item nav-profile">
-          <span className="nav-link">
+          <NavLink className="nav-link" to={ROUTE.USER_PROFIL}>
             <div className="nav-profile-image">
               <span className="text-avatar">
                 <span>{getShortName(currentUser)}</span>
@@ -95,7 +95,7 @@ const Sidebar = forwardRef(({}, ref) => {
                 <div>{currentUser?.position}</div>
               </div>
             </div>
-          </span>
+          </NavLink>
         </li>
         <li
           className={isPathActive(ROUTE.HOME) ? "nav-item active" : "nav-item"}

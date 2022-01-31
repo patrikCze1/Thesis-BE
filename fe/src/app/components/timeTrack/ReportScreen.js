@@ -172,6 +172,11 @@ export default function ReportScreen() {
   return (
     <div className="row">
       <div className="col-md-12">
+        <div className="page-header">
+          <h4>
+            <Trans>menu.report</Trans>
+          </h4>
+        </div>
         <div className="card">
           <div className="card-body">
             <div className="d-flex justify-content-between align-items-baseline">

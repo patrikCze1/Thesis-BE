@@ -44,6 +44,7 @@ export default function TodoScreen() {
 
   const handleShowInfo = () => {
     console.log("info");
+    //todo
   };
 
   //todo add delete all completed function

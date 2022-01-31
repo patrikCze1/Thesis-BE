@@ -22,7 +22,7 @@ export default function NotificationScreen() {
   const { notifications, loaded, count, unreadCount } = useSelector(
     (state) => state.notificationReducer
   );
-  console.log();
+
   useEffect(() => {
     dispatch(loadNotificationsAction(paginationOffset, paginationLimit));
   }, [paginationOffset]);
@@ -88,14 +88,20 @@ export default function NotificationScreen() {
           </div>
 
           {loaded ? (
-            notifications.map((notification) => (
-              <NotificationListItem
-                key={notification.id}
-                notification={notification}
-                onClick={(e) => handleClick(e, notification)}
-                setSeen={(e) => handleSeen(e, notification.id, notification)}
-              />
-            ))
+            notifications.length > 0 ? (
+              notifications.map((notification) => (
+                <NotificationListItem
+                  key={notification.id}
+                  notification={notification}
+                  onClick={(e) => handleClick(e, notification)}
+                  setSeen={(e) => handleSeen(e, notification.id, notification)}
+                />
+              ))
+            ) : (
+              <p className="text-center">
+                <Trans>label.noRecords</Trans>
+              </p>
+            )
           ) : (
             <Loader />
           )}
