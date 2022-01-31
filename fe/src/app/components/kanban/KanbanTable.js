@@ -122,9 +122,9 @@ export default function KanbanTable() {
       dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
 
-    // return () => {
-    //   io?.close();
-    // };
+    return () => {
+      io?.close();
+    };
   }, [projectId]);
 
   useEffect(() => {

@@ -156,7 +156,7 @@ export default function KanbanTask({ task, index }) {
                           }).format(new Date(task.deadline))}
                       </p>
                     )}
-                    <small>{`${project.key && `${project.key}-`}${
+                    <small>{`${project.key !== null ? `${project.key}-` : ""}${
                       task.number
                     }`}</small>
                   </>

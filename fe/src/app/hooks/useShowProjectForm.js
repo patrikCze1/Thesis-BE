@@ -16,13 +16,16 @@ export function useShowProjectForm() {
   const showForm = (projectId = null) => {
     console.log("showForm");
     dispatch(clearProjectAction());
-    if (projectId) dispatch(loadProjectAction(projectId));
+    console.log("projectId", projectId);
+    if (projectId) {
+      dispatch(loadProjectAction(projectId));
+
+      history.push({
+        search: `?upravit=${projectId}`,
+      });
+    }
 
     setFormVisible(true);
-
-    history.push({
-      search: `?upravit=${projectId}`,
-    });
   };
 
   const hideForm = () => {

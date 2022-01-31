@@ -503,6 +503,9 @@ export default function TaskForm({ task, hideModal }) {
               value={formData.projectStageId}
               onChange={(e) => handleChangeAndSave(e)}
             >
+              {!formData.projectStageId && (
+                <option value={null}>{t("project.stage.choose")}</option>
+              )}
               {project &&
                 project.projectStages &&
                 project.projectStages.map((stage, i) => {

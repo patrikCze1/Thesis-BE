@@ -227,6 +227,9 @@ i18n
               completed: "Dokončený",
               cancelled: "Zrušený",
             },
+            stage: {
+              choose: "Vyberte",
+            },
             description: "Popis",
             newPhase: "Nová fáze",
           },
