@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 
 export default function TodoListItem({ todo, onDelete, onComplete }) {
-  const [isCompleted, setIsCompleted] = useState(todo.completed ? true : false);
+  const [isCompleted, setIsCompleted] = useState(todo.completed || false);
 
   const handleComplete = () => {
     onComplete(todo.id, !isCompleted);

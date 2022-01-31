@@ -296,6 +296,7 @@ i18n
           },
           message: {
             goToMainPage: "Jít na hlavní stránku",
+            recordRemoved: "Záznam odstraněn",
           },
         },
       },

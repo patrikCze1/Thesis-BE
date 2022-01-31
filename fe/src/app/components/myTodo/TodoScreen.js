@@ -41,6 +41,11 @@ export default function TodoScreen() {
     console.log("complete todo", id);
     dispatch(editTodoAction(id, { completed }));
   };
+
+  const handleShowInfo = () => {
+    console.log("info");
+  };
+
   //todo add delete all completed function
   return (
     <div className="row">
@@ -48,6 +53,9 @@ export default function TodoScreen() {
         <div className="page-header">
           <h4 className="card-title">
             <Trans>menu.myTodos</Trans>
+            <a href="#" onClick={() => handleShowInfo()} className="ml-1">
+              <i className="mdi mdi-information-outline"></i>
+            </a>
           </h4>
         </div>
         <div className="card px-3">

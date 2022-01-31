@@ -61,6 +61,7 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
       },
       //begin / hours
+      //estimation time
       //muted, favourites...
       // todo proverit taskId
     },

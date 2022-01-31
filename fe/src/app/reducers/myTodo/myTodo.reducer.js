@@ -1,5 +1,6 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
+import i18next from "i18next";
 
 const initialState = {
   todos: [],
@@ -77,7 +78,7 @@ export const deleteTodoAction = (id) => async (dispatch) => {
   try {
     await axios.delete(`/api/todos/${id}`);
     dispatch({ type: "todos/delete", payload: id });
-    toast.success("Odstraněno");
+    toast.success(i18next.t("message.recordRemoved"));
   } catch (error) {
     toast.error(error.response?.data?.message);
   }
