@@ -2,8 +2,8 @@ const nodemailer = require("nodemailer");
 const Email = require("email-templates");
 const path = require("path");
 
-const APP_NAME = "App";
-const APP_EMAIL = "neodpovidat@app.cz";
+const APP_NAME = "Jago";
+const APP_EMAIL = "neodpovidat@jago.cz";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.mailtrap.io",
@@ -15,13 +15,23 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+/**
+ *
+ * @param {string} to
+ * @param {string} subject
+ * @param {string} templatePath
+ * @param {string} template
+ * @param {Object} locals
+ * @returns
+ */
 const sendMail = async (to, subject, templatePath, template, locals = {}) => {
+  console.log("send mail ", to, subject, templatePath, template, locals);
   const dir = path.resolve(templatePath);
   const emailObject = new Email({
     message: {
-      to: to,
+      to,
       from: `${APP_NAME} <${APP_EMAIL}>`,
-      subject: subject,
+      subject,
     },
     send: true,
     transport: transporter,
@@ -30,14 +40,18 @@ const sendMail = async (to, subject, templatePath, template, locals = {}) => {
     },
   });
 
-  return emailObject.send({
-    template: template,
-    message: {
-      to: to,
-      from: `${APP_NAME} <${APP_EMAIL}>`,
-    },
-    locals: locals,
-  });
+  try {
+    return await emailObject.send({
+      template: template,
+      message: {
+        to,
+        from: `${APP_NAME} <${APP_EMAIL}>`,
+      },
+      locals,
+    });
+  } catch (error) {
+    console.error("sendMail ", error);
+  }
 };
 
 // exports.transporter = transporter;

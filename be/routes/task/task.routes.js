@@ -18,6 +18,11 @@ const { SOCKET_EMIT, ROLE, TASK_PRIORITY } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
 const sequelize = require("../../models");
+const {
+  sendEmailNotification,
+} = require("../../service/notification/notificationService");
+const { findOneById } = require("../../repo/user/user.repository");
+const { getFeUrl } = require("../../service/utils");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -349,21 +354,48 @@ router.patch(
       });
 
       if (task.completedAt && task.createdById !== user.id) {
-        const io = getIo();
-        const newNotification =
-          await notificationService.createTaskNotification(
-            task.id,
-            `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
-            task.createdById,
-            user.id
-          );
-        newNotification.setDataValue("creator", user);
-        newNotification.setDataValue("createdAt", new Date());
-        newNotification.setDataValue("TaskNotification", { task });
+        try {
+          const io = getIo();
 
-        io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-          notification: newNotification,
-        });
+          const creator = await findOneById(task.createdById);
+          if (creator) {
+            const taskName = `[${task.number}] ${task.title}`;
+            sendEmailNotification(
+              creator.email,
+              req.t("notification.task.taskCompleted", {
+                taskName,
+                userName: getFullName(user),
+              }),
+              "email/task/",
+              "completed",
+              {
+                taskLink: `${getFeUrl()}/projekty/${task.projectId}?ukol=${
+                  task.id
+                }`,
+                userName: getFullName(user),
+                taskName,
+              }
+            );
+          }
+
+          const newNotification =
+            await notificationService.createTaskNotification(
+              task.id,
+              `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
+              task.createdById,
+              user.id
+            );
+
+          newNotification.setDataValue("creator", user);
+          newNotification.setDataValue("createdAt", new Date());
+          newNotification.setDataValue("TaskNotification", { task });
+
+          io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            notification: newNotification,
+          });
+        } catch (error) {
+          console.error(error);
+        }
       }
       await task.save();
 

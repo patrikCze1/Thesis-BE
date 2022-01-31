@@ -28,5 +28,10 @@
     "error": {
       "jwtExpired": "Byly jste odhlášeni."
     }
+  },
+  "notification": {
+    "task": {
+      "taskCompleted": "Uživatel {{userName}} dokončil úkol {{taskName}}"
+    }
   }
 }

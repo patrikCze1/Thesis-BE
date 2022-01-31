@@ -122,9 +122,10 @@ export default function KanbanTable() {
       dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
 
-    return () => {
-      io?.close();
-    };
+    // return () => {
+    //   console.log("close sockets");
+    //   io?.close();
+    // };
   }, [projectId]);
 
   useEffect(() => {

@@ -156,11 +156,11 @@ export default function KanbanTask({ task, index }) {
                           }).format(new Date(task.deadline))}
                       </p>
                     )}
-                    <small>{`${project.key !== null ? `${project.key}-` : ""}${
-                      task.number
-                    }`}</small>
                   </>
                 )}
+                <small className="d-inline-block ml-auto">{`${
+                  project.key !== null ? `${project.key}-` : ""
+                }${task.number}`}</small>
 
                 {/* <Dropdown variant="p-0" alignRight>
                   <Dropdown.Toggle variant="dropdown-toggle p-0">
