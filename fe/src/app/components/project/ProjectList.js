@@ -5,8 +5,8 @@ import ProjectListItem from "./ProjectListItem";
 
 export default function ProjectList({ projects }) {
   return (
-    <div className="grid-margin stretch-card">
-      <div className="table-responsive">
+    <div className="grid-margin ">
+      <div>
         <table className="table table-striped">
           <thead>
             <tr>
@@ -28,9 +28,17 @@ export default function ProjectList({ projects }) {
             </tr>
           </thead>
           <tbody>
-            {projects.map((project) => {
-              return <ProjectListItem key={project.id} project={project} />;
-            })}
+            {projects.length > 0 ? (
+              projects.map((project) => {
+                return <ProjectListItem key={project.id} project={project} />;
+              })
+            ) : (
+              <tr>
+                <td colSpan={5} className="text-center">
+                  <Trans>label.noRecords</Trans>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>

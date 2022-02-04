@@ -43,7 +43,10 @@ export default function ProjectListItem({ project }) {
       if (result.value) dispatch(deleteProjectAction(project.id));
     });
   };
-
+  console.log(
+    "hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles)",
+    hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles)
+  );
   return (
     <tr>
       <td className="py-1">
@@ -63,21 +66,23 @@ export default function ProjectListItem({ project }) {
         </label>
       </td>
       <td className="text-center">
-        {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
-          <Dropdown>
-            <Dropdown.Toggle variant="btn">
-              <i className="mdi mdi-dots-vertical"></i>
-            </Dropdown.Toggle>
-            <Dropdown.Menu>
-              <Dropdown.Item onClick={handleEditClick}>
-                <Trans>Edit</Trans>
-              </Dropdown.Item>
-              <Dropdown.Item onClick={handleDeleteClick}>
-                <Trans>Delete</Trans>
-              </Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        )}
+        <div>
+          {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
+            <Dropdown>
+              <Dropdown.Toggle variant="btn">
+                <i className="mdi mdi-dots-vertical"></i>
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={handleEditClick}>
+                  <Trans>Edit</Trans>
+                </Dropdown.Item>
+                <Dropdown.Item onClick={handleDeleteClick}>
+                  <Trans>Delete</Trans>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          )}
+        </div>
       </td>
     </tr>
   );

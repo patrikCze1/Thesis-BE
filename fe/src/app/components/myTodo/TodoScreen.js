@@ -9,10 +9,12 @@ import {
   editTodoAction,
   loadTodosAction,
 } from "../../reducers/myTodo/myTodo.reducer";
+import { useModuleInfoModal } from "../../hooks/Common";
 
 export default function TodoScreen() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { handleShow } = useModuleInfoModal();
 
   const { todos } = useSelector((state) => state.todoReducer);
 
@@ -42,11 +44,6 @@ export default function TodoScreen() {
     dispatch(editTodoAction(id, { completed }));
   };
 
-  const handleShowInfo = () => {
-    console.log("info");
-    //todo
-  };
-
   //todo add delete all completed function
   return (
     <div className="row">
@@ -54,7 +51,7 @@ export default function TodoScreen() {
         <div className="page-header">
           <h4 className="card-title">
             <Trans>menu.myTodos</Trans>
-            <a href="#" onClick={() => handleShowInfo()} className="ml-1">
+            <a href="#" onClick={handleShow} className="ml-1">
               <i className="mdi mdi-information-outline"></i>
             </a>
           </h4>
