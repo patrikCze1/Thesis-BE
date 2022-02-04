@@ -5,7 +5,7 @@ import jwtDecode from "jwt-decode";
 import Cookies from "js-cookie";
 
 import { ROUTE } from "./../../../utils/enum";
-import { getIo } from "../../../utils/websocket.config";
+import { getIo, initIo } from "../../../utils/websocket.config";
 import i18n from "../../../i18n";
 import { parseUserFromJwt } from "../../service/user/user.service";
 
@@ -18,7 +18,7 @@ const now = new Date();
 let token = null;
 export default function currentUserReducer(state = initialState, action) {
   switch (action.type) {
-    case "user/load":
+    case "user/login":
       const data = {
         value: action.payload.token,
         expiry: now.getTime() + 1000 * 60 * 60 * 12,
@@ -29,7 +29,9 @@ export default function currentUserReducer(state = initialState, action) {
       token = jwtDecode(action.payload.token);
       console.log("token", token);
 
-      return { ...state, user: token.user };
+      initIo();
+
+      return { ...state, user: token.user, actionProcessing: false };
 
     case "user/loadFromStorage":
       // const itemStr = window.localStorage.getItem("app-user");
@@ -81,9 +83,31 @@ export default function currentUserReducer(state = initialState, action) {
   }
 }
 
-export const loadCurrentUserAction = (data) => async (dispatch) => {
-  dispatch({ type: "user/load", payload: data });
+export const loginAction = (email, password, history) => async (dispatch) => {
+  dispatch({ type: "user/actionStart" });
+  try {
+    const response = await axios.post(
+      `/api/auth/login`,
+      { email, password },
+      {
+        auth: {
+          username: email,
+          password: password,
+        },
+      }
+    );
+
+    dispatch({ type: "user/login", payload: response.data });
+    history.push(ROUTE.HOME);
+  } catch (e) {
+    dispatch({ type: "user/actionFail" });
+    toast.error(e.response?.data?.message);
+  }
 };
+
+// export const loadCurrentUserAction = (data) => async (dispatch) => {
+//   dispatch({ type: "user/load", payload: data });
+// };
 
 export const loadFromSessionAction = () => async (dispatch) => {
   dispatch({ type: "user/loadFromStorage" });

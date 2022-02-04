@@ -4,20 +4,20 @@ import { Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
-import axios from "./../../../utils/axios.config";
 import Loader from "./../common/Loader";
-import { loadCurrentUserAction } from "./../../reducers/user/currentUserReducer";
+import { loginAction } from "./../../reducers/user/currentUserReducer";
 import logo from "./../../../assets/images/logo_blue.svg";
 import { ROUTE } from "../../../utils/enum";
-import { initIo } from "../../../utils/websocket.config";
 
 export default function Login() {
   const dispatch = useDispatch();
 
-  const { user } = useSelector((state) => state.currentUserReducer);
+  const { user, actionProcessing } = useSelector(
+    (state) => state.currentUserReducer
+  );
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(false);
-  const [loading, setLoading] = useState(false);
+  // const [error, setError] = useState(false);
+
   const { t } = useTranslation();
   const history = useHistory();
 
@@ -31,38 +31,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError(false);
-
-    try {
-      const res = await axios.post(
-        `/api/auth/login`,
-        { ...formData },
-        {
-          auth: {
-            username: formData.email,
-            password: formData.password,
-          },
-        }
-      );
-
-      if (res?.status === 200) {
-        setLoading(false);
-        dispatch(loadCurrentUserAction(res.data));
-        console.log(res);
-        initIo();
-
-        history.push(ROUTE.HOME);
-      }
-    } catch (err) {
-      console.error("login err ", err);
-      if (err?.response?.status === 400) {
-        setError(t("Invalid credentials"));
-      } else {
-        setError(t("Can not login"));
-      }
-    }
-    setLoading(false);
+    dispatch(loginAction(formData.email, formData.password, history));
   };
 
   const handleInputChange = (e) => {
@@ -92,7 +61,7 @@ export default function Login() {
               <Trans>Login</Trans>
             </h4>
             <Form className="pt-3" method="post" onSubmit={handleSubmit}>
-              {error && <span className="error-message">{error}</span>}
+              {/* {error && <span className="error-message">{error}</span>} */}
               <Form.Group className="d-flex search-field">
                 <Form.Control
                   type="text"
@@ -141,7 +110,7 @@ export default function Login() {
                 </NavLink>
               </div>
 
-              {loading && <Loader />}
+              {actionProcessing && <Loader />}
             </Form>
           </div>
         </div>

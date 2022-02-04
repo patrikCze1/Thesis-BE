@@ -24,31 +24,35 @@ router.post("/login", async (req, res) => {
 
   try {
     const user = await User.findOne({
-      where: { [Op.or]: [{ email: email }, { username: email }] },
+      where: { [Op.or]: [{ email }, { username: email }] },
     });
 
-    const match = await bcrypt.compare(password, user.password);
+    if (user) {
+      const match = await bcrypt.compare(password, user.password);
 
-    if (user && match) {
-      // if ok return auth token
-      const token = generateToken(user);
-      const refreshToken = generateRefreshToken(user);
+      if (match) {
+        const token = generateToken(user);
+        const refreshToken = generateRefreshToken(user);
 
+        return res
+          .cookie("Auth-Token", token, {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+          })
+          .cookie("Refresh-Token", refreshToken, {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+          })
+          .send({
+            token,
+          });
+      } else {
+        return res.status(400).json({ message: req.t("error.badCredentials") });
+      }
+    } else
       return res
-        .cookie("Auth-Token", token, {
-          secure: process.env.NODE_ENV === "production",
-          httpOnly: true,
-        })
-        .cookie("Refresh-Token", refreshToken, {
-          secure: process.env.NODE_ENV === "production",
-          httpOnly: true,
-        })
-        .send({
-          token,
-        });
-    } else {
-      return res.status(400).json({ message: req.t("error.badCredentials") });
-    }
+        .status(400)
+        .json({ message: req.t("auth.error.userDontExist") });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

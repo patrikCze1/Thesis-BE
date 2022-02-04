@@ -28,7 +28,8 @@
   "field": {},
   "auth": {
     "error": {
-      "jwtExpired": "Byly jste odhlášeni."
+      "jwtExpired": "Byly jste odhlášeni.",
+      "userDontExist": "Uživatel neexistuje"
     }
   },
   "notification": {
