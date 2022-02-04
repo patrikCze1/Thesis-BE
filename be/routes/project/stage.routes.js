@@ -16,7 +16,13 @@ router.post("/:projectId/stages", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -52,7 +58,13 @@ router.patch("/:projectId/stages", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -79,7 +91,13 @@ router.delete("/stages/:id", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 

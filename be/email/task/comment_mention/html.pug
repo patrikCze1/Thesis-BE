@@ -1,0 +1,8 @@
+doctype html
+html(lang='cs')
+ body
+   h1 #{taskName}
+   div.remark
+     p Uživatel #{username} Vás označil v komentáři v úkolu
+      a(href=`${taskLink}`) #{taskName}
+    p #{commentText}

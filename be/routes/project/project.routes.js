@@ -176,7 +176,13 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       !user.roles.includes(ROLE.ADMIN) &&
       !user.roles.includes(ROLE.MANAGEMENT)
     ) {
-      res.status(403).json({ success: false });
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
     const data = {
@@ -227,7 +233,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       !user.roles.includes(ROLE.ADMIN) &&
       !user.roles.includes(ROLE.MANAGEMENT)
     ) {
-      res.status(403).json({ success: false });
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
 

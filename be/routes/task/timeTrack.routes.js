@@ -178,7 +178,13 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     let track = await TimeTrack.findByPk(req.params.id);
     console.log(track);
     if (track.userId != user.id) {
-      res.status(403).json({});
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
 
@@ -194,14 +200,19 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
-  // update trakc
   const user = getUser(req, res);
 
   try {
     let track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res.status(403).json({});
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
 
@@ -226,7 +237,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res.status(403).json({});
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
 

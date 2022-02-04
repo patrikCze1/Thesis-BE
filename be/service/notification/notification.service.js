@@ -1,8 +1,5 @@
 const { NOTIFICATION_TYPE } = require("../../enum/enum");
-const {
-  Notification,
-  TaskNotification,
-} = require("./../../models/modelHelper");
+const { Notification, TaskNotification } = require("../../models/modelHelper");
 const { sendMail, APP_EMAIL, APP_NAME } = require("../../email/config");
 
 /**
@@ -12,6 +9,7 @@ const { sendMail, APP_EMAIL, APP_NAME } = require("../../email/config");
  * @param {number} receiverId
  * @param {number} createdById
  * @returns {TaskNotification}
+ * @throws {error}
  */
 const createTaskNotification = async (
   taskId,
@@ -44,17 +42,17 @@ const createTaskNotification = async (
  * @param {string} subject
  * @param {string} templatePath
  * @param {string} template
- * @param {Object} locals
+ * @param {Object} emailData
  */
 const sendEmailNotification = (
   to,
   subject,
   templatePath,
   template,
-  locals = {}
+  emailData = {}
 ) => {
   try {
-    sendMail(to, subject, templatePath, template, locals);
+    sendMail(to, subject, templatePath, template, emailData);
   } catch (error) {
     console.error("sendEmailNotification", error);
   }

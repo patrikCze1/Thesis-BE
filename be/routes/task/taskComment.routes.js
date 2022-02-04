@@ -12,7 +12,7 @@ const {
   Task,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
-const { validator, notificationService } = require("../../service");
+const { validator } = require("../../service");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = `public/uploads/task-comment/${req.params.taskId}/`;
@@ -34,6 +34,11 @@ const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
+const {
+  sendEmailNotification,
+  createTaskNotification,
+} = require("../../service/notification/notification.service");
+const { getFeUrl } = require("../../service/utils");
 const io = getIo();
 
 router.post(
@@ -54,11 +59,19 @@ router.post(
 
     try {
       const user = getUser(req, res);
+      const data = {
+        text: body.text,
+        taskId: req.params.taskId,
+        userId: user.id,
+      };
 
-      const mentionedUsers = body.text.match(mentionRegex);
+      const newComment = await TaskComment.create(data);
+
+      const mentionedUsers = data.text.match(mentionRegex);
       console.log("mentionedUsers", mentionedUsers);
+
       if (Array.isArray(mentionedUsers) && mentionedUsers.length > 0) {
-        const task = await Task.findByPk(req.params.taskId);
+        const task = await Task.findByPk(data.taskId);
 
         for (const mention of mentionedUsers) {
           const mentionUser = await User.findOne({
@@ -66,15 +79,30 @@ router.post(
           });
 
           if (mentionUser) {
-            const newNotification =
-              await notificationService.createTaskNotification(
-                task.id,
-                `Uživatel ${getFullName(
-                  user
-                )} Vás označil v komentáři v úkolu ${task.title}`,
-                mentionUser.id,
-                user.id
+            if (mentionUser?.allowEmailNotification)
+              sendEmailNotification(
+                mentionUser.email,
+                "Byl/a jste označen/a v komentáři",
+                "email/task/",
+                "comment_mention",
+                {
+                  commentText: data.text,
+                  username: getFullName(user),
+                  taskName: task.title,
+                  taskLink: `${getFeUrl()}/projekty/${task.projectId}?ukol=${
+                    task.id
+                  }`,
+                }
               );
+
+            const newNotification = await createTaskNotification(
+              task.id,
+              `Uživatel ${getFullName(user)} Vás označil v komentáři v úkolu ${
+                task.title
+              }`,
+              mentionUser.id,
+              user.id
+            );
             newNotification.setDataValue("creator", user);
             newNotification.setDataValue("createdAt", new Date());
             newNotification.setDataValue("TaskNotification", { task });
@@ -87,13 +115,6 @@ router.post(
       }
 
       console.log("req.files ", req.files);
-      const data = {
-        text: body.text,
-        taskId: req.params.taskId,
-        userId: user.id,
-      };
-
-      const newItem = await TaskComment.create(data);
       let attachemnts = [];
 
       if (req.files && req.files.length > 0) {
@@ -101,7 +122,7 @@ router.post(
           req.files.map(async (file) => {
             try {
               const attach = await TaskCommentAttachment.create({
-                commentId: newItem.id,
+                commentId: newComment.id,
                 originalName: file.originalname,
                 file: file.filename,
                 path: file.path,
@@ -116,9 +137,9 @@ router.post(
         );
       }
 
-      newItem.setDataValue("commentAttachments", attachemnts);
-      newItem.setDataValue("taskCommentUser", user);
-      newItem.setDataValue("createdAt", new Date());
+      newComment.setDataValue("commentAttachments", attachemnts);
+      newComment.setDataValue("taskCommentUser", user);
+      newComment.setDataValue("createdAt", new Date());
 
       const task = await Task.findByPk(req.params.taskId);
       const projectUsers = await findUsersByProject(task.projectId);
@@ -126,11 +147,11 @@ router.post(
         console.log("socket ", u.id);
         if (u.id !== user.id)
           io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
-            comment: newItem,
+            comment: newComment,
           });
       }
 
-      res.json({ comment: newItem });
+      res.json({ comment: newComment });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -142,8 +163,12 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
     let taskComment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
 
-    if (!user.id !== taskComment.userId) {
-      res.status(403).json();
+    if (user.id !== taskComment.userId) {
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 
@@ -162,8 +187,10 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
     const comment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
 
-    if (!comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
-      res.status(403).json();
+    if (comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
+      res
+        .status(403)
+        .json({ message: req.t("error.missingPermissionForAction") });
       return;
     }
 
@@ -201,12 +228,14 @@ router.delete(
   async (req, res) => {
     try {
       const attachment = await TaskCommentAttachment.findByPk(req.params.id);
-      const comment = await TaskComment.findByPk(rattachment.commentId);
+      const comment = await TaskComment.findByPk(attachment.commentId);
       // const task = await Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
 
-      if (!comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
-        res.status(403).json();
+      if (comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
+        res
+          .status(403)
+          .json({ message: req.t("error.missingPermissionForAction") });
         return;
       }
       fs.unlinkSync(attachment.path);

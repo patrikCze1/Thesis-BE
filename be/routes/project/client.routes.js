@@ -7,13 +7,13 @@ const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { ROLE } = require("../../enum/enum");
 
-// only for admins
-
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res.status(403).json();
+    res
+      .status(403)
+      .json({ message: req.json({ message: req.t("error.accessDenied") }) });
     return;
   }
 
@@ -33,9 +33,9 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       ],
     });
-    res.json({ success: false, clients });
+    res.json({ clients });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -43,7 +43,9 @@ router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res.status(403).json({ success: false });
+    res
+      .status(403)
+      .json({ message: req.json({ message: req.t("error.accessDenied") }) });
     return;
   }
 
@@ -53,13 +55,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
     });
 
     if (!client) {
-      res.status(404).json({ success: false });
+      res.status(404).json({});
       return;
     }
 
     res.json({ success: true, client });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -67,7 +69,13 @@ router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res.status(403).json({ success: false });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -86,7 +94,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const newRecord = await Client.create(data);
     res.send({ success: true, client: newRecord });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -94,14 +102,20 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res.status(403).json({ success: false });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
   try {
     const client = await Client.findByPk(req.params.id);
     if (!client) {
-      res.status(404).json({ success: false });
+      res.status(404).json({});
       return;
     }
 
@@ -109,7 +123,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ success: true, client: updated });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -117,7 +131,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res.status(403).json({ success: false });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -127,7 +147,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
     res.json({ success: true, message: "Success" });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

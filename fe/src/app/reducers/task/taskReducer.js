@@ -123,6 +123,16 @@ export default function taskReducer(state = initialState, action) {
     case "task/actionFail":
       return { ...state, actionSuccess: false, actionProcessing: false };
 
+    case "task/changeCommentsCount":
+      return {
+        ...state,
+        tasks: state.tasks.map((task) => {
+          if (task.id === action.payload.taskId)
+            task.commentsCount += action.payload.value;
+          return task;
+        }),
+      };
+
     default:
       return state;
   }

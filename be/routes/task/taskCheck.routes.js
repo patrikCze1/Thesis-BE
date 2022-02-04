@@ -60,7 +60,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const user = getUser(req, res);
 
     if (!task.createdById !== user.id && !user.roles.includes(ROLE.ADMIN)) {
-      res.status(403).json();
+      res
+        .status(403)
+        .json({
+          message: req.json({
+            message: req.t("error.missingPermissionForAction"),
+          }),
+        });
       return;
     }
 

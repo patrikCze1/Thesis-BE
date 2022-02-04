@@ -8,7 +8,7 @@ export default function ErrorBoundaryContent() {
   return (
     <div>
       <h1>{t("error.errorAppeared")}</h1>
-      <NavLink to="/">{t("message.goToMainPage")}</NavLink>
+      <a href="/">{t("message.goToMainPage")}</a>
     </div>
   );
 }

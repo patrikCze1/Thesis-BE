@@ -2,7 +2,9 @@
   "error": {
     "badCredentials": "Špatné přihlašovací údaje",
     "insufficientPermissions": "Nedostatečné oprávnění",
-    "theseFieldsAreRequired": "Tyto pole jsou povinná"
+    "theseFieldsAreRequired": "Tyto pole jsou povinná",
+    "missingPermissionForAction": "Pro tuto akci nemáte dostatečné oprávnění",
+    "accessDenied": "Přístup zamítnut"
   },
   "project": {
     "error": {

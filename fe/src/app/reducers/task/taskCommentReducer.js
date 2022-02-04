@@ -93,6 +93,10 @@ export const createAction = (taskId, data) => async (dispatch) => {
       headers: { "Content-Type": "multipart/form-data" },
     });
     dispatch({ type: "comment/create", payload: response.data });
+    dispatch({
+      type: "task/changeCommentsCount",
+      payload: { taskId, value: 1 },
+    });
   } catch (error) {
     toast.error(error.response?.data?.message);
     dispatch({ type: "comment/actionFail", payload: null });
@@ -127,7 +131,12 @@ export const deleteTaskCommentAction =
       await axios.delete(`/api/tasks/${taskId}/comments/${commentId}`);
       toast.success(i18next.t("comment.commentDeleted"));
       dispatch({ type: "comment/delete", payload: commentId });
+      dispatch({
+        type: "task/changeCommentsCount",
+        payload: { taskId, value: -1 },
+      });
     } catch (error) {
+      console.error("error", error);
       toast.error(error.response?.data?.message);
       dispatch({ type: "comment/actionFail", payload: null });
     }

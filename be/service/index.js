@@ -1,5 +1,5 @@
 module.exports = {
   validator: require("./validator"),
-  notificationService: require("./notification/notificationService"),
+  notificationService: require("./notification/notification.service"),
   utils: require("./utils"),
 };

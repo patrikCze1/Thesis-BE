@@ -77,7 +77,13 @@ router.post("/", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -117,7 +123,13 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -147,7 +159,13 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res.status(403).json({ message: "Nedostatečné oprávnění" });
+    res
+      .status(403)
+      .json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
     return;
   }
 
@@ -157,7 +175,6 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
     await removedUser.destroy();
 
-    // todo remove all users records...
     await UserGroup.destroy({ where: { userId: req.params.id } });
     await ProjectUser.destroy({ where: { userId: req.params.id } });
 

@@ -59,6 +59,11 @@ module.exports = (sequelize) => {
       passwordResetHash: {
         type: DataTypes.STRING(255),
       },
+      allowEmailNotification: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: true,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),

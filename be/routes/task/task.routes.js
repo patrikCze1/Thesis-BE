@@ -12,7 +12,7 @@ const {
   Project,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
-const { validator, notificationService } = require("../../service");
+const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, TASK_PRIORITY } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
@@ -20,7 +20,8 @@ const { getFullName } = require("../../service/user.service");
 const sequelize = require("../../models");
 const {
   sendEmailNotification,
-} = require("../../service/notification/notificationService");
+  createTaskNotification,
+} = require("../../service/notification/notification.service");
 const { findOneById } = require("../../repo/user/user.repository");
 const { getFeUrl } = require("../../service/utils");
 
@@ -244,7 +245,11 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               "description",
             ].includes(field)
           ) {
-            res.status(403).json({ message: "Nedostatečné oprávnění" });
+            res.status(403).json({
+              message: req.json({
+                message: req.t("error.missingPermissionForAction"),
+              }),
+            });
             return;
           }
         });
@@ -263,15 +268,26 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           task.solverId != null &&
           user.id != task.solverId
         ) {
-          const newNotification =
-            await notificationService.createTaskNotification(
-              task.id,
-              `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${
-                task.title
-              }`,
-              task.solverId,
-              user.id
+          const newSolver = await User.findByPk(task.solverId);
+          if (newSolver?.allowEmailNotification)
+            sendEmailNotification(
+              newSolver.email,
+              req.t("task.newAssignment"),
+              "email/task",
+              "new_assignment",
+              {
+                taskLink: getFeTaskUrl(task.projectId, task.id),
+                taskName: task.title,
+                username: getFullName(user),
+              }
             );
+
+          const newNotification = await createTaskNotification(
+            task.id,
+            `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${task.title}`,
+            task.solverId,
+            user.id
+          );
           newNotification.setDataValue("creator", user);
           newNotification.setDataValue("createdAt", new Date());
           newNotification.setDataValue("TaskNotification", { task });
@@ -284,13 +300,26 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           taskSolverId !== task.solverId &&
           user.id != taskSolverId
         ) {
-          const newNotification =
-            await notificationService.createTaskNotification(
-              task.id,
-              `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.title}`,
-              taskSolverId,
-              user.id
+          const oldSolver = await User.findByPk(taskSolverId);
+          if (oldSolver?.allowEmailNotification)
+            sendEmailNotification(
+              oldSolver.email,
+              req.t("task.newAssignment"),
+              "email/task",
+              "removed_assignment",
+              {
+                taskLink: getFeTaskUrl(task.projectId, task.id),
+                taskName: task.title,
+                username: getFullName(user),
+              }
             );
+
+          const newNotification = await createTaskNotification(
+            task.id,
+            `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.title}`,
+            taskSolverId,
+            user.id
+          );
           newNotification.setDataValue("creator", user);
           newNotification.setDataValue("createdAt", new Date());
           newNotification.setDataValue("TaskNotification", { task });
@@ -298,15 +327,14 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             notification: newNotification,
           });
         } else if (field === "priority" && user.id != taskSolverId) {
-          const newNotification =
-            await notificationService.createTaskNotification(
-              task.id,
-              `Uživatel ${getFullName(user)} změnil prioritu úkolu: ${
-                task.title
-              } na ${TASK_PRIORITY[task.priority]}`,
-              taskSolverId,
-              user.id
-            );
+          const newNotification = await createTaskNotification(
+            task.id,
+            `Uživatel ${getFullName(user)} změnil prioritu úkolu: ${
+              task.title
+            } na ${TASK_PRIORITY[task.priority]}`,
+            taskSolverId,
+            user.id
+          );
           newNotification.setDataValue("creator", user);
           newNotification.setDataValue("createdAt", new Date());
           newNotification.setDataValue("TaskNotification", { task });
@@ -360,31 +388,29 @@ router.patch(
           const creator = await findOneById(task.createdById);
           if (creator) {
             const taskName = `[${task.number}] ${task.title}`;
-            sendEmailNotification(
-              creator.email,
-              req.t("notification.task.taskCompleted", {
-                taskName,
-                userName: getFullName(user),
-              }),
-              "email/task/",
-              "completed",
-              {
-                taskLink: `${getFeUrl()}/projekty/${task.projectId}?ukol=${
-                  task.id
-                }`,
-                userName: getFullName(user),
-                taskName,
-              }
-            );
+            if (creator?.allowEmailNotification)
+              sendEmailNotification(
+                creator.email,
+                req.t("notification.task.taskCompleted", {
+                  taskName,
+                  userName: getFullName(user),
+                }),
+                "email/task/",
+                "completed",
+                {
+                  taskLink: getFeTaskUrl(task.projectId, task.id),
+                  username: getFullName(user),
+                  taskName,
+                }
+              );
           }
 
-          const newNotification =
-            await notificationService.createTaskNotification(
-              task.id,
-              `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
-              task.createdById,
-              user.id
-            );
+          const newNotification = await createTaskNotification(
+            task.id,
+            `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
+            task.createdById,
+            user.id
+          );
 
           newNotification.setDataValue("creator", user);
           newNotification.setDataValue("createdAt", new Date());
@@ -417,7 +443,11 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       !user.roles.includes(ROLE.MANAGEMENT) &&
       task.createdById !== user.id
     ) {
-      res.status(403).json({ message: "Nedostatečné oprávnění" });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 
