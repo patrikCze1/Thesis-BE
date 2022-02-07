@@ -17,6 +17,7 @@ import {
 } from "./../../../reducers/user/groupReducer";
 import GroupForm from "./GroupForm";
 import Loader from "../../common/Loader";
+import i18n from "../../../../i18n";
 
 const { SearchBar } = Search;
 
@@ -148,6 +149,7 @@ export default function Groups() {
                             pagination={paginationFactory()}
                             {...props.baseProps}
                             wrapperClasses="table-responsive"
+                            noDataIndication={i18n.t("label.noRecords")}
                           />
                         </div>
                       )}

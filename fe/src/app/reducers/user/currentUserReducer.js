@@ -1,13 +1,13 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
-import jwtDecode from "jwt-decode";
+import CryptoJS from "crypto-js";
 import Cookies from "js-cookie";
 
 import { ROUTE } from "./../../../utils/enum";
 import { getIo, initIo } from "../../../utils/websocket.config";
 import i18n from "../../../i18n";
-import { parseUserFromJwt } from "../../service/user/user.service";
+import { parseUserFromStorage } from "../../service/user/user.service";
 
 const initialState = {
   user: {},
@@ -15,44 +15,29 @@ const initialState = {
 };
 
 const now = new Date();
-let token = null;
 export default function currentUserReducer(state = initialState, action) {
   switch (action.type) {
     case "user/login":
       const data = {
-        value: action.payload.token,
+        value: encrypt(JSON.stringify(action.payload.user)),
         expiry: now.getTime() + 1000 * 60 * 60 * 12,
       };
-
+      console.log("data", data);
       window.localStorage.setItem("app-user", JSON.stringify(data));
-
-      token = jwtDecode(action.payload.token);
-      console.log("token", token);
 
       initIo();
 
-      return { ...state, user: token.user, actionProcessing: false };
+      return { ...state, user: action.payload.user, actionProcessing: false };
 
     case "user/loadFromStorage":
-      // const itemStr = window.localStorage.getItem("app-user");
+      const user = parseUserFromStorage();
 
-      // if (!itemStr) return { ...state };
+      console.log("loadFromStorage", user);
 
-      // const item = JSON.parse(itemStr);
-
-      // token = jwtDecode(item.value);
-      // console.log("token", token);
-      // if (!item.expiry || now.getTime() > item.expiry) {
-      //   window.localStorage.removeItem("app-user");
-      //   return { ...state };
-      // }
-
-      token = parseUserFromJwt();
-
-      if (token)
+      if (user)
         return {
           ...state,
-          user: token.user,
+          user,
         };
       else return { ...state };
 
@@ -65,6 +50,18 @@ export default function currentUserReducer(state = initialState, action) {
     case "user/actionFail":
       return { ...state, actionProcessing: false };
 
+    case "user/update":
+      const storageData = window.localStorage.getItem("app-user");
+      const updatedUser = { ...state.user, ...action.payload };
+      storageData.value = encrypt(JSON.stringify(updatedUser));
+      window.localStorage.setItem("app-user", JSON.stringify(storageData));
+
+      return {
+        ...state,
+        actionProcessing: false,
+        user: updatedUser,
+      };
+
     case "user/logout":
       Cookies.remove("Auth-Token");
       Cookies.remove("Refresh-Token");
@@ -73,7 +70,6 @@ export default function currentUserReducer(state = initialState, action) {
       socket.disconnect();
       //todo socket disconnect
       //todo call endpoint?
-      // const socket = getIo();
       document.title = i18n.t("app.title");
 
       return { ...initialState };
@@ -129,3 +125,19 @@ export const changePasswordAction = (data) => async (dispatch) => {
     toast.error(e.response?.data?.message);
   }
 };
+
+export const updateAction = (data) => async (dispatch) => {
+  dispatch({ type: "user/actionStart" });
+  try {
+    const response = await axios.patch(`/api/me/update`, data);
+    dispatch({ type: "user/update", payload: response.data.user });
+    toast.success(i18next.t("alert.changesSaved"));
+  } catch (e) {
+    dispatch({ type: "user/actionFail" });
+    toast.error(e.response?.data?.message);
+  }
+};
+
+function encrypt(str) {
+  return CryptoJS.AES.encrypt(str, "Secret Passphrase").toString();
+}

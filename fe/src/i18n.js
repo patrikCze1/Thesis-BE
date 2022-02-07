@@ -248,9 +248,11 @@ i18n
             phone: "Telefon",
             position: "Pozice",
             email: "E-mail",
+            notifications: "Notifikace",
           },
           notification: {
             readAll: "Přečíst vše",
+            allowEmailNotifications: "Povolit e-mailové notifikace",
           },
           role: {
             user: "Uživatel",
@@ -301,6 +303,9 @@ i18n
           message: {
             goToMainPage: "Jít na hlavní stránku",
             recordRemoved: "Záznam odstraněn",
+          },
+          alert: {
+            changesSaved: "Změny uloženy",
           },
         },
       },

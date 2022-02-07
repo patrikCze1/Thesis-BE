@@ -61,13 +61,30 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
     };
     await user.update(data);
 
-    res.send({ success: true });
+    res.json({ success: true });
   } catch (e) {
     if (e.errors && e.errors.length > 0) {
       res.status(500).json({ message: e.errors[0].message });
     } else {
       res.status(500).json({ message: e.message });
     }
+  }
+});
+
+router.patch("/update", authenticateToken, async (req, res) => {
+  try {
+    const me = getUser(req, res);
+    let user = await User.findByPk(me.id);
+
+    Object.keys(req.body).forEach((key) => {
+      user[key] = req.body[key];
+    });
+
+    await user.save();
+
+    return res.json({ user });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 });
 
@@ -91,7 +108,7 @@ router.post("/forgotten-password", async (req, res) => {
           user.email,
           "Forgotten password",
           "email/user/",
-          "reset-password",
+          "reset_password",
           { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}` }
         );
       } catch (error) {

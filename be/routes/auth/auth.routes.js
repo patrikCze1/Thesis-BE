@@ -44,7 +44,7 @@ router.post("/login", async (req, res) => {
             httpOnly: true,
           })
           .send({
-            token,
+            user,
           });
       } else {
         return res.status(400).json({ message: req.t("error.badCredentials") });

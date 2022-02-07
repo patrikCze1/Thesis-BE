@@ -8,6 +8,7 @@ import ClientTableRow from "./ClientTableRow";
 import Loader from "./../../common/Loader";
 import { loadClietntsAction } from "./../../../reducers/common/clientReducer";
 import { usePagination } from "../../../hooks/usePagination";
+import i18n from "../../../../i18n";
 
 export default function Clients() {
   const dispatch = useDispatch();
@@ -81,7 +82,17 @@ export default function Clients() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody>{clientsLoaded && renderedClients}</tbody>
+                  <tbody>
+                    {clients.length > 0 ? (
+                      renderedClients
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="text-center">
+                          {i18n.t("label.noRecords")}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
                 </table>
                 {clientsLoaded ? renderPagination() : <Loader />}
               </div>

@@ -18,6 +18,7 @@ import TimeTrackListItem from "./TimeTrackListItem";
 import Starter from "./Starter";
 import Loader from "./../common/Loader";
 import { usePagination } from "../../hooks/usePagination";
+import i18n from "../../../i18n";
 
 export default function TimeTrackScreen() {
   const dispatch = useDispatch();
@@ -112,31 +113,35 @@ export default function TimeTrackScreen() {
       </div>
 
       {loaded && groupedTracks ? (
-        Object.entries(groupedTracks).map(([key, day]) => (
-          <div className="col-md-12 grid-margin stretch-card" key={key}>
-            <div className="card">
-              <div className="card-body">
-                <h5 className="track-list-title">
-                  {day.date}
-                  <small>{formatSecondsToString(day.total, false)}</small>
-                </h5>
+        groupedTracks.length > 0 ? (
+          Object.entries(groupedTracks).map(([key, day]) => (
+            <div className="col-md-12 grid-margin stretch-card" key={key}>
+              <div className="card">
+                <div className="card-body">
+                  <h5 className="track-list-title">
+                    {day.date}
+                    <small>{formatSecondsToString(day.total, false)}</small>
+                  </h5>
 
-                <div className="track-list">
-                  {day.data.map((track) => (
-                    <TimeTrackListItem
-                      track={track}
-                      key={track.id}
-                      projects={projects}
-                      deleteTrack={handleDeleteTrack}
-                      editTrack={handleUpdateTrack}
-                      // onClickCopy={handleCopyTrack}
-                    />
-                  ))}
+                  <div className="track-list">
+                    {day.data.map((track) => (
+                      <TimeTrackListItem
+                        track={track}
+                        key={track.id}
+                        projects={projects}
+                        deleteTrack={handleDeleteTrack}
+                        editTrack={handleUpdateTrack}
+                        // onClickCopy={handleCopyTrack}
+                      />
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        ))
+          ))
+        ) : (
+          <p className="col-md-12 text-center">{i18n.t("label.noRecords")}</p>
+        )
       ) : (
         <Loader />
       )}

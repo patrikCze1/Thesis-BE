@@ -10,6 +10,7 @@ import {
   loadTodosAction,
 } from "../../reducers/myTodo/myTodo.reducer";
 import { useModuleInfoModal } from "../../hooks/Common";
+import i18n from "../../../i18n";
 
 export default function TodoScreen() {
   const { t } = useTranslation();
@@ -75,18 +76,22 @@ export default function TodoScreen() {
               </button>
             </form>
             <div className="list-wrapper">
-              <ul className="d-flex flex-column todo-list">
-                {todos.map((todo, i) => {
-                  return (
-                    <TodoListItem
-                      todo={todo}
-                      onComplete={handleComplete}
-                      onDelete={handleRemoveTodo}
-                      key={i}
-                    />
-                  );
-                })}
-              </ul>
+              {todos.length > 0 ? (
+                <ul className="d-flex flex-column todo-list">
+                  {todos.map((todo, i) => {
+                    return (
+                      <TodoListItem
+                        todo={todo}
+                        onComplete={handleComplete}
+                        onDelete={handleRemoveTodo}
+                        key={i}
+                      />
+                    );
+                  })}
+                </ul>
+              ) : (
+                <p className="text-center">{i18n.t("label.noRecords")}</p>
+              )}
             </div>
           </div>
         </div>
