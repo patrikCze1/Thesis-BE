@@ -289,7 +289,7 @@ export default function TaskForm({ task, hideModal }) {
                 type="text"
                 name="title"
                 placeholder={`${t("label.title")}...`}
-                value={formData.title}
+                value={formData.title || ""}
                 disabled={disableEdit}
                 onSave={(val) =>
                   handleChangeAndSave({ target: { name: "title", value: val } })
@@ -304,7 +304,7 @@ export default function TaskForm({ task, hideModal }) {
               value={
                 formData.description
                   ? formData.description
-                  : t("project.description")
+                  : t("task.description")
               }
               type="quill"
               onSave={(val) => handleQuillChange(val)}
@@ -322,7 +322,7 @@ export default function TaskForm({ task, hideModal }) {
 
             <ul className="comment-attachment-list">
               {attachments?.length > 0 &&
-                attachments.map((file, i) => {
+                attachments.map((file) => {
                   return (
                     <AttachmentItem
                       key={file.id}
@@ -381,7 +381,7 @@ export default function TaskForm({ task, hideModal }) {
                     name="check"
                     className="form-control h-auto"
                     placeholder={t("Set checklist")}
-                    value={checkInput}
+                    value={checkInput || ""}
                     onChange={handleCheckFormInput}
                     required
                   />
@@ -415,12 +415,14 @@ export default function TaskForm({ task, hideModal }) {
                   rows={3}
                   className="h-auto form-mention"
                   onChange={(val) => handleCommentTextInput(val)}
-                  value={commentFormData.text}
+                  value={commentFormData.text || ""}
                   required
                   autoFocus
                 >
                   {projectUsers.map((user) => (
-                    <Option value={user.username}>{getFullName(user)}</Option>
+                    <Option value={user.username} key={user.id}>
+                      {getFullName(user)}
+                    </Option>
                   ))}
                 </Mentions>
               }
@@ -609,8 +611,16 @@ export default function TaskForm({ task, hideModal }) {
               dateFormat="Pp"
               showTimeSelect
               withPortal
+              isClearable
               disabled={!canEdit}
             />
+            {deadline &&
+              task.completedAt &&
+              new Date(deadline) < new Date(task.completedAt) && (
+                <small className="text-warning">
+                  {t("task.completedAfterDeadline")}
+                </small>
+              )}
           </Form.Group>
           <Form.Group>
             <label>

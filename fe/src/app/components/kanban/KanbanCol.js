@@ -3,6 +3,9 @@ import { Droppable } from "react-beautiful-dnd";
 import KanbanTask from "./../task/KanbanTask";
 
 export default function KanbanCol({ kanbanCol, tasks }) {
+  // dont display first column if is empty
+  if (kanbanCol.id === null && !tasks.length > 0) return "";
+
   return (
     <div className="kanban-col">
       <div className="board-wrapper p-3">

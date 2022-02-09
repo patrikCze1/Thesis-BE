@@ -210,6 +210,7 @@ i18n
             uploadFiles: "Nahrát soubory",
             dragFiles: "Přetáhněte soubory",
             files: "Soubory",
+            completedAfterDeadline: "Dokončeno po termínu",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",

@@ -7,7 +7,7 @@ const jwt = require("jsonwebtoken");
 const path = require("path");
 
 const { authenticateToken, getUser } = require("../../auth/auth");
-const { sendMail, APP_EMAIL, APP_NAME } = require("../../email/config");
+const { sendMail } = require("../../email/config");
 
 /**
  * List of users groups

@@ -12,12 +12,6 @@ const initialState = {
   savingProject: false,
 };
 
-const stageZero = {
-  id: null,
-  name: "Nepřiřazeno",
-  order: 0,
-};
-
 export default function projectReducer(state = initialState, action) {
   switch (action.type) {
     case "project/loadList":
@@ -46,7 +40,7 @@ export default function projectReducer(state = initialState, action) {
         ...state,
         projectLoaded: true,
         project: action.payload.project,
-        stages: [stageZero, ...action.payload.project.projectStages],
+        stages: [...action.payload.project.projectStages],
       };
 
     case "project/saving":

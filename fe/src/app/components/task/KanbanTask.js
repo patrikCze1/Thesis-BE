@@ -129,16 +129,22 @@ export default function KanbanTask({ task, index }) {
                 {task.deadline && (
                   <>
                     {task.completedAt ? (
-                      <p className="task-date">
+                      <small
+                        className={`task-date ${
+                          new Date(task.deadline) < new Date(task.completedAt)
+                            ? "text-warning"
+                            : ""
+                        }`}
+                      >
                         {task.deadline &&
                           new Intl.DateTimeFormat("cs-CZ", {
                             year: "numeric",
                             month: "2-digit",
                             day: "2-digit",
                           }).format(new Date(task.deadline))}
-                      </p>
+                      </small>
                     ) : (
-                      <p
+                      <small
                         className={
                           task.deadline && now > new Date(task.deadline)
                             ? "task-date text-danger"
@@ -154,7 +160,7 @@ export default function KanbanTask({ task, index }) {
                             month: "2-digit",
                             day: "2-digit",
                           }).format(new Date(task.deadline))}
-                      </p>
+                      </small>
                     )}
                   </>
                 )}

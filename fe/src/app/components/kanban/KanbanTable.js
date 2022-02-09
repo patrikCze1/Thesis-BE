@@ -116,16 +116,16 @@ export default function KanbanTable() {
     dispatch(loadProjectAction(projectId));
     dispatch(loadTasksAction(projectId));
     dispatch(loadUsersByProject(projectId));
-    const io = handleWebsockets();
+    const sockets = handleWebsockets();
 
     if (selectedTask) {
       dispatch(loadTaskDetailAction(projectId, selectedTask));
     }
 
-    // return () => {
-    //   console.log("close sockets");
-    //   io?.close();
-    // };
+    return () => {
+      console.log("close sockets");
+      sockets?.close();
+    };
   }, [projectId]);
 
   useEffect(() => {
@@ -143,41 +143,41 @@ export default function KanbanTable() {
 
   console.log("tasks", tasks);
   const refreshTableState = () => {
-    if (stages?.length) {
-      const columnOrder = stages.sort((a, b) => {
-        if (a.order < b.order) return -1;
-        if (a.order > b.order) return 1;
-        return 0;
-      });
+    const stagesWithFirstCol = [stageZero, ...stages];
 
-      const columns = {
-        "droppableCol-null": stageZero,
+    const columnOrder = stagesWithFirstCol.sort((a, b) => {
+      if (a.order < b.order) return -1;
+      if (a.order > b.order) return 1;
+      return 0;
+    });
+
+    const columns = {
+      "droppableCol-null": stageZero,
+    };
+    for (const col of stages) {
+      columns[`droppableCol-${col.id}`] = {
+        id: col.id,
+        name: col.name,
       };
-      for (const col of stages) {
-        columns[`droppableCol-${col.id}`] = {
-          id: col.id,
-          name: col.name,
-        };
-      }
-
-      // const tableTasks = {};
-      // for (const task of tasks) {
-      //   tableTasks[`draggableTask-${task.id}`] = {
-      //     id: task.id,
-      //     projectStage: task.projectStage,
-      //   };
-      // }
-      console.log("setTableState");
-
-      setTableState({
-        ...tableState,
-        tasks,
-        columns,
-        columnOrder,
-      });
     }
-  };
 
+    // const tableTasks = {};
+    // for (const task of tasks) {
+    //   tableTasks[`draggableTask-${task.id}`] = {
+    //     id: task.id,
+    //     projectStage: task.projectStage,
+    //   };
+    // }
+    console.log("setTableState");
+
+    setTableState({
+      ...tableState,
+      tasks,
+      columns,
+      columnOrder,
+    });
+  };
+  console.log("tableState", tableState);
   useEffect(() => {
     if (taskLoaded && selectedTask) {
       setShowTaskDetail(true);
@@ -404,7 +404,7 @@ export default function KanbanTable() {
                   );
                 else return task.projectStageId == column.id;
               });
-
+              console.log("columnTasks", columnTasks, column);
               return (
                 <KanbanCol
                   key={column.id}
