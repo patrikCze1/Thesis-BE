@@ -4,6 +4,8 @@ import { useParams, NavLink } from "react-router-dom";
 
 import i18n from "../../../i18n";
 import { ROUTE } from "../../../utils/enum";
+import { useProjectDetail } from "../../hooks/project";
+import { useInitShowTask, useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { loadArchiveTasksAction } from "../../reducers/task/task.reducer";
@@ -16,7 +18,9 @@ const paginationLimit = 2;
 export default function TaskArchiveScreen() {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
-  const { project } = useSelector((state) => state.projectReducer);
+  const { renderModal } = useTaskDetail(projectId);
+  const { project } = useProjectDetail(projectId);
+
   const { archiveTasks, archiveTasksCount, tasksLoaded } = useSelector(
     (state) => state.taskReducer
   );
@@ -81,6 +85,7 @@ export default function TaskArchiveScreen() {
           {renderPagination()}
         </div>
       </div>
+      {renderModal()}
     </div>
   );
 }

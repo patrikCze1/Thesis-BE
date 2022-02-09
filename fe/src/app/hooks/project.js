@@ -1,10 +1,12 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import {
   clearProjectAction,
   loadProjectAction,
 } from "../reducers/project/project.reducer";
+import { loadUsersByProject } from "../reducers/user/userReducer";
+import { objectIsNotEmpty } from "../service/utils";
 
 export function useShowProjectForm() {
   const dispatch = useDispatch();
@@ -40,4 +42,21 @@ export function useShowProjectForm() {
   };
 
   return [showForm, hideForm, formVisible];
+}
+
+export function useProjectDetail(projectId) {
+  const dispatch = useDispatch();
+  const { project, projectLoaded, stages } = useSelector(
+    (state) => state.projectReducer
+  );
+
+  useEffect(() => {
+    if (projectId) {
+      if (!objectIsNotEmpty(project) && project.id !== projectId)
+        dispatch(loadProjectAction(projectId));
+      dispatch(loadUsersByProject(projectId));
+    }
+  }, [projectId]);
+
+  return { project, projectLoaded, stages };
 }

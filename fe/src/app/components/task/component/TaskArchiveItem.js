@@ -1,16 +1,22 @@
 import React from "react";
+import { useInitShowTask } from "../../../hooks/task";
 
 export default function TaskArchiveItem({ task }) {
+  const { click } = useInitShowTask(task);
+
   return (
     <a
       href="!#"
       className="tickets-card row mx-0"
-      onClick={(evt) => evt.preventDefault()}
+      onClick={(e) => {
+        e.preventDefault();
+        click();
+      }}
     >
       <div className="tickets-details col-lg-7">
         <div className="wrapper">
           <h5>
-            #{task.number} - {task.title}
+            {task.number} - {task.title}
           </h5>
         </div>
         <div className="wrapper text-muted d-none d-md-block">

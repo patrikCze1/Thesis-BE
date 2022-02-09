@@ -3,9 +3,12 @@ import { NavLink } from "react-router-dom";
 import { Trans } from "react-i18next";
 
 import { ROUTE, TASK_PRIORITY } from "../../../utils/enum";
-import { getMonthDayTime } from "../../service/date/date.service";
+import { getDayMonthShort } from "../../service/date/date.service";
 
 export default function TaskTableItem({ task }) {
+  console.log("task", task);
+  const now = new Date();
+
   return (
     <tr>
       <td>
@@ -29,10 +32,34 @@ export default function TaskTableItem({ task }) {
           <Trans>{TASK_PRIORITY[task.priority]}</Trans>
         </span>
       </td>
-      {/*todo and completed after deadline */}
-      <td className={new Date() > new Date(task.deadline) ? "text-danger" : ""}>
-        {getMonthDayTime(task.deadline)}
-      </td>
+
+      {task.deadline ? (
+        <>
+          {task.completedAt ? (
+            <td
+              className={`task-date ${
+                new Date(task.deadline) < new Date(task.completedAt)
+                  ? "text-warning"
+                  : ""
+              }`}
+            >
+              {getDayMonthShort(new Date(task.deadline))}
+            </td>
+          ) : (
+            <td
+              className={
+                task.deadline && now > new Date(task.deadline)
+                  ? " text-danger"
+                  : ""
+              }
+            >
+              {getDayMonthShort(new Date(task.deadline))}
+            </td>
+          )}
+        </>
+      ) : (
+        <td></td>
+      )}
     </tr>
   );
 }

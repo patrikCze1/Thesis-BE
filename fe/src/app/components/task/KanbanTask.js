@@ -1,30 +1,21 @@
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { Draggable } from "react-beautiful-dnd";
 import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { Trans } from "react-i18next";
-import { useHistory } from "react-router-dom";
 
-import { loadTaskDetailAction } from "../../reducers/task/task.reducer";
 import { TASK_PRIORITY } from "./../../../utils/enum";
 import { getFullName, getShortName } from "../../service/user/user.service";
+import { useInitShowTask } from "../../hooks/task";
 
 export default function KanbanTask({ task, index }) {
-  const dispatch = useDispatch();
-  const history = useHistory();
   const now = new Date();
 
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
   const { project } = useSelector((state) => state.projectReducer);
-
-  const handleClick = () => {
-    dispatch(loadTaskDetailAction(task.projectId, task.id));
-    history.push({
-      search: `?ukol=${task.id}`,
-    });
-  };
+  const { click } = useInitShowTask(task);
 
   function renderBadget() {
     switch (task.priority.toString()) {
@@ -116,7 +107,7 @@ export default function KanbanTask({ task, index }) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          onClick={handleClick}
+          onClick={click}
         >
           <ul id="portlet-card-list-1" className="portlet-card-list">
             <li className="portlet-card">

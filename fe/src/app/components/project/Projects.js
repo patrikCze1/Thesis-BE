@@ -17,7 +17,7 @@ import { getIo } from "../../../utils/websocket.config";
 import ProjectForm from "./ProjectForm";
 import { hasRole } from "../../service/role.service";
 import { ROLES, SOCKET } from "../../../utils/enum";
-import { useShowProjectForm } from "../../hooks/useShowProjectForm";
+import { useShowProjectForm } from "../../hooks/project";
 import { usePagination } from "../../hooks/usePagination";
 
 export default function Projects() {

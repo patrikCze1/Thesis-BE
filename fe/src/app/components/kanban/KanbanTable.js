@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext } from "react-beautiful-dnd";
-import { useParams, useHistory, NavLink } from "react-router-dom";
+import { useParams, NavLink } from "react-router-dom";
 import i18next from "i18next";
 import { Trans, useTranslation } from "react-i18next";
-import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import KanbanCol from "./KanbanCol";
 import Loader from "./../common/Loader";
-import TaskForm from "./../task/TaskForm";
 
 import {
   loadProjectAction,
@@ -20,7 +19,6 @@ import {
   loadTasksAction,
   editTaskAction,
   createTaskAction,
-  loadTaskDetailAction,
 } from "../../reducers/task/task.reducer";
 import { loadUsersByProject } from "./../../reducers/user/userReducer";
 import { getFullName, getShortName } from "../../service/user/user.service";
@@ -34,30 +32,26 @@ import { ROUTE, SOCKET } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
 import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
+import { useTaskDetail } from "../../hooks/task";
+import { useProjectDetail } from "../../hooks/project";
 
-const initialFilter = {
-  query: "",
-  color: "",
-  afterDeadline: false,
-  beforeDeadline: false,
-  assignedMe: false,
-  notAssigned: false,
-};
+// const initialFilter = {
+//   query: "",
+//   color: "",
+//   afterDeadline: false,
+//   beforeDeadline: false,
+//   assignedMe: false,
+//   notAssigned: false,
+// };
 
 export default function KanbanTable() {
   const dispatch = useDispatch();
-  const history = useHistory();
   const { t } = useTranslation();
   const { id: projectId } = useParams();
+  const { renderModal, setShowTaskDetail } = useTaskDetail(projectId);
+  const { project, projectLoaded, stages } = useProjectDetail(projectId);
 
-  const search = window.location.search;
-  const params = new URLSearchParams(search);
-  const selectedTask = params.get("ukol");
-
-  const { project, projectLoaded, stages } = useSelector(
-    (state) => state.projectReducer
-  );
-  const { tasks, task, taskLoaded } = useSelector((state) => state.taskReducer);
+  const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
@@ -69,7 +63,6 @@ export default function KanbanTable() {
     order: 0,
   };
 
-  const [showTaskDetail, setShowTaskDetail] = useState(false);
   const [tableState, setTableState] = useState({
     tasks: {},
     columns: {},
@@ -116,24 +109,18 @@ export default function KanbanTable() {
   console.log("projectStages", stages);
 
   useEffect(() => {
-    dispatch(loadProjectAction(projectId));
-    dispatch(loadTasksAction(projectId));
-    dispatch(loadUsersByProject(projectId));
+    dispatch(loadTasksAction(projectId, "?archive=false"));
     const sockets = handleWebsockets();
 
-    if (selectedTask) {
-      dispatch(loadTaskDetailAction(projectId, selectedTask));
-    }
+    // if (selectedTask) {
+    //   dispatch(loadTaskDetailAction(projectId, selectedTask));
+    // }
 
     return () => {
       console.log("close sockets");
       sockets?.close();
     };
   }, [projectId]);
-
-  useEffect(() => {
-    if (selectedTask) dispatch(loadTaskDetailAction(projectId, selectedTask));
-  }, [selectedTask]);
 
   // useEffect(() => {
   //   if (project.projectStages)
@@ -181,11 +168,6 @@ export default function KanbanTable() {
     });
   };
   console.log("tableState", tableState);
-  useEffect(() => {
-    if (taskLoaded && selectedTask) {
-      setShowTaskDetail(true);
-    }
-  }, [taskLoaded]);
 
   const handleDragEnd = (result) => {
     const { destination, source, draggableId } = result;
@@ -231,18 +213,6 @@ export default function KanbanTable() {
     );
 
     setShowTaskDetail(true);
-  };
-
-  const handleHideTaskDetail = () => {
-    setShowTaskDetail(false);
-    const queryParams = new URLSearchParams(window.location.search);
-
-    if (queryParams.has("ukol")) {
-      queryParams.delete("ukol");
-      history.replace({
-        search: queryParams.toString(),
-      });
-    }
   };
 
   // const handleClickUserIcon = (e, user) => {
@@ -429,35 +399,7 @@ export default function KanbanTable() {
         </div>
       </DragDropContext>
 
-      {showTaskDetail && (
-        <Modal
-          size="lg"
-          show={showTaskDetail}
-          onHide={handleHideTaskDetail}
-          aria-labelledby="example-modal-sizes-title-sm"
-        >
-          {taskLoaded ? (
-            <Modal.Body>
-              <button
-                type="button"
-                className="close close-modal"
-                onClick={() => setShowTaskDetail(false)}
-              >
-                <span aria-hidden="true">×</span>
-                <span className="sr-only">
-                  <Trans>Close</Trans>
-                </span>
-              </button>
-              <TaskForm
-                task={task}
-                hideModal={() => setShowTaskDetail(false)}
-              />
-            </Modal.Body>
-          ) : (
-            <Loader />
-          )}
-        </Modal>
-      )}
+      {renderModal()}
     </>
   );
 }

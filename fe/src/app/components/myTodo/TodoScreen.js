@@ -9,7 +9,7 @@ import {
   editTodoAction,
   loadTodosAction,
 } from "../../reducers/myTodo/myTodo.reducer";
-import { useModuleInfoModal } from "../../hooks/Common";
+import { useModuleInfoModal } from "../../hooks/common";
 import i18n from "../../../i18n";
 
 export default function TodoScreen() {

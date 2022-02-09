@@ -1,7 +1,7 @@
 import React from "react";
 import { Trans } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useChangePassword } from "../../hooks/User";
+import { useChangePassword } from "../../hooks/user";
 
 import PasswordRepeat from "../common/PasswordRepeat";
 import Loader from "./../common/Loader";

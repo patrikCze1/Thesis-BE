@@ -29,6 +29,8 @@ export default function NotificationScreen() {
 
   const handleClick = (e, notification) => {
     e.preventDefault();
+    if (notification?.seen === false)
+      dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
       const { projectId, id } = notification.TaskNotification.task;
       history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
