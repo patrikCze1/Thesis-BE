@@ -8,7 +8,7 @@ import { ROUTE } from "./../../../../utils/enum";
 import {
   loadUnreadNotificationsAction,
   setSeenAction,
-} from "../../../reducers/notification/notificationReducer";
+} from "../../../reducers/notification/notification.reducer";
 import NavNotificationListItem from "./NavNotificationListItem";
 
 export default function NavigationNotifications() {

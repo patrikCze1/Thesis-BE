@@ -34,6 +34,7 @@ export const ROUTE = Object.freeze({
   PROJECTS: "/projekty",
   PROJECTS_EDIT: "/projekty/upravit/:id",
   PROJECTS_DETAIL: "/projekty/:id",
+  PROJECTS_DETAIL_ARCHIVE: "/projekty/:id/archiv",
   PROJECTS_NEW: "/projekty/novy",
   USER_PROFIL: "/profil",
   NOTIFICATIONS: "/oznameni",

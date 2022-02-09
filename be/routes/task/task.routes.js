@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { Op } = require("sequelize");
 
 const {
   Task,
@@ -24,19 +25,26 @@ const {
 } = require("../../service/notification/notification.service");
 const { findOneById } = require("../../repo/user/user.repository");
 const { projectStageRepo } = require("../../repo");
+const { addTimeToDate } = require("../../service/date");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const where = {};
     const { projectId } = req.params;
 
+    const skipParams = ["offset", "archive", "limit"];
     if (projectId && projectId != "-1") where.ProjectId = projectId;
-
-    for (const key in req.query) {
-      if (req.query[key]) where[key] = req.query[key];
+    if (req.query.archive && Boolean(req.query.archive) === true) {
+      where.completedAt = { [Op.lt]: addTimeToDate(new Date(), -86400 * 7) };
     }
 
-    const tasks = await Task.findAll({
+    for (const key in req.query) {
+      if (!skipParams.includes(key) && req.query[key])
+        where[key] = req.query[key];
+    }
+    console.log("where", where);
+    const tasks = await Task.findAndCountAll({
+      subQuery: false,
       attributes: {
         include: [
           [
@@ -62,15 +70,15 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
-      // order: [
-      //   [
-      //     req.query.orderBy ? req.query.orderBy : "createdAt",
-      //     req.query.sort ? req.query.sort : "DESC",
-      //   ],
-      // ],
+      order: [
+        [
+          req.query.orderBy ? req.query.orderBy : "createdAt",
+          req.query.sort ? req.query.sort : "DESC",
+        ],
+      ],
       group: ["Task.id"],
     });
-    res.json({ tasks });
+    res.json({ rows: tasks.rows, count: tasks.count?.length || 0 }); //sequelize bug
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -219,8 +227,8 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     console.log("findUsersByProject", projectUsers);
     for (const u of projectUsers) {
       console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-      if (user.id !== u.id)
-        io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+      // if (user.id !== u.id)
+      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -367,13 +375,12 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       const solver = await User.findByPk(parseInt(task.solverId));
       task.setDataValue("solver", solver);
     }
+    res.json({ task });
 
     const projectUsers = await findUsersByProject(projectId);
     for (const u of projectUsers) {
       if (u.id !== user.id) io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
     }
-
-    res.json({ task });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -468,8 +475,14 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     }
 
     await task.destroy();
-    io.emit("TASK_DELETE", { id: req.params.id });
     res.json({ message: "Úkol odstraněn" });
+
+    const projectUsers = await findUsersByProject(task.projectId);
+    for (const u of projectUsers) {
+      console.log("SOCKET TASK_DELETE to", u.id);
+      // if (u.id !== user.id)
+      io.to(u.id).emit("TASK_DELETE", { id: task.id });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

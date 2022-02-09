@@ -211,6 +211,7 @@ i18n
             dragFiles: "Přetáhněte soubory",
             files: "Soubory",
             completedAfterDeadline: "Dokončeno po termínu",
+            archive: "Archiv",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",

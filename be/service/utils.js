@@ -18,4 +18,5 @@ const getFeTaskUrl = (projectId, taskId) => {
 
 module.exports = {
   getFeUrl,
+  getFeTaskUrl,
 };

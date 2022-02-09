@@ -1,9 +1,11 @@
-import axios from "./../../../utils/axios.config";
+import axios from "../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
 
 const initialState = {
   tasks: [],
+  archiveTasks: [],
+  archiveTasksCount: 0,
   tasksLoaded: false,
   tasksError: false,
   tasksErrorMessage: "",
@@ -21,7 +23,15 @@ export default function taskReducer(state = initialState, action) {
       return { ...state, tasksLoaded: false, tasksError: false };
 
     case "tasks/loaded":
-      return { ...state, tasksLoaded: true, tasks: action.payload.tasks };
+      return { ...state, tasksLoaded: true, tasks: action.payload.rows };
+
+    case "tasks/archiveLoaded":
+      return {
+        ...state,
+        tasksLoaded: true,
+        archiveTasks: action.payload.rows,
+        archiveTasksCount: action.payload.count,
+      };
 
     case "tasks/loadFail":
       return { ...state, tasksLoaded: true, tasksError: true };
@@ -153,6 +163,21 @@ export const loadTasksAction =
     }
   };
 
+export const loadArchiveTasksAction =
+  (projectId, params = "") =>
+  async (dispatch) => {
+    dispatch({ type: "tasks/loadStart", payload: null });
+    try {
+      const response = await axios.get(
+        `/api/projects/${projectId}/tasks/${params}`
+      );
+      dispatch({ type: "tasks/archiveLoaded", payload: response.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+      dispatch({ type: "tasks/loadFail", payload: null });
+    }
+  };
+
 export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
   dispatch({ type: "task/loadStart", payload: null });
   try {
@@ -224,9 +249,7 @@ export const completeTaskAction = (projectId, taskId) => async (dispatch) => {
 export const deleteTaskAction = (projectId, taskId) => async (dispatch) => {
   dispatch({ type: "task/actionStart", payload: null });
   try {
-    const response = await axios.delete(
-      `/api/projects/${projectId}/tasks/${taskId}`
-    );
+    await axios.delete(`/api/projects/${projectId}/tasks/${taskId}`);
     dispatch({ type: "task/delete", payload: taskId });
     toast.success(i18next.t("task.taskDeleted"));
   } catch (error) {
@@ -236,5 +259,6 @@ export const deleteTaskAction = (projectId, taskId) => async (dispatch) => {
 };
 
 export const socketDeleteTask = (id) => (dispatch) => {
+  console.log("socketDeleteTask action");
   dispatch({ type: "task/socketDelete", payload: id });
 };

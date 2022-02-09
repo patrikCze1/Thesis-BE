@@ -5,7 +5,7 @@ import Pagination from "../components/common/Pagination";
 /**
  *
  * @param {Number} limit
- * @param {Number} offset
+ * @param {Number} initialOffset
  * @param {Number} count
  * @returns {Array} [offset, renderPagination]
  */

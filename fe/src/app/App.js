@@ -24,7 +24,7 @@ import ErrorBoundary from "./../app/components/error/ErrorBoundary";
 import axios from "./../utils/axios.config";
 import { initIo } from "../utils/websocket.config";
 import { SOCKET, ROUTE } from "./../utils/enum";
-import { socketNewNotification } from "./reducers/notification/notificationReducer";
+import { socketNewNotification } from "./reducers/notification/notification.reducer";
 import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
 import AnonymRoutes from "./router/AnonymRoutes";
 import i18n from "../i18n";

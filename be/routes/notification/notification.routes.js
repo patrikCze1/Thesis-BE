@@ -11,7 +11,7 @@ const { authenticateToken, getUser } = require("../../auth/auth");
 const { getIo } = require("../../service/io");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const io = getIo();
+  // const io = getIo();
   // console.log("io", io);
   try {
     const user = getUser(req, res);
@@ -47,11 +47,11 @@ router.get("/", authenticateToken, async (req, res) => {
     //   console.log("socket", socket);
     //   // socket.broadcast.to(socketid).emit('message', 'for your eyes only');
     // }
-    io.to(1).emit("test", "test");
+    // io.to(1).emit("test", "test");
 
-    res.json({ success: true, records });
+    res.json(records);
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    res.status(500).json({ message: error.message });
   }
 });
 

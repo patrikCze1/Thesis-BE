@@ -1,7 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext } from "react-beautiful-dnd";
-import { useParams, useHistory } from "react-router-dom";
+import { useParams, useHistory, NavLink } from "react-router-dom";
 import i18next from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
@@ -21,17 +21,19 @@ import {
   editTaskAction,
   createTaskAction,
   loadTaskDetailAction,
-} from "./../../reducers/task/taskReducer";
+} from "../../reducers/task/task.reducer";
 import { loadUsersByProject } from "./../../reducers/user/userReducer";
 import { getFullName, getShortName } from "../../service/user/user.service";
 import {
   socketDeleteTask,
   socketEditTask,
   socketNewTask,
-} from "./../../reducers/task/taskReducer";
+} from "../../reducers/task/task.reducer";
 import { getIo } from "../../../utils/websocket.config";
-import { SOCKET } from "../../../utils/enum";
+import { ROUTE, SOCKET } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
+import i18n from "../../../i18n";
+import { createRouteWithParams } from "../../service/router.service";
 
 const initialFilter = {
   query: "",
@@ -91,6 +93,7 @@ export default function KanbanTable() {
           dispatch(socketEditTask(data.task));
       });
       socket.on(SOCKET.TASK_DELETE, (data) => {
+        console.log("socket.on(SOCKET.TASK_DELETE data", data);
         dispatch(socketDeleteTask(data.id));
       });
       socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
@@ -357,6 +360,16 @@ export default function KanbanTable() {
               <i className="mdi mdi-plus btn-icon-prepend"></i>
               <Trans>label.add</Trans>
             </button>
+
+            <NavLink
+              to={createRouteWithParams(ROUTE.PROJECTS_DETAIL_ARCHIVE, {
+                ":id": projectId,
+              })}
+              title={i18n.t("task.archive")}
+              className="btn btn-icons bg-white align-items-center d-flex"
+            >
+              <i className="mdi mdi-archive"></i>
+            </NavLink>
           </div>
         </div>
       </div>

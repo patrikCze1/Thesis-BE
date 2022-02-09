@@ -7,7 +7,7 @@ import {
   loadNotificationsAction,
   setSeenAction,
   setSeenAllAction,
-} from "../../reducers/notification/notificationReducer";
+} from "../../reducers/notification/notification.reducer";
 import Loader from "../common/Loader";
 import Pagination from "../common/Pagination";
 import NotificationListItem from "./NotificationListItem";

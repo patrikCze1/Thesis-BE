@@ -1,4 +1,4 @@
-import axios from "./../../../utils/axios.config";
+import axios from "../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18n from "../../../i18n";
 
@@ -19,20 +19,18 @@ export default function notificationReducer(state = initialState, action) {
       return {
         ...state,
         loaded: true,
-        notifications: action.payload.records.rows,
-        count: action.payload.records.count,
+        notifications: action.payload.rows,
+        count: action.payload.count,
       };
 
     case "notification/unreadLoaded":
-      if (action.payload.records.count > 0)
-        document.title = `(${action.payload.records.count}) ${i18n.t(
-          "app.title"
-        )}`;
+      if (action.payload.count > 0)
+        document.title = `(${action.payload.count}) ${i18n.t("app.title")}`;
       return {
         ...state,
         loaded: true,
-        unreadNotifications: action.payload.records.rows,
-        unreadCount: action.payload.records.count,
+        unreadNotifications: action.payload.rows,
+        unreadCount: action.payload.count,
       };
 
     case "notification/seen":

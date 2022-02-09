@@ -7,8 +7,8 @@ import Chart from "react-google-charts";
 import {
   loadNotificationsAction,
   setSeenAction,
-} from "../../reducers/notification/notificationReducer";
-import { loadTasksAction } from "../../reducers/task/taskReducer";
+} from "../../reducers/notification/notification.reducer";
+import { loadTasksAction } from "../../reducers/task/task.reducer";
 import {
   formatSecondsToString,
   getFirstDayOfWeek,

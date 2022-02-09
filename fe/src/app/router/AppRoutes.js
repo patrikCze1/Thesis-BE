@@ -15,10 +15,14 @@ import TimeTrackScreen from "../components/timeTrack/TimeTrackScreen";
 import ReportScreen from "../components/timeTrack/ReportScreen";
 import TodoScreen from "../components/myTodo/TodoScreen";
 import { ROLES, ROUTE } from "../../utils/enum";
+import TaskArchiveScreen from "../components/task/TaskArchiveScreen";
 
 export default function AppRoutes() {
   return (
     <Switch>
+      <PrivateRoute path={ROUTE.PROJECTS_DETAIL_ARCHIVE}>
+        <TaskArchiveScreen />
+      </PrivateRoute>
       <PrivateRoute path={ROUTE.PROJECTS_DETAIL}>
         <KanbanTable />
       </PrivateRoute>

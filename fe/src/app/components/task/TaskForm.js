@@ -12,7 +12,7 @@ import {
   deleteTaskAction,
   editTaskAction,
   completeTaskAction,
-} from "./../../reducers/task/taskReducer";
+} from "../../reducers/task/task.reducer";
 import {
   createAction,
   editAction as editCheckAction,
