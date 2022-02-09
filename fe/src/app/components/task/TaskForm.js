@@ -50,7 +50,7 @@ export default function TaskForm({ task, hideModal }) {
     text: "",
     files: [],
   });
-  const [deadline, setDeadline] = useState(task.deadline);
+  const [deadline, setDeadline] = useState(task.deadline || null);
   const [projectUsers, setProjectUsers] = useState([]); //todo users
   const [showFileForm, setShowFileForm] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
@@ -79,6 +79,8 @@ export default function TaskForm({ task, hideModal }) {
       //   console.log("TASK_COMMENT_DELETE", data);
       //   dispatch(socketDeleteComment(data.id));
       // });
+
+      return () => socket?.close();
     } catch (error) {
       console.error(error);
     }
@@ -479,7 +481,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>Priority</Trans>
             </label>
             <select
-              className="form-control"
+              className="form-control form-control-sm"
               name="priority"
               value={formData.priority}
               onChange={(e) => handleChangeAndSave(e)}
@@ -500,9 +502,9 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>Stage</Trans>
             </label>
             <select
-              className="form-control"
+              className="form-control form-control-sm"
               name="projectStageId"
-              value={formData.projectStageId}
+              value={formData.projectStageId || null}
               onChange={(e) => handleChangeAndSave(e)}
             >
               {!formData.projectStageId && (
@@ -525,7 +527,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>Creator</Trans>
             </label>
             <select
-              className="form-control"
+              className="form-control form-control-sm"
               name="createdById"
               value={formData.createdById}
               onChange={(e) => handleChangeAndSave(e)}
@@ -547,7 +549,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>Solver</Trans>
             </label>
             <select
-              className="form-control"
+              className="form-control form-control-sm"
               name="solverId"
               value={formData.solverId}
               onChange={(e) => handleChangeAndSave(e)}
@@ -569,7 +571,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>label.color</Trans>
             </label>
             <button
-              className="form-control w-100 p-2"
+              className="form-control form-control-sm w-100 p-2"
               onClick={() => setShowColorPicker(!showColorPicker)}
             >
               <div
@@ -602,7 +604,7 @@ export default function TaskForm({ task, hideModal }) {
               <Trans>Deadline</Trans>
             </label>
             <DatePicker
-              className="form-control w-100"
+              className="form-control form-control-sm w-100"
               locale="cs"
               selected={deadline && new Date(deadline)}
               onChange={(val) => handleDeadlineChange(val)}

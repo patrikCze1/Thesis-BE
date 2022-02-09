@@ -1,3 +1,4 @@
 module.exports = {
-    projectRepo: require('./project/projectRepo'),
-}
+  projectRepo: require("./project/project.repository"),
+  projectStageRepo: require("./project/projectStage.repository"),
+};

@@ -49,11 +49,11 @@ export const ROUTE = Object.freeze({
 
 export const TASK_COLORS = Object.freeze([
   "#B80000",
-  "#DB3E00",
+  "#f26b11",
   "#FCCB00",
   "#008B02",
-  "#1273DE",
   "#004DCF",
+  "#e81ce1",
   "#fff",
 ]);
 

@@ -4,7 +4,8 @@
     "insufficientPermissions": "Nedostatečné oprávnění",
     "theseFieldsAreRequired": "Tyto pole jsou povinná",
     "missingPermissionForAction": "Pro tuto akci nemáte dostatečné oprávnění",
-    "accessDenied": "Přístup zamítnut"
+    "accessDenied": "Přístup zamítnut",
+    "thisFieldsAreRequired": "Tyto pole jsou povinná"
   },
   "project": {
     "error": {
@@ -25,7 +26,10 @@
     "workInProgress": "Pracuje se",
     "complete": "Dokončeno"
   },
-  "field": {},
+  "field": {
+    "title": "Název",
+    "description": "Popis"
+  },
   "auth": {
     "error": {
       "jwtExpired": "Byly jste odhlášeni.",

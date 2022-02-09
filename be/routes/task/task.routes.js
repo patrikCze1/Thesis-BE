@@ -23,7 +23,7 @@ const {
   createTaskNotification,
 } = require("../../service/notification/notification.service");
 const { findOneById } = require("../../repo/user/user.repository");
-const { getFeUrl } = require("../../service/utils");
+const { projectStageRepo } = require("../../repo");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -175,23 +175,40 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).json({
-      message: "Tyto pole jsou povinná: " + result.requiredFields.join(", "),
+      message:
+        `${req.t("error.thisFieldsAreRequired")}: ` +
+        result.requiredFields
+          .map((field) => req.t(`field.${field}`))
+          .join(", "),
     });
     return;
   }
 
-  let data = req.body;
-  data.projectId = projectId;
+  const data = req.body;
+  data.projectId = parseInt(projectId) || projectId;
   data.createdById = user.id;
 
   try {
+    let firstStage = null;
+    try {
+      firstStage = await projectStageRepo.findFirstByProject(projectId);
+      data.projectStageId = firstStage?.id;
+    } catch (error) {
+      console.error("projectStageRepo.findFirstByProject", error);
+    }
+
     const projectTasksCount = await Task.count({
       where: { projectId: projectId },
+      paranoid: false,
     });
     const newTask = await Task.create({
       ...data,
       number: projectTasksCount + 1,
     });
+    newTask.setDataValue("createdAt", new Date());
+    newTask.setDataValue("updatedAt", new Date());
+    res.json({ task: newTask });
+
     TaskChangeLog.create({
       taskId: newTask.id,
       userId: user.id,
@@ -202,10 +219,9 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     console.log("findUsersByProject", projectUsers);
     for (const u of projectUsers) {
       console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+      if (user.id !== u.id)
+        io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
-
-    res.json({ task: newTask });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

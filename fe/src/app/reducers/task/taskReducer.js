@@ -182,6 +182,7 @@ export const createTaskAction = (projectId, data) => async (dispatch) => {
 };
 
 export const socketNewTask = (task) => (dispatch) => {
+  console.log("socketNewTask task", task);
   dispatch({ type: "task/socketNew", payload: task });
 };
 
