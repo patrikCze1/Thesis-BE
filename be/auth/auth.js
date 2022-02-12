@@ -1,4 +1,5 @@
 const jwt = require("jsonwebtoken");
+const { ROLE } = require("../enum/enum");
 
 const { TokenExpiredError } = jwt;
 
@@ -69,6 +70,22 @@ const getUser = (req, res) => {
   }
 };
 
+const managementAccessOnly = (req, res, next) => {
+  const currentUser = getUser(req, res);
+
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
+    return;
+  } else next();
+};
+
 module.exports = {
   generateToken,
   authenticateToken,
@@ -77,6 +94,7 @@ module.exports = {
   isRefreshTokenValid,
   getUser,
   getUserToken,
+  managementAccessOnly,
 };
 
 //FE

@@ -60,10 +60,10 @@ module.exports = (sequelize) => {
       foreignKey: { name: "clientId", allowNull: true, as: "client" },
     });
     Project.hasMany(models.Task, { onDelete: "CASCADE", foreignKey: "taskId" });
-    Project.hasMany(models.ProjectStage, {
+    Project.hasMany(models.Board, {
       onDelete: "CASCADE",
       foreignKey: "projectId",
-      as: "projectStages",
+      as: "boards",
     });
     Project.belongsTo(models.User, {
       foreignKey: "createdById",

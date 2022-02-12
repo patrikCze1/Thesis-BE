@@ -14,7 +14,8 @@ const io = require("./service/io").init(server);
 const sequelize = require("./models/index");
 const {
   projectRoutes,
-  projectStageRoutes,
+  boardRoutes,
+  stageRoutes,
   clientRoutes,
   taskRoutes,
   taskAttachmentRoutes,
@@ -83,7 +84,8 @@ io.on("connection", (socket) => {
  * List of routes
  */
 app.use("/api/projects", projectRoutes);
-app.use("/api/projects", projectStageRoutes);
+app.use("/api/projects", boardRoutes);
+app.use("/api/boards", stageRoutes);
 app.use("/api/clients", clientRoutes);
 app.use("/api/projects", taskRoutes);
 app.use("/api/tasks", taskCommentRoutes);

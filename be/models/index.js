@@ -10,7 +10,7 @@ const sequelize = new Sequelize(process.env.DB_CONNECTION, {
     acquire: 30000,
     idle: 10000,
   },
-  //force: true,
+  // force: true,
 });
 
 const models = [
@@ -20,8 +20,9 @@ const models = [
   require("./user/relation/ProjectUser"),
   require("./project/Client"),
   require("./project/Project"),
+  require("./project/Board"),
   require("./project/ProjectGroup"),
-  require("./project/ProjectStage"),
+  require("./project/Stage"),
   require("./task/Task"),
   require("./task/TaskAttachment"),
   require("./task/TaskComment"),
@@ -34,7 +35,6 @@ const models = [
   require("./notification/TaskNotification"),
 ];
 
-//Note, Role, Stage (kaban)
 for (const model of models) {
   model(sequelize);
 }

@@ -89,17 +89,17 @@ export default function KanbanTable() {
         console.log("socket.on(SOCKET.TASK_DELETE data", data);
         dispatch(socketDeleteTask(data.id));
       });
-      socket.on(SOCKET.PROJECT_STAGE_NEW, (data) => {
-        if (data.stage.projectId == projectId)
-          dispatch(socketNewStage(data.stage));
-      });
-      socket.on(SOCKET.PROJECT_STAGE_EDIT, (data) => {
-        if (data.projectId == projectId)
-          dispatch(socketEditStages([stageZero, ...data.stages]));
-      });
-      socket.on(SOCKET.PROJECT_STAGE_DELETE, (data) => {
-        dispatch(socketDeleteStage(data.id));
-      });
+      // socket.on(SOCKET.BOARD_STAGE_NEW, (data) => {
+      //   if (data.stage.projectId == projectId)
+      //     dispatch(socketNewStage(data.stage));
+      // });
+      // socket.on(SOCKET.BOARD_STAGE_EDIT, (data) => {
+      //   if (data.projectId == projectId)
+      //     dispatch(socketEditStages([stageZero, ...data.stages]));
+      // });
+      // socket.on(SOCKET.BOARD_STAGE_DELETE, (data) => {
+      //   dispatch(socketDeleteStage(data.id));
+      // });
     } catch (error) {
       console.error(error);
     }
@@ -364,7 +364,7 @@ export default function KanbanTable() {
               const columnTasks = tableState.tasks.filter((task) => {
                 if (isFiltered())
                   return (
-                    task.projectStageId == column.id &&
+                    task.stageId == column.id &&
                     ((filterObject.notAssigned && task.solverId === null) ||
                       (filterObject.assignedMe &&
                         task.solverId === currentUser.id) ||

@@ -21,7 +21,7 @@
       "created": "Vytvoření úkolu"
     }
   },
-  "projectStage": {
+  "stage": {
     "todo": "Co udělat",
     "workInProgress": "Pracuje se",
     "complete": "Dokončeno"

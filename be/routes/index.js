@@ -1,6 +1,7 @@
 module.exports = {
   projectRoutes: require("./project/project.routes"),
-  projectStageRoutes: require("./project/stage.routes"),
+  boardRoutes: require("./project/board.routes"),
+  stageRoutes: require("./project/stage.routes"),
   taskRoutes: require("./task/task.routes.js"),
   taskAttachmentRoutes: require("./task/taskAttachment.routes.js"),
   taskCommentRoutes: require("./task/taskComment.routes"),

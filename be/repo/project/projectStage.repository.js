@@ -1,13 +1,13 @@
-const { ProjectStage } = require("../../models/modelHelper");
+const { Stage } = require("../../models/modelHelper");
 
 /**
  *
  * @param {number} projectId
- * @returns {Promise} ProjectStage
+ * @returns {Promise} Stage
  */
 exports.findFirstByProject = (projectId) => {
   console.log("findFirstByProject", projectId);
-  return ProjectStage.findOne({
+  return Stage.findOne({
     where: {
       projectId: projectId,
     },

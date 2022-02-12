@@ -4,10 +4,11 @@ const {
   Project,
   User,
   Client,
-  ProjectStage,
+  Stage,
   ProjectGroup,
   ProjectUser,
   Group,
+  Board,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
@@ -74,11 +75,10 @@ router.get("/:id", authenticateToken, async (req, res) => {
       include: [
         { model: Client },
         { model: User, as: "creator" },
-        { model: ProjectStage, as: "projectStages" },
         { model: Group, as: "groups" },
         { model: User, as: "users" },
+        { model: Board, as: "boards" },
       ],
-      order: [[{ model: ProjectStage, as: "projectStages" }, "order", "ASC"]],
     });
 
     if (!project) {
@@ -111,7 +111,9 @@ router.post("/", authenticateToken, async (req, res) => {
     res.status(400).json({
       message:
         req.t("error.theseFieldsAreRequired") +
-        result.requiredFields.join(", "),
+        result.requiredFields
+          .map((field) => req.t(`field.${field}`))
+          .join(", "),
     });
     return;
   }
@@ -122,40 +124,46 @@ router.post("/", authenticateToken, async (req, res) => {
   };
 
   try {
-    const newProject = await Project.create(data);
+    const project = await Project.create(data);
+    const board = await Board.create({
+      projectId: project.id,
+      name: project.name,
+    });
     if (data.clientId) {
-      newProject.setDataValue("Client", await Client.findByPk(data.clientId));
+      project.setDataValue("Client", await Client.findByPk(data.clientId));
     }
 
-    ProjectStage.create({
-      name: req.t("projectStage.todo"),
+    res.json({ project });
+
+    Stage.create({
+      name: req.t("stage.todo"),
       order: 1,
-      projectId: newProject.id,
+      projectId: project.id,
+      boardId: board.id,
     });
-    ProjectStage.create({
-      name: req.t("projectStage.workInProgress"),
+    Stage.create({
+      name: req.t("stage.workInProgress"),
       order: 2,
-      projectId: newProject.id,
+      projectId: project.id,
+      boardId: board.id,
     });
-    ProjectStage.create({
-      name: req.t("projectStage.complete"),
+    Stage.create({
+      name: req.t("stage.complete"),
       order: 3,
-      projectId: newProject.id,
+      projectId: project.id,
+      boardId: board.id,
     });
 
-    //todo create stages
     for (let groupId of req.body.groups) {
-      await ProjectGroup.create({ projectId: newProject.id, groupId });
+      ProjectGroup.create({ projectId: project.id, groupId });
     }
 
     for (let userId of req.body.users) {
-      await ProjectUser.create({ projectId: newProject.id, userId });
-      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project: newProject });
+      ProjectUser.create({ projectId: project.id, userId });
+      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project: project });
     }
 
     //todo notifikace, prirazeni k projektu
-
-    res.json({ project: newProject });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -176,13 +184,11 @@ router.patch("/:id", authenticateToken, async (req, res) => {
       !user.roles.includes(ROLE.ADMIN) &&
       !user.roles.includes(ROLE.MANAGEMENT)
     ) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
     const data = {
@@ -233,17 +239,15 @@ router.delete("/:id", authenticateToken, async (req, res) => {
       !user.roles.includes(ROLE.ADMIN) &&
       !user.roles.includes(ROLE.MANAGEMENT)
     ) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 
-    await project.destroy(); // soft delete (paranoid)
+    await project.destroy();
 
     io.emit(SOCKET_EMIT.PROJECT_DELETE, { id: req.params.id });
     res.json({ message: req.t("project.message.projectDeleted") });

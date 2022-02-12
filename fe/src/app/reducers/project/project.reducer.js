@@ -40,7 +40,7 @@ export default function projectReducer(state = initialState, action) {
         ...state,
         projectLoaded: true,
         project: action.payload.project,
-        stages: [...action.payload.project.projectStages],
+        stages: [...action.payload.project.stages],
       };
 
     case "project/saving":

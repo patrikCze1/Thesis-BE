@@ -1,8 +1,9 @@
 const { DataTypes } = require("sequelize");
+const { PROJECT_STAGE_TYPE } = require("../../enum/enum");
 
 module.exports = (sequelize) => {
-  const ProjectStage = sequelize.define(
-    "ProjectStage",
+  const Stage = sequelize.define(
+    "Stage",
     {
       id: {
         type: DataTypes.INTEGER,
@@ -17,9 +18,15 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      projectId: {
+      boardId: {
         type: DataTypes.INTEGER,
         allowNull: false,
+      },
+      type: {
+        type: DataTypes.TINYINT,
+      },
+      limit: {
+        type: DataTypes.INTEGER,
       },
     },
     {
@@ -27,15 +34,15 @@ module.exports = (sequelize) => {
     }
   );
 
-  ProjectStage.associate = function (models) {
-    ProjectStage.belongsTo(models.Project, {
-      as: "project",
-      foreignKey: "projectId",
+  Stage.associate = function (models) {
+    Stage.belongsTo(models.Board, {
+      as: "board",
+      foreignKey: "boardId",
     });
-    ProjectStage.hasMany(models.Task, {
-      foreignKey: "projectStageId",
+    Stage.hasMany(models.Task, {
+      foreignKey: "stageId",
       onDelete: "set null",
     });
   };
-  return ProjectStage;
+  return Stage;
 };

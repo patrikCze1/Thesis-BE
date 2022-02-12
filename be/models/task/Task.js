@@ -46,7 +46,10 @@ module.exports = (sequelize) => {
       parentId: {
         type: DataTypes.INTEGER,
       },
-      projectStageId: {
+      stageId: {
+        type: DataTypes.INTEGER,
+      },
+      boardId: {
         type: DataTypes.INTEGER,
       },
       createdAt: {
@@ -74,14 +77,19 @@ module.exports = (sequelize) => {
     Task.belongsTo(models.User, { foreignKey: "createdById", as: "creator" });
     Task.belongsTo(models.User, { foreignKey: "solverId", as: "solver" });
     Task.belongsTo(models.Project, { foreignKey: "projectId", as: "project" });
+    Task.belongsTo(models.Board, {
+      foreignKey: "boardId",
+      as: "board",
+      onDelete: "SET NULL",
+    });
     Task.belongsTo(models.Task, {
       foreignKey: "parentId",
       as: "parentTask",
       onDelete: "SET NULL",
     });
-    Task.belongsTo(models.ProjectStage, {
-      foreignKey: "projectStageId",
-      as: "projectStage",
+    Task.belongsTo(models.Stage, {
+      foreignKey: "stageId",
+      as: "stage",
       onDelete: "SET NULL",
     });
     Task.hasMany(models.TaskAttachment, {
