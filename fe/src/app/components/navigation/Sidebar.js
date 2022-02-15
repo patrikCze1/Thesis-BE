@@ -9,6 +9,8 @@ import logoSmall from "./../../../assets/images/logo_blue_small.svg";
 import { getFullName, getShortName } from "./../../service/user/user.service";
 import { ROUTE, ROLES } from "../../../utils/enum";
 import { hasRole } from "../../service/role.service";
+import { objectIsNotEmpty } from "../../service/utils";
+import { createRouteWithParams } from "../../service/router.service";
 
 const Sidebar = forwardRef(({}, ref) => {
   let location = useLocation();
@@ -16,6 +18,8 @@ const Sidebar = forwardRef(({}, ref) => {
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
+  const { project } = useSelector((state) => state.projectReducer);
+  const { board } = useSelector((state) => state.boardReducer);
 
   const toggleMenu = (menuItem) => {
     if (menuOpen[menuItem]) {
@@ -120,6 +124,99 @@ const Sidebar = forwardRef(({}, ref) => {
           </NavLink>
         </li>
 
+        {objectIsNotEmpty(project) && (
+          <>
+            <li
+              className={
+                isPathActive(ROUTE.PROJECTS) ? "nav-item active" : "nav-item"
+              }
+            >
+              <ul className="nav flex-column sub-menu">
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(
+                        createRouteWithParams(ROUTE.PROJECTS_BOARDS, {
+                          ":id": project.id,
+                        })
+                      )
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={createRouteWithParams(ROUTE.PROJECTS_BOARDS, {
+                      ":id": project.id,
+                    })}
+                  >
+                    <span className="menu-title">{project.name}</span>
+                  </NavLink>
+                </li>
+                {objectIsNotEmpty(board) && (
+                  <li className="nav-item subitem">
+                    <NavLink
+                      className={
+                        isPathActive(
+                          createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+                            ":id": project.id,
+                            ":boardId": board.id,
+                          })
+                        )
+                          ? "nav-link active"
+                          : "nav-link"
+                      }
+                      to={createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+                        ":id": project.id,
+                        ":boardId": board.id,
+                      })}
+                    >
+                      <span className="menu-title">{board.name}</span>
+                    </NavLink>
+                  </li>
+                )}
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(
+                        createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+                          ":id": project.id,
+                        })
+                      )
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+                      ":id": project.id,
+                    })}
+                  >
+                    <span className="menu-title">
+                      <Trans>task.backlog</Trans>
+                    </span>
+                  </NavLink>
+                </li>
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(
+                        createRouteWithParams(ROUTE.PROJECTS_DETAIL_ARCHIVE, {
+                          ":id": project.id,
+                        })
+                      )
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={createRouteWithParams(ROUTE.PROJECTS_DETAIL_ARCHIVE, {
+                      ":id": project.id,
+                    })}
+                  >
+                    <span className="menu-title">
+                      <Trans>task.archive</Trans>
+                    </span>
+                  </NavLink>
+                </li>
+              </ul>
+            </li>
+          </>
+        )}
+
         {hasRole(ROLES.ADMIN, currentUser.roles) && (
           <li
             className={
@@ -144,11 +241,11 @@ const Sidebar = forwardRef(({}, ref) => {
                 <li className="nav-item subitem">
                   <NavLink
                     className={
-                      isPathActive("/administrace/klienti")
+                      isPathActive(ROUTE.ADMIN_CLIENT)
                         ? "nav-link active"
                         : "nav-link"
                     }
-                    to="/administrace/klienti"
+                    to={ROUTE.ADMIN_CLIENT}
                   >
                     <Trans>Clients</Trans>
                   </NavLink>

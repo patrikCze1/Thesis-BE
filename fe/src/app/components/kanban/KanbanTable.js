@@ -34,6 +34,7 @@ import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
 import { useTaskDetail } from "../../hooks/task";
 import { useProjectDetail } from "../../hooks/project";
+import { loadBoardDetailAction } from "../../reducers/project/board.reducer";
 
 // const initialFilter = {
 //   query: "",
@@ -47,15 +48,16 @@ import { useProjectDetail } from "../../hooks/project";
 export default function KanbanTable() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const { id: projectId } = useParams();
+  const { id: projectId, boardId } = useParams();
   const { renderModal, setShowTaskDetail } = useTaskDetail(projectId);
-  const { project, projectLoaded, stages } = useProjectDetail(projectId);
+  const { project, projectLoaded } = useProjectDetail(projectId);
 
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
+  const { board, stages } = useSelector((state) => state.boardReducer);
 
   const stageZero = {
     id: null,
@@ -109,7 +111,8 @@ export default function KanbanTable() {
   console.log("projectStages", stages);
 
   useEffect(() => {
-    dispatch(loadTasksAction(projectId, "?archive=false"));
+    dispatch(loadTasksAction(projectId, `?archive=false&boardId=${boardId}`));
+    dispatch(loadBoardDetailAction(projectId, boardId));
     const sockets = handleWebsockets();
 
     // if (selectedTask) {
@@ -120,7 +123,7 @@ export default function KanbanTable() {
       console.log("close sockets");
       sockets?.close();
     };
-  }, [projectId]);
+  }, [projectId, boardId]);
 
   // useEffect(() => {
   //   if (project.projectStages)
@@ -258,7 +261,9 @@ export default function KanbanTable() {
     <>
       <div className="d-flex align-items-center flex-wrap pb-4">
         <div className="wrapper d-flex align-items-center">
-          <h4 className="mb-md-0 mb-4 text-dark">{project.name}</h4>
+          <h4 className="mb-md-0 mb-4 text-dark">
+            {project.name} / {board.name}
+          </h4>
 
           <div className="image-grouped ml-md-4">
             {projectUsers &&
@@ -340,6 +345,10 @@ export default function KanbanTable() {
             >
               <i className="mdi mdi-archive"></i>
             </NavLink>
+
+            <button type="button" className="btn btn-icons bg-white mr-0">
+              <i className="mdi mdi-menu"></i>
+            </button>
           </div>
         </div>
       </div>

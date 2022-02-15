@@ -26,7 +26,7 @@ router.get("/", authenticateToken, async (req, res) => {
     const filter = req.query;
     // only admin can see all projects
     if (user.roles.includes(ROLE.ADMIN)) {
-      projects = await Project.findAll({
+      projects = await Project.findAndCountAll({
         include: [
           {
             model: Client,
@@ -46,7 +46,7 @@ router.get("/", authenticateToken, async (req, res) => {
       projects = await projectRepo.findByUser(user, filter);
     }
 
-    res.json({ projects });
+    res.json({ ...projects });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -59,7 +59,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
     if (!user.roles.includes(ROLE.ADMIN)) {
       // only admin can see all projects
       const userProjects = await projectRepo.findByUser(user, {});
-      const result = userProjects.find(
+      const result = userProjects.rows.find(
         (project) => project.id == req.params.id
       );
 
@@ -77,7 +77,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
         { model: User, as: "creator" },
         { model: Group, as: "groups" },
         { model: User, as: "users" },
-        { model: Board, as: "boards" },
+        // { model: Board, as: "boards" },
       ],
     });
 
@@ -122,7 +122,7 @@ router.post("/", authenticateToken, async (req, res) => {
     ...req.body,
     createdById: user.id,
   };
-
+  console.log("data", data);
   try {
     const project = await Project.create(data);
     const board = await Board.create({
@@ -132,6 +132,8 @@ router.post("/", authenticateToken, async (req, res) => {
     if (data.clientId) {
       project.setDataValue("Client", await Client.findByPk(data.clientId));
     }
+    if (data.users) project.setDataValue("users", data.users);
+    if (data.groups) project.setDataValue("users", data.groups);
 
     res.json({ project });
 

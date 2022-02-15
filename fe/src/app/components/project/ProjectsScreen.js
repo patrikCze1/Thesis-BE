@@ -4,30 +4,35 @@ import { Trans } from "react-i18next";
 import { useHistory } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 
-import ProjectList from "./ProjectList";
-import Loader from "./../common/Loader";
+import Loader from "../common/Loader";
 
 import {
   loadProjectsAction,
   socketDeleteProject,
   socketEditProject,
   socketNewProject,
-} from "./../../reducers/project/project.reducer";
+} from "../../reducers/project/project.reducer";
 import { getIo } from "../../../utils/websocket.config";
-import ProjectForm from "./ProjectForm";
+import ProjectForm from "./component/ProjectForm";
 import { hasRole } from "../../service/role.service";
 import { ROLES, SOCKET } from "../../../utils/enum";
 import { useShowProjectForm } from "../../hooks/project";
 import { usePagination } from "../../hooks/usePagination";
+import ProjectListItem from "./component/ProjectListItem";
 
+const paginationLimit = 20;
 export default function Projects() {
   const dispatch = useDispatch();
-  // const []=usePagination() //todo
-  const { projects, projectsLoaded } = useSelector(
+  const { projects, projectsLoaded, projectsCount } = useSelector(
     (state) => state.projectReducer
   );
   const { user } = useSelector((state) => state.currentUserReducer);
   const [showForm, hideForm, formVisible] = useShowProjectForm();
+  const [paginationOffset, renderPagination] = usePagination(
+    paginationLimit,
+    0,
+    projectsCount
+  );
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
@@ -56,15 +61,20 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    console.log("projects effect");
-    dispatch(loadProjectsAction());
     const io = handleWebsockets();
-    if (params.has("upravit")) showForm(params.get("upravit"));
+    // if (params.has("upravit")) showForm(params.get("upravit"));
 
     return () => {
       io?.close();
     };
   }, []);
+
+  useEffect(() => {
+    console.log("projects effect");
+    dispatch(
+      loadProjectsAction(`?offset=${paginationOffset}&limit=${paginationLimit}`)
+    );
+  }, [paginationOffset]);
 
   useEffect(() => {
     console.log('queryParams.get("upravit")', params.get("upravit"));
@@ -112,12 +122,46 @@ export default function Projects() {
                 <div className="wrapper"></div>
               </div>
               {projectsLoaded ? (
-                <ProjectList projects={projects} />
+                <table className="table table-striped">
+                  <thead>
+                    <tr>
+                      <th>
+                        <Trans>Title</Trans>
+                      </th>
+                      <th>
+                        <Trans>project.creator</Trans>
+                      </th>
+                      <th>
+                        <Trans>Client</Trans>
+                      </th>
+                      <th>
+                        <Trans>State</Trans>
+                      </th>
+                      <th className="text-center w-100px">
+                        <Trans>Action</Trans>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {projects.length > 0 ? (
+                      projects.map((project) => (
+                        <ProjectListItem key={project.id} project={project} />
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan={5} className="text-center">
+                          <Trans>label.noRecords</Trans>
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               ) : (
                 <Loader />
               )}
             </div>
           </div>
+          {renderPagination()}
         </div>
       </div>
 
@@ -134,7 +178,10 @@ export default function Projects() {
                 <Trans>Close</Trans>
               </span>
             </button>
-            <ProjectForm projectId={null} closeForm={handleHideForm} />
+            <ProjectForm
+              projectId={params.get("upravit")}
+              closeForm={handleHideForm}
+            />
           </Modal.Body>
         </Modal>
       )}

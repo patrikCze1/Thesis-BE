@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Board } = require("../../models/modelHelper");
+const { Board, Stage } = require("../../models/modelHelper");
 const {
   getUser,
   authenticateToken,
@@ -9,6 +9,33 @@ const {
 const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+
+router.get("/:projectId/boards", authenticateToken, async (req, res) => {
+  try {
+    const boards = await Board.findAll({
+      where: { projectId: req.params.projectId },
+    });
+    res.json({ boards });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+router.get(
+  "/:projectId/boards/:boardId",
+  authenticateToken,
+  async (req, res) => {
+    try {
+      const board = await Board.findByPk(req.params.boardId);
+      const stages = await Stage.findAll({
+        where: { boardId: req.params.boardId },
+      });
+      res.json({ board, stages });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  }
+);
 
 router.post(
   "/:projectId/boards",
@@ -39,6 +66,25 @@ router.post(
       const board = await Board.create(data);
 
       res.json({ board });
+
+      Stage.create({
+        name: req.t("stage.todo"),
+        order: 1,
+        projectId: project.id,
+        boardId: board.id,
+      });
+      Stage.create({
+        name: req.t("stage.workInProgress"),
+        order: 2,
+        projectId: project.id,
+        boardId: board.id,
+      });
+      Stage.create({
+        name: req.t("stage.complete"),
+        order: 3,
+        projectId: project.id,
+        boardId: board.id,
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -65,8 +111,6 @@ router.delete(
   "/boards/:boardId",
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
-    const user = getUser(req, res);
-
     try {
       const board = await Board.findByPk(req.params.boardId);
       if (!board) {

@@ -8,20 +8,20 @@ import { useProjectDetail } from "../../hooks/project";
 import { useInitShowTask, useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
-import { loadArchiveTasksAction } from "../../reducers/task/task.reducer";
+import { loadTasksAction } from "../../reducers/task/task.reducer";
 import { createRouteWithParams } from "../../service/router.service";
 import { objectIsNotEmpty } from "../../service/utils";
 import Loader from "../common/Loader";
-import TaskArchiveItem from "./component/TaskArchiveItem";
+import TaskTableItem from "./component/TaskTableItem";
 
 const paginationLimit = 20;
-export default function TaskArchiveScreen() {
+export default function TaskBacklogScreen() {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
   const { renderModal } = useTaskDetail(projectId);
   const { project } = useProjectDetail(projectId);
 
-  const { archiveTasks, archiveTasksCount, tasksLoaded } = useSelector(
+  const { tasks, archiveTasksCount, tasksLoaded } = useSelector(
     (state) => state.taskReducer
   );
   const [paginationOffset, renderPagination] = usePagination(
@@ -37,9 +37,9 @@ export default function TaskArchiveScreen() {
   useEffect(() => {
     if (objectIsNotEmpty(project))
       dispatch(
-        loadArchiveTasksAction(
+        loadTasksAction(
           projectId,
-          `?archive=true&offset=${paginationOffset}`
+          `?archive=false&boardId=null&offset=${paginationOffset}`
         )
       );
   }, [project, paginationOffset]);
@@ -48,7 +48,7 @@ export default function TaskArchiveScreen() {
     <>
       <div className="page-header flex-wrap">
         <h4>
-          {project.name} / {i18n.t("task.archive")}
+          {project.name} / {i18n.t("task.backlog")}
         </h4>
       </div>
 
@@ -56,32 +56,33 @@ export default function TaskArchiveScreen() {
         <div className="col-lg-12">
           <div className="card">
             <div className="card-body">
-              {/* <div className="d-sm-flex pb-4 mb-4 border-bottom">
-              <div className="d-flex align-items-center">
-                <h5 className="page-title">
-                  
-                </h5>
-                <p className=" mb-0 ml-3 text-muted">({archiveTasksCount})</p>
-              </div>
-            </div> */}
+              <div className="table-responsive">
+                <table className="table table-bordered table-hover">
+                  <thead>
+                    <tr>
+                      <th> # </th>
+                      <th> First name </th>
+                      <th> Progress </th>
+                      <th> Amount </th>
+                      <th> Deadline </th>
+                    </tr>
+                  </thead>
 
-              <div className="row">
-                <div className="col-12">
-                  {tasksLoaded ? (
-                    archiveTasks.length > 0 ? (
-                      archiveTasks.map((task) => (
-                        <TaskArchiveItem key={task.id} task={task} />
-                      ))
+                  <tbody>
+                    {tasksLoaded && tasks.length > 0 ? (
+                      tasks.map((task) => <TaskTableItem task={task} />)
                     ) : (
-                      <p className="text-center">{i18n.t("label.noRecords")}</p>
-                    )
-                  ) : (
-                    <Loader />
-                  )}
-                </div>
+                      <tr>
+                        <td colSpan={5} className="text-center">
+                          {i18n.t("label.noRecords")}
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
               </div>
+              {!tasksLoaded && <Loader />}
             </div>
-
             {renderPagination()}
           </div>
         </div>

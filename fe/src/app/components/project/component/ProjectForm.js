@@ -8,18 +8,17 @@ import {
   createProjectAction,
   editProjectAction,
   loadProjectAction,
-} from "./../../reducers/project/project.reducer";
-import { loadClietntsAction } from "./../../reducers/common/clientReducer";
-import { loadGroupsAction } from "./../../reducers/user/groupReducer";
-import { loadUsersAction } from "./../../reducers/user/userReducer";
+} from "../../../reducers/project/project.reducer";
+import { loadClietntsAction } from "../../../reducers/common/clientReducer";
+import { loadGroupsAction } from "../../../reducers/user/groupReducer";
+import { loadUsersAction } from "../../../reducers/user/userReducer";
 
-import Loader from "./../common/Loader";
-import { getFullName } from "../../service/user/user.service";
-import LoaderTransparent from "../common/LoaderTransparent";
-import { PROJECT_STATE } from "../../../utils/enum";
-import ProjectStageForm from "./ProjectStageForm";
+import Loader from "../../common/Loader";
+import { getFullName } from "../../../service/user/user.service";
+import LoaderTransparent from "../../common/LoaderTransparent";
+import { PROJECT_STATE } from "../../../../utils/enum";
 
-export default function ProjectForm({ projectId }) {
+export default function ProjectForm({ projectId = false }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -93,7 +92,7 @@ export default function ProjectForm({ projectId }) {
       };
 
       if (projectId || project.id) {
-        dispatch(editProjectAction(projectId || project.id, data));
+        dispatch(editProjectAction(project.id, data));
       } else {
         dispatch(createProjectAction(data));
       }
@@ -123,7 +122,7 @@ export default function ProjectForm({ projectId }) {
     };
   });
 
-  if (!projectLoaded && !projectId) {
+  if (!projectLoaded) {
     return <Loader />;
   }
 
@@ -286,8 +285,6 @@ export default function ProjectForm({ projectId }) {
               </Button>
               {savingProject && <LoaderTransparent />}
             </Form>
-
-            {isEdit && <ProjectStageForm projectId={projectId} />}
           </div>
         </div>
       </div>

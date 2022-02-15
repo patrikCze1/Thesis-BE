@@ -11,6 +11,7 @@ import taskAttachmentReducer from "./task/taskAttachmentReducer";
 import notificationReducer from "./notification/notification.reducer";
 import timeTrackReducer from "./timeTrack/timeTrack.reducer";
 import todoReducer from "./myTodo/myTodo.reducer";
+import boardReducer from "./project/board.reducer";
 
 const reducers = combineReducers({
   projectReducer,
@@ -25,6 +26,7 @@ const reducers = combineReducers({
   timeTrackReducer,
   todoReducer,
   taskAttachmentReducer,
+  boardReducer,
 });
 
 export default reducers;

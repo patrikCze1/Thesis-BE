@@ -4,6 +4,7 @@ import i18next from "i18next";
 
 const initialState = {
   projects: [],
+  projectsCount: 0,
   projectsLoaded: false,
   project: {},
   projectLoaded: false,
@@ -21,7 +22,8 @@ export default function projectReducer(state = initialState, action) {
       return {
         ...state,
         projectsLoaded: true,
-        projects: action.payload.projects,
+        projects: action.payload.rows,
+        projectsCount: action.payload.count,
       };
 
     case "project/clearProject":
@@ -40,7 +42,7 @@ export default function projectReducer(state = initialState, action) {
         ...state,
         projectLoaded: true,
         project: action.payload.project,
-        stages: [...action.payload.project.stages],
+        // stages: [...action.payload.project.stages],
       };
 
     case "project/saving":
@@ -148,17 +150,19 @@ export default function projectReducer(state = initialState, action) {
   }
 }
 
-export const loadProjectsAction = () => async (dispatch) => {
-  dispatch({ type: "project/loadList", payload: null });
-  try {
-    const response = await axios.get(`/api/projects`, {
-      withCredentials: true,
-    });
-    dispatch({ type: "project/listLoaded", payload: response.data });
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-  }
-};
+export const loadProjectsAction =
+  (params = "") =>
+  async (dispatch) => {
+    dispatch({ type: "project/loadList", payload: null });
+    try {
+      const response = await axios.get(`/api/projects${params}`, {
+        withCredentials: true,
+      });
+      dispatch({ type: "project/listLoaded", payload: response.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    }
+  };
 
 export const loadProjectAction = (id) => async (dispatch) => {
   dispatch({ type: "project/loadDetail", payload: null });

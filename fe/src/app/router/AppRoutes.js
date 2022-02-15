@@ -1,7 +1,8 @@
 import React from "react";
 import { Switch } from "react-router-dom";
 
-import Projects from "../components/project/Projects";
+import Projects from "../components/project/ProjectsScreen";
+import ProjectBoardsScreen from "../components/project/ProjectBoardsScreen";
 import Dashboard from "../components/dashboard/Dashboard";
 import KanbanTable from "../components/kanban/KanbanTable";
 import Users from "../components/admin/users/Users";
@@ -16,6 +17,7 @@ import ReportScreen from "../components/timeTrack/ReportScreen";
 import TodoScreen from "../components/myTodo/TodoScreen";
 import { ROLES, ROUTE } from "../../utils/enum";
 import TaskArchiveScreen from "../components/task/TaskArchiveScreen";
+import TaskBacklogScreen from "../components/task/TaskBacklogScreen";
 
 export default function AppRoutes() {
   return (
@@ -23,8 +25,14 @@ export default function AppRoutes() {
       <PrivateRoute path={ROUTE.PROJECTS_DETAIL_ARCHIVE}>
         <TaskArchiveScreen />
       </PrivateRoute>
-      <PrivateRoute path={ROUTE.PROJECTS_DETAIL}>
+      <PrivateRoute path={ROUTE.PROJECTS_DETAIL_BACKLOG}>
+        <TaskBacklogScreen />
+      </PrivateRoute>
+      <PrivateRoute path={ROUTE.PROJECTS_BOARDS_DETAIL}>
         <KanbanTable />
+      </PrivateRoute>
+      <PrivateRoute path={ROUTE.PROJECTS_BOARDS}>
+        <ProjectBoardsScreen />
       </PrivateRoute>
       <PrivateRoute path={ROUTE.PROJECTS}>
         <Projects />

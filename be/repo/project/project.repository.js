@@ -8,7 +8,7 @@ const { Op } = require("sequelize");
  * @returns
  */
 exports.findByUser = async (user, filter) => {
-  return await Project.findAll({
+  return await Project.findAndCountAll({
     // attributes: { exclude: ['user'] },
     where: {
       [Op.or]: [

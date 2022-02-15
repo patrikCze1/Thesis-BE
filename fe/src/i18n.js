@@ -212,6 +212,7 @@ i18n
             files: "Soubory",
             completedAfterDeadline: "Dokončeno po termínu",
             archive: "Archiv",
+            backlog: "Nevyřízené",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",
@@ -235,6 +236,7 @@ i18n
             },
             description: "Popis",
             newPhase: "Nová fáze",
+            boards: "Nástěnky",
           },
           pagiantion: {
             previous: "Předchozí",
@@ -305,9 +307,16 @@ i18n
           message: {
             goToMainPage: "Jít na hlavní stránku",
             recordRemoved: "Záznam odstraněn",
+            boardCreated: "Nástěnka vytvořena",
+            boardDeleted: "Nástěnka ostraněna",
           },
           alert: {
             changesSaved: "Změny uloženy",
+          },
+          board: {
+            deleteBoard: "Odstranit nástěnku",
+            boardWillBeDeleted:
+              "Nástěnka {{board}} bude ostraněna a nebude možné tuto akci vrátit zpět.",
           },
         },
       },

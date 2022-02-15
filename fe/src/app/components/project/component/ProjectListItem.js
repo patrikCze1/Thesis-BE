@@ -7,13 +7,11 @@ import { Trans, useTranslation } from "react-i18next";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-import {
-  deleteProjectAction,
-  loadProjectAction,
-} from "./../../reducers/project/project.reducer";
-import { PROJECT_STATE, ROLES, ROUTE } from "../../../utils/enum";
-import { hasRole } from "../../service/role.service";
-import { getFullName } from "../../service/user/user.service";
+import { deleteProjectAction } from "./../../../reducers/project/project.reducer";
+import { PROJECT_STATE, ROLES, ROUTE } from "./../../../../utils/enum";
+import { hasRole } from "../../../service/role.service";
+import { getFullName } from "../../../service/user/user.service";
+import { createRouteWithParams } from "../../../service/router.service";
 
 export default function ProjectListItem({ project }) {
   const history = useHistory();
@@ -23,7 +21,6 @@ export default function ProjectListItem({ project }) {
   const { user } = useSelector((state) => state.currentUserReducer);
 
   const handleEditClick = () => {
-    // dispatch(loadProjectAction(project.id));
     history.push({
       search: `?upravit=${project.id}`,
     });
@@ -51,7 +48,9 @@ export default function ProjectListItem({ project }) {
     <tr>
       <td className="py-1">
         <NavLink
-          to={`${ROUTE.PROJECTS}/${project.id}`}
+          to={`${createRouteWithParams(ROUTE.PROJECTS_BOARDS, {
+            ":id": project.id,
+          })}`}
           className="project-title"
         >
           {project.key && `[${project.key}] `}

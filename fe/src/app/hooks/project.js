@@ -15,8 +15,9 @@ export function useShowProjectForm() {
   const search = window.location.search;
   const params = new URLSearchParams(search);
   console.log("formVisible", formVisible);
+
   const showForm = (projectId = null) => {
-    console.log("showForm");
+    console.log("showForm projectId", projectId);
     dispatch(clearProjectAction());
     console.log("projectId", projectId);
     if (projectId) {
