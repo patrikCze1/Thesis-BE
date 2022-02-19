@@ -149,10 +149,7 @@ export default function KanbanTable() {
       "droppableCol-null": stageZero,
     };
     for (const col of stages) {
-      columns[`droppableCol-${col.id}`] = {
-        id: col.id,
-        name: col.name,
-      };
+      columns[`droppableCol-${col.id}`] = col;
     }
 
     // const tableTasks = {};
@@ -313,11 +310,13 @@ export default function KanbanTable() {
             >
               <i className="mdi mdi-filter-outline text-primary"></i>
             </button>
+
             {isFiltered() && (
               <button
                 type="button"
                 className={`btn btn-icon ml-0 `}
                 onClick={() => handleClearFilter()}
+                title={i18n.t("label.filter")}
               >
                 <i className="mdi mdi-filter-remove text-danger"></i>
               </button>
@@ -342,7 +341,11 @@ export default function KanbanTable() {
               <i className="mdi mdi-archive"></i>
             </NavLink>
 
-            <button type="button" className="btn btn-icons bg-white mr-0">
+            <button
+              type="button"
+              className="btn btn-icons bg-white mr-0"
+              title={i18n.t("board.editStages")}
+            >
               <i className="mdi mdi-menu"></i>
             </button>
           </div>

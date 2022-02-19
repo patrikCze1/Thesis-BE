@@ -39,7 +39,7 @@ export default function BoardItem({ board, user }) {
   };
 
   return (
-    <div className="col-lg-4 col-md-6 col-sm-6">
+    <div className="col-lg-4 col-md-6 col-sm-6 pb-4">
       <div className="card bg-primary">
         <div className="card-body">
           <div className=" d-flex justify-content-between">

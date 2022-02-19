@@ -14,6 +14,12 @@ router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   try {
     const boards = await Board.findAll({
       where: { projectId: req.params.projectId },
+      order: [
+        [
+          req.query.orderBy ? req.query.orderBy : "createdAt",
+          req.query.sort ? req.query.sort : "DESC",
+        ],
+      ],
     });
     res.json({ boards });
   } catch (error) {

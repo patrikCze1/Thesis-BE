@@ -10,7 +10,17 @@ export default function KanbanCol({ kanbanCol, tasks }) {
     <div className="kanban-col">
       <div className="board-wrapper p-3">
         <div className="board-portlet">
-          <h4 className="portlet-heading text-dark">{kanbanCol.name}</h4>
+          <h4 className="portlet-heading text-dark">
+            <span
+              className={`kanban-col-type-${kanbanCol.type} px-2 board-portlet`}
+            >
+              {kanbanCol.name}
+            </span>{" "}
+            <small>
+              ({tasks.length}
+              {kanbanCol.limit ? ` / ${kanbanCol.limit}` : ""})
+            </small>
+          </h4>
         </div>
         <Droppable
           droppableId={`droppableCol-${kanbanCol.id}`}

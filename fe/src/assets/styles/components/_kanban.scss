@@ -227,3 +227,12 @@
   top: 0;
   right: 0;
 }
+
+.kanban-col-type {
+  &-1 {
+    background-color: lighten($blue, 15%);
+  }
+  &-5 {
+    background-color: lighten($green, 15%);
+  }
+}

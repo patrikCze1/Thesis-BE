@@ -67,3 +67,8 @@ export const TASK_PRIORITY = Object.freeze({
   4: "priority.urgent",
   5: "priority.critical",
 });
+
+export const STAGE_TYPE = Object.freeze({
+  IN_PROGRESS: 1,
+  COMPLETED: 5,
+});

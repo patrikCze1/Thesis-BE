@@ -319,6 +319,7 @@ i18n
             boardUpdated: "Nástěnka upravena",
             boardWillBeDeleted:
               "Nástěnka {{board}} bude ostraněna a nebude možné tuto akci vrátit zpět.",
+            editStages: "Upravit sloupce",
           },
         },
       },
