@@ -45,6 +45,18 @@ export default function boardReducer(state = initialState, action) {
         boards: [...state.boards, action.payload.board],
       };
 
+    case "board/edit":
+      toast.success(i18n.t("message.boardUpdated"));
+
+      return {
+        ...state,
+        working: false,
+        boards: state.boards.map((board) => {
+          if (board.id === action.payload.board.id) return action.payload.board;
+          else return board;
+        }),
+      };
+
     case "board/delete":
       toast.success(i18n.t("message.boardDeleted"));
       return {
@@ -101,6 +113,21 @@ export const createBoardAction = (projectId, data) => async (dispatch) => {
     toast.error(error.response?.data?.message);
   }
 };
+
+export const editBoardAction =
+  (projectId, boardId, data) => async (dispatch) => {
+    dispatch({ type: "board/actionStart", payload: null });
+    try {
+      const response = await axios.patch(
+        `/api/projects/${projectId}/boards/${boardId}`,
+        data
+      );
+      dispatch({ type: "board/edit", payload: response.data });
+    } catch (error) {
+      dispatch({ type: "board/actionStop", payload: null });
+      toast.error(error.response?.data?.message);
+    }
+  };
 
 export const deleteBoardAction = (boardId) => async (dispatch) => {
   try {

@@ -70,7 +70,10 @@ export default function BoardItem({ board, user }) {
             )}
           </div>
 
-          <p className="text-muted mt-3 mb-0">{board.description}</p>
+          <p
+            className=" mt-3 mb-0 text-white"
+            dangerouslySetInnerHTML={{ __html: board.description }}
+          ></p>
         </div>
       </div>
     </div>

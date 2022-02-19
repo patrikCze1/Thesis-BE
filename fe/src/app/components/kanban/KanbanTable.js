@@ -251,7 +251,14 @@ export default function KanbanTable() {
       <div className="d-flex align-items-center flex-wrap pb-4">
         <div className="wrapper d-flex align-items-center">
           <h4 className="mb-md-0 mb-4 text-dark">
-            {project?.name} / {board?.name}
+            <NavLink
+              to={createRouteWithParams(ROUTE.PROJECTS_BOARDS, {
+                ":id": projectId,
+              })}
+            >
+              {project?.name}
+            </NavLink>{" "}
+            / {board?.name}
           </h4>
 
           <div className="image-grouped ml-md-4">

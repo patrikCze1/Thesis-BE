@@ -40,5 +40,10 @@
     "task": {
       "taskCompleted": "Uživatel {{userName}} dokončil úkol {{taskName}}"
     }
+  },
+  "board": {
+    "message": {
+      "deleted": "Nástěnka odstraněna"
+    }
   }
 }

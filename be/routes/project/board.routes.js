@@ -42,6 +42,7 @@ router.post(
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
     const currentUser = getUser(req, res);
+    const { projectId } = req.params;
 
     const requiredAttr = ["name"];
     const result = validator.validateRequiredFields(requiredAttr, req.body);
@@ -59,32 +60,32 @@ router.post(
     const data = {
       ...req.body,
       createdById: currentUser.id,
-      projectId: req.params.projectId,
+      projectId,
     };
 
     try {
       const board = await Board.create(data);
 
-      res.json({ board });
-
       Stage.create({
         name: req.t("stage.todo"),
         order: 1,
-        projectId: project.id,
+        projectId,
         boardId: board.id,
       });
       Stage.create({
         name: req.t("stage.workInProgress"),
         order: 2,
-        projectId: project.id,
+        projectId,
         boardId: board.id,
       });
       Stage.create({
         name: req.t("stage.complete"),
         order: 3,
-        projectId: project.id,
+        projectId,
         boardId: board.id,
       });
+
+      res.json({ board });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -100,6 +101,7 @@ router.patch(
       const b = await Board.findByPk(req.params.boardId);
 
       const board = await b.update(data);
+
       res.json({ board });
     } catch (error) {
       res.status(500).json({ message: error.message });
@@ -123,7 +125,7 @@ router.delete(
       await board.destroy();
 
       //   io.emit(SOCKET_EMIT.PROJECT_DELETE, { id: req.params.id });
-      res.json({ message: req.t("board.message.boardDeleted") });
+      res.json({ message: req.t("board.message.deleted") });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

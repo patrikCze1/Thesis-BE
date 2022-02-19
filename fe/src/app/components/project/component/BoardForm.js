@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
+import ReactQuill from "react-quill";
 import { useDispatch, useSelector } from "react-redux";
-import { createBoardAction } from "../../../reducers/project/board.reducer";
+import {
+  createBoardAction,
+  editBoardAction,
+} from "../../../reducers/project/board.reducer";
 import LoaderTransparent from "../../common/LoaderTransparent";
 
-export default function BoardForm({ projectId, isEdit }) {
+export default function BoardForm({ projectId, isEdit, closeForm }) {
   const dispatch = useDispatch();
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState({ name: "", description: "" });
   const { working, board } = useSelector((state) => state.boardReducer);
 
   useEffect(() => {
@@ -14,7 +18,7 @@ export default function BoardForm({ projectId, isEdit }) {
     if (isEdit && board) {
       setFormData({ name: board.name, description: board.description });
     }
-  }, []);
+  }, [board]);
 
   const handleChange = (prop, val) => {
     setFormData({ ...formData, [prop]: val });
@@ -23,7 +27,11 @@ export default function BoardForm({ projectId, isEdit }) {
   const handleSubmit = (e) => {
     // todo check if user has acess to project
     e.preventDefault();
-    dispatch(createBoardAction(projectId, formData));
+    if (isEdit) dispatch(editBoardAction(projectId, board.id, formData));
+    else {
+      dispatch(createBoardAction(projectId, formData));
+      closeForm();
+    }
   };
 
   return (
@@ -53,21 +61,17 @@ export default function BoardForm({ projectId, isEdit }) {
                   <label className="form-label">
                     <Trans>Description</Trans>
                   </label>
-                  <textarea
-                    className="form-control"
-                    id="validationCustom05"
-                    name="description"
-                    rows="4"
+
+                  <ReactQuill
                     value={formData.description}
-                    onChange={(e) =>
-                      handleChange("description", e.target.value)
-                    }
-                  ></textarea>
+                    onChange={(value) => handleChange("description", value)}
+                    theme="snow"
+                  />
                 </div>
               </div>
 
               <button className="btn btn-primary" type="submit">
-                <Trans>{1 == 2 ? "Edit" : "Create"}</Trans>
+                <Trans>{isEdit ? "Edit" : "Create"}</Trans>
               </button>
               {working && <LoaderTransparent />}
             </form>

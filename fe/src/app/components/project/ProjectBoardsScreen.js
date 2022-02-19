@@ -31,8 +31,8 @@ export default function ProjectBoardsScreen() {
   console.log("projectId", projectId);
   useEffect(() => {
     if (projectId) {
-      dispatch(loadBoardsAction(projectId));
       dispatch(loadProjectAction(projectId));
+      dispatch(loadBoardsAction(projectId));
     }
   }, [projectId]);
 

@@ -316,6 +316,7 @@ i18n
           },
           board: {
             deleteBoard: "Odstranit nástěnku",
+            boardUpdated: "Nástěnka upravena",
             boardWillBeDeleted:
               "Nástěnka {{board}} bude ostraněna a nebude možné tuto akci vrátit zpět.",
           },
