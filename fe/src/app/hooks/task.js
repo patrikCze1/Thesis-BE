@@ -32,7 +32,7 @@ export function useTaskDetail(projectId) {
   const handleHideTaskDetail = () => {
     setShowTaskDetail(false);
     const queryParams = new URLSearchParams(window.location.search);
-
+    console.log("handleHideTaskDetail");
     if (queryParams.has("ukol")) {
       queryParams.delete("ukol");
       history.replace({
@@ -55,17 +55,14 @@ export function useTaskDetail(projectId) {
               <button
                 type="button"
                 className="close close-modal"
-                onClick={() => setShowTaskDetail(false)}
+                onClick={handleHideTaskDetail}
               >
                 <span aria-hidden="true">×</span>
                 <span className="sr-only">
                   <Trans>Close</Trans>
                 </span>
               </button>
-              <TaskForm
-                task={task}
-                hideModal={() => setShowTaskDetail(false)}
-              />
+              <TaskForm task={task} hideModal={handleHideTaskDetail} />
             </Modal.Body>
           ) : (
             <Loader />

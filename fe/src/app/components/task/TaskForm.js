@@ -56,7 +56,7 @@ export default function TaskForm({ task, hideModal }) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const { checks } = useSelector((state) => state.taskCheckReducer);
   const { comments } = useSelector((state) => state.taskCommentReducer);
-  const { project } = useSelector((state) => state.projectReducer);
+  const { stages } = useSelector((state) => state.boardReducer);
   const { users } = useSelector((state) => state.userReducer);
   const { attachments, uploading } = useSelector(
     (state) => state.taskAttachmentReducer
@@ -503,16 +503,15 @@ export default function TaskForm({ task, hideModal }) {
             </label>
             <select
               className="form-control form-control-sm"
-              name="projectStageId"
-              value={formData.projectStageId || null}
+              name="stageId"
+              value={formData.stageId || null}
               onChange={(e) => handleChangeAndSave(e)}
             >
-              {!formData.projectStageId && (
+              {!formData.stageId && (
                 <option value={null}>{t("project.stage.choose")}</option>
               )}
-              {project &&
-                project.projectStages &&
-                project.projectStages.map((stage, i) => {
+              {stages &&
+                stages.map((stage, i) => {
                   return (
                     <option value={stage.id} key={i}>
                       {stage.name}

@@ -35,6 +35,7 @@ import { createRouteWithParams } from "../../service/router.service";
 import { useTaskDetail } from "../../hooks/task";
 import { useProjectDetail } from "../../hooks/project";
 import { loadBoardDetailAction } from "../../reducers/project/board.reducer";
+import NewTaskForm from "../task/component/NewTaskForm";
 
 // const initialFilter = {
 //   query: "",
@@ -49,9 +50,9 @@ export default function KanbanTable() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { id: projectId, boardId } = useParams();
-  const { renderModal, setShowTaskDetail } = useTaskDetail(projectId);
+  const { renderModal } = useTaskDetail(projectId);
   const { project, projectLoaded } = useProjectDetail(projectId);
-
+  console.log("boardId", boardId);
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
   const { user: currentUser } = useSelector(
@@ -71,6 +72,7 @@ export default function KanbanTable() {
     columnOrder: [],
   });
   const [showFilter, setShowFilter] = useState(false);
+  const [showNewTaskForm, setShowNewTaskForm] = useState(false);
   const [filterObject, setFilterObject] = useState({});
 
   const handleWebsockets = () => {
@@ -137,7 +139,6 @@ export default function KanbanTable() {
   console.log("tasks", tasks);
   const refreshTableState = () => {
     const stagesWithFirstCol = [stageZero, ...stages];
-
     const columnOrder = stagesWithFirstCol.sort((a, b) => {
       if (a.order < b.order) return -1;
       if (a.order > b.order) return 1;
@@ -192,7 +193,7 @@ export default function KanbanTable() {
       if (task.id == draggableId.substring(index + 1)) {
         const updatedTask = {
           ...task,
-          projectStageId: tableState.columns[destination.droppableId].id,
+          stageId: tableState.columns[destination.droppableId].id,
         };
         dispatch(editTaskAction(projectId, updatedTask.id, updatedTask));
         return updatedTask;
@@ -204,18 +205,6 @@ export default function KanbanTable() {
       ...tableState,
       tasks: updatedTasks,
     });
-  };
-
-  const handleCreateTask = () => {
-    dispatch(
-      createTaskAction(projectId, {
-        title: i18next.t("New task"),
-        description: i18next.t("Description"),
-        projectId,
-      })
-    );
-
-    setShowTaskDetail(true);
   };
 
   // const handleClickUserIcon = (e, user) => {
@@ -262,7 +251,7 @@ export default function KanbanTable() {
       <div className="d-flex align-items-center flex-wrap pb-4">
         <div className="wrapper d-flex align-items-center">
           <h4 className="mb-md-0 mb-4 text-dark">
-            {project.name} / {board.name}
+            {project?.name} / {board?.name}
           </h4>
 
           <div className="image-grouped ml-md-4">
@@ -330,7 +319,7 @@ export default function KanbanTable() {
             <button
               type="button"
               className="btn btn-primary btn-icon-text d-flex align-items-center"
-              onClick={handleCreateTask}
+              onClick={() => setShowNewTaskForm(!showNewTaskForm)}
             >
               <i className="mdi mdi-plus btn-icon-prepend"></i>
               <Trans>label.add</Trans>
@@ -359,6 +348,16 @@ export default function KanbanTable() {
             onChange={handleUpdateFilter}
             filter={filterObject}
             onClear={handleClearFilter}
+          />
+        </div>
+      )}
+
+      {showNewTaskForm && (
+        <div style={{ position: "relative" }}>
+          <NewTaskForm
+            projectId={projectId}
+            boardId={boardId}
+            onHide={() => setShowNewTaskForm(!showNewTaskForm)}
           />
         </div>
       )}
@@ -394,7 +393,7 @@ export default function KanbanTable() {
                           new Date(task.deadline)))
                     // task.solver?.id === filteredUser.id
                   );
-                else return task.projectStageId == column.id;
+                else return task.stageId == column.id;
               });
               console.log("columnTasks", columnTasks, column);
               return (

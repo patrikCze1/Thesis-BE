@@ -24,7 +24,7 @@ const {
   createTaskNotification,
 } = require("../../service/notification/notification.service");
 const { findOneById } = require("../../repo/user/user.repository");
-const { projectStageRepo } = require("../../repo");
+const { stageRepo } = require("../../repo");
 const { addTimeToDate } = require("../../service/date");
 const { getFeTaskUrl } = require("../../service/utils");
 
@@ -190,7 +190,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const io = getIo();
   const { projectId } = req.params;
 
-  const requiredAttr = ["title", "description"];
+  const requiredAttr = ["title"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).json({
@@ -210,10 +210,11 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     let firstStage = null;
     try {
-      firstStage = await projectStageRepo.findFirstByProject(projectId);
-      data.projectStageId = firstStage?.id;
+      firstStage = await stageRepo.findFirstByBoard(req.body.boardId);
+      console.log("firstStage", firstStage);
+      data.stageId = firstStage?.id;
     } catch (error) {
-      console.error("projectStageRepo.findFirstByProject", error);
+      console.error("stageRepo.findFirstByBoard", error);
     }
 
     const projectTasksCount = await Task.count({

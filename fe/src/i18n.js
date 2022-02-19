@@ -206,6 +206,7 @@ i18n
               "Úkol bude ostraněn a nebude možné se k němu vrátit",
             taskCompleted: "Úkol dokončen",
             taskDeleted: "Úkol odstraněn",
+            taskCreated: "Úkol přidán",
             description: "Popis",
             uploadFiles: "Nahrát soubory",
             dragFiles: "Přetáhněte soubory",

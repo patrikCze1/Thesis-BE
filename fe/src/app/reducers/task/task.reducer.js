@@ -1,6 +1,7 @@
 import axios from "../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
+import i18n from "../../../i18n";
 
 const initialState = {
   tasks: [],
@@ -57,6 +58,7 @@ export default function taskReducer(state = initialState, action) {
       };
 
     case "task/create":
+      toast.success(i18n.t("task.taskCreated"));
       return {
         ...state,
         actionSuccess: true,
@@ -191,6 +193,12 @@ export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
   }
 };
 
+/**
+ *
+ * @param {number} projectId
+ * @param {object} data
+ * @returns
+ */
 export const createTaskAction = (projectId, data) => async (dispatch) => {
   dispatch({ type: "task/actionStart", payload: null });
   console.log("task", data);

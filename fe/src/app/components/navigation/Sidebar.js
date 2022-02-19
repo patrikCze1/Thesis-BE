@@ -11,6 +11,7 @@ import { ROUTE, ROLES } from "../../../utils/enum";
 import { hasRole } from "../../service/role.service";
 import { objectIsNotEmpty } from "../../service/utils";
 import { createRouteWithParams } from "../../service/router.service";
+import i18n from "../../../i18n";
 
 const Sidebar = forwardRef(({}, ref) => {
   let location = useLocation();
@@ -147,7 +148,9 @@ const Sidebar = forwardRef(({}, ref) => {
                       ":id": project.id,
                     })}
                   >
-                    <span className="menu-title">{project.name}</span>
+                    <span className="menu-title">
+                      {i18n.t("project.boards")}
+                    </span>
                   </NavLink>
                 </li>
                 {objectIsNotEmpty(board) && (
