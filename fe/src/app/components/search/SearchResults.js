@@ -5,6 +5,8 @@ import { useHistory } from "react-router-dom";
 import axios from "./../../../utils/axios.config";
 import SearchResultItem from "./SearchResultItem";
 import { ROUTE } from "../../../utils/enum";
+import { createRouteWithParams } from "../../service/router.service";
+import { useInitShowTask } from "../../hooks/task";
 
 export default function SearchResults() {
   const queryString = window.location.search;
@@ -12,7 +14,7 @@ export default function SearchResults() {
   const [query, setQuery] = useState(sp.get("q"));
   const [tasks, setTasks] = useState([]);
   const [projects, setProjects] = useState([]);
-  const [showPArticles, setShowPArticles] = useState(false);
+  const { click } = useInitShowTask();
   const history = useHistory();
 
   const fetchSearch = async () => {
@@ -40,12 +42,14 @@ export default function SearchResults() {
 
   const handleClickTask = (e, task) => {
     e.preventDefault();
-    history.push(`${ROUTE.PROJECTS}/${task.projectId}/?ukol=${task.id}`);
+    click(task);
   };
 
   const handleClickProject = (e, project) => {
     e.preventDefault();
-    history.push(`${ROUTE.PROJECTS}/${project.id}`);
+    history.push(
+      createRouteWithParams(ROUTE.PROJECTS_BOARDS, { ":projectId": project.id })
+    );
   };
 
   return (
@@ -75,7 +79,7 @@ export default function SearchResults() {
                     {tasks.map((task, i) => (
                       <SearchResultItem
                         key={i}
-                        title={task.title}
+                        title={task.name}
                         onClick={(e) => handleClickTask(e, task)}
                       />
                     ))}

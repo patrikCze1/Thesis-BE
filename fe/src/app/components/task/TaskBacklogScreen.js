@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
+import { Trans } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, NavLink } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import i18n from "../../../i18n";
-import { ROUTE } from "../../../utils/enum";
 import { useProjectDetail } from "../../hooks/project";
-import { useInitShowTask, useTaskDetail } from "../../hooks/task";
+import { useCreateTask, useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
+import { loadBoardsAction } from "../../reducers/project/board.reducer";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { loadTasksAction } from "../../reducers/task/task.reducer";
-import { createRouteWithParams } from "../../service/router.service";
 import { objectIsNotEmpty } from "../../service/utils";
 import Loader from "../common/Loader";
 import TaskTableItem from "./component/TaskTableItem";
@@ -19,6 +19,10 @@ export default function TaskBacklogScreen() {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
   const { renderModal } = useTaskDetail(projectId);
+  const { renderForm, setShowNewTaskForm, showNewTaskForm } = useCreateTask(
+    projectId,
+    null
+  );
   const { project } = useProjectDetail(projectId);
 
   const { tasks, archiveTasksCount, tasksLoaded } = useSelector(
@@ -31,7 +35,10 @@ export default function TaskBacklogScreen() {
   );
 
   useEffect(() => {
-    dispatch(loadProjectAction(projectId));
+    if (projectId) {
+      dispatch(loadProjectAction(projectId));
+      dispatch(loadBoardsAction(projectId));
+    }
   }, [projectId]);
 
   useEffect(() => {
@@ -39,48 +46,59 @@ export default function TaskBacklogScreen() {
       dispatch(
         loadTasksAction(
           projectId,
-          `?archive=false&boardId=null&offset=${paginationOffset}`
+          `?archive=false&boardId=null&offset=${paginationOffset}&orderBy=priority`
         )
       );
   }, [project, paginationOffset]);
 
   return (
     <>
-      <div className="page-header flex-wrap">
+      <div className="page-header flex-wrap p-relative">
         <h4>
           {project.name} / {i18n.t("task.backlog")}
         </h4>
+        <div className="d-lg-flex flex-column flex-md-row ml-md-0 ml-md-auto my-2 wrapper">
+          <div className="d-flex mt-4 mt-md-0 mb-2">
+            <button
+              type="button"
+              className="btn btn-primary"
+              onClick={() => setShowNewTaskForm(!showNewTaskForm)}
+            >
+              <Trans>Create</Trans>
+            </button>
+          </div>
+          {renderForm()}
+        </div>
       </div>
 
       <div className="row">
         <div className="col-lg-12">
           <div className="card">
             <div className="card-body">
-              <div className="table-responsive">
-                <table className="table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th> # </th>
-                      <th> First name </th>
-                      <th> Progress </th>
-                      <th> Amount </th>
-                      <th> Deadline </th>
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {tasksLoaded && tasks.length > 0 ? (
-                      tasks.map((task) => <TaskTableItem task={task} />)
-                    ) : (
+              {tasks.length > 0 ? (
+                <div className="table-responsive">
+                  <table className="table table-bordered table-hover">
+                    <thead>
                       <tr>
-                        <td colSpan={5} className="text-center">
-                          {i18n.t("label.noRecords")}
-                        </td>
+                        <th> # </th>
+                        <th> {i18n.t("label.name")} </th>
+                        <th> {i18n.t("task.priority")} </th>
+                        <th> {i18n.t("task.estimation")} </th>
+                        <th> {i18n.t("task.deadline")} </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+
+                    <tbody>
+                      {tasksLoaded &&
+                        tasks.map((task) => (
+                          <TaskTableItem task={task} key={task.id} />
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-center">{i18n.t("label.noRecords")}</p>
+              )}
               {!tasksLoaded && <Loader />}
             </div>
             {renderPagination()}

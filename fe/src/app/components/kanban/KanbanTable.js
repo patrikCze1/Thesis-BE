@@ -32,7 +32,7 @@ import { ROUTE, SOCKET } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
 import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
-import { useTaskDetail } from "../../hooks/task";
+import { useCreateTask, useTaskDetail } from "../../hooks/task";
 import { useProjectDetail } from "../../hooks/project";
 import { loadBoardDetailAction } from "../../reducers/project/board.reducer";
 import NewTaskForm from "../task/component/NewTaskForm";
@@ -51,8 +51,12 @@ export default function KanbanTable() {
   const { t } = useTranslation();
   const { id: projectId, boardId } = useParams();
   const { renderModal } = useTaskDetail(projectId);
+  const { renderForm, setShowNewTaskForm, showNewTaskForm } = useCreateTask(
+    projectId,
+    boardId
+  );
   const { project, projectLoaded } = useProjectDetail(projectId);
-  console.log("boardId", boardId);
+
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
   const { user: currentUser } = useSelector(
@@ -72,7 +76,6 @@ export default function KanbanTable() {
     columnOrder: [],
   });
   const [showFilter, setShowFilter] = useState(false);
-  const [showNewTaskForm, setShowNewTaskForm] = useState(false);
   const [filterObject, setFilterObject] = useState({});
 
   const handleWebsockets = () => {
@@ -362,15 +365,7 @@ export default function KanbanTable() {
         </div>
       )}
 
-      {showNewTaskForm && (
-        <div style={{ position: "relative" }}>
-          <NewTaskForm
-            projectId={projectId}
-            boardId={boardId}
-            onHide={() => setShowNewTaskForm(!showNewTaskForm)}
-          />
-        </div>
-      )}
+      {renderForm()}
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="kanban-wrapper">
@@ -387,7 +382,7 @@ export default function KanbanTable() {
                       (filterObject.assignedMe &&
                         task.solverId === currentUser.id) ||
                       (filterObject.query &&
-                        task.title
+                        task.name
                           .toLowerCase()
                           .includes(filterObject.query?.toLowerCase())) ||
                       (filterObject.query &&

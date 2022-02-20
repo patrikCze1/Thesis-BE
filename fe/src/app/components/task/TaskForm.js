@@ -39,6 +39,7 @@ import TaskCommentItem from "./TaskCommentItem";
 import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
+import i18n from "../../../i18n";
 
 export default function TaskForm({ task, hideModal }) {
   const dispatch = useDispatch();
@@ -56,7 +57,7 @@ export default function TaskForm({ task, hideModal }) {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const { checks } = useSelector((state) => state.taskCheckReducer);
   const { comments } = useSelector((state) => state.taskCommentReducer);
-  const { stages } = useSelector((state) => state.boardReducer);
+  const { stages, boards } = useSelector((state) => state.boardReducer);
   const { users } = useSelector((state) => state.userReducer);
   const { attachments, uploading } = useSelector(
     (state) => state.taskAttachmentReducer
@@ -154,9 +155,9 @@ export default function TaskForm({ task, hideModal }) {
     }
   };
 
-  const handleEditCheck = (check) => {
-    dispatch(editCheckAction(check.id, check));
-  };
+  // const handleEditCheck = (check) => {
+  //   dispatch(editCheckAction(check.id, check));
+  // };
 
   const handleCheckFormInput = (e) => {
     setCheckInput(e.target.value);
@@ -281,6 +282,12 @@ export default function TaskForm({ task, hideModal }) {
     }
   };
 
+  const handleMoveToBacklog = () => {
+    dispatch(
+      editTaskAction(task.projectId, task.id, { boardId: null, stageId: null })
+    );
+  };
+  console.log("boards", boards);
   return (
     <div className="card-body">
       <div className="row">
@@ -623,10 +630,53 @@ export default function TaskForm({ task, hideModal }) {
                 </small>
               )}
           </Form.Group>
+
+          <Form.Group>
+            <label>
+              <Trans>task.estimation</Trans>
+            </label>
+            <input
+              className="form-control form-control-sm"
+              name="estimation"
+              value={formData.estimation}
+              onChange={(e) => handleChangeAndSave(e)}
+              disabled={!canEdit}
+              placeholder={i18n.t("task.hoursCount")}
+            />
+          </Form.Group>
+
           <Form.Group>
             <label>
               <Trans>label.actions</Trans>
             </label>
+
+            {task.boardId && (
+              <button onClick={handleMoveToBacklog} className="btn btn-link">
+                {i18n.t("task.moveToBacklog")}
+              </button>
+            )}
+
+            <Form.Group>
+              <label>
+                <Trans>task.board</Trans>
+              </label>
+              <select
+                className="form-control form-control-sm"
+                name="boardId"
+                value={formData.boardId}
+                onChange={(e) => handleChangeAndSave(e)}
+              >
+                {!formData.boardId && <option value="">{t("Choose")}</option>}
+                {boards &&
+                  boards.map((board, i) => {
+                    return (
+                      <option value={board.id} key={i}>
+                        {board.name}
+                      </option>
+                    );
+                  })}
+              </select>
+            </Form.Group>
 
             {task.completedAt ? (
               <>

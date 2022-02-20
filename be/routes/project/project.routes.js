@@ -14,7 +14,7 @@ const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
 
 const io = getIo();
 
@@ -142,18 +142,21 @@ router.post("/", authenticateToken, async (req, res) => {
       order: 1,
       projectId: project.id,
       boardId: board.id,
+      type: null,
     });
     Stage.create({
       name: req.t("stage.workInProgress"),
       order: 2,
       projectId: project.id,
       boardId: board.id,
+      type: STAGE_TYPE.IN_PROGRESS,
     });
     Stage.create({
       name: req.t("stage.complete"),
       order: 3,
       projectId: project.id,
       boardId: board.id,
+      type: STAGE_TYPE.COMPLETED,
     });
 
     for (let groupId of req.body.groups) {
@@ -162,10 +165,13 @@ router.post("/", authenticateToken, async (req, res) => {
 
     for (let userId of req.body.users) {
       ProjectUser.create({ projectId: project.id, userId });
-      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project: project });
     }
 
-    //todo notifikace, prirazeni k projektu
+    res.json({ project });
+
+    for (let userId of req.body.users) {
+      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

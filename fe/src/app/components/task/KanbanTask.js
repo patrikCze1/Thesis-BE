@@ -15,7 +15,7 @@ export default function KanbanTask({ task, index }) {
     (state) => state.currentUserReducer
   );
   const { project } = useSelector((state) => state.projectReducer);
-  const { click } = useInitShowTask(task);
+  const { click } = useInitShowTask();
 
   function renderBadget() {
     switch (task.priority.toString()) {
@@ -92,13 +92,14 @@ export default function KanbanTask({ task, index }) {
       default:
         break;
     }
+
     return (
       <div className="badge badge-pill badge-danger">
         <i className="mdi mdi-14px mdi-alert-outline"></i>
       </div>
     );
   }
-  //todo pocet komentu + souboru
+
   return (
     <Draggable draggableId={`draggableTask-${task.id}`} index={index}>
       {(provided) => (
@@ -107,7 +108,7 @@ export default function KanbanTask({ task, index }) {
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
-          onClick={click}
+          onClick={() => click(task)}
         >
           <ul id="portlet-card-list-1" className="portlet-card-list">
             <li className="portlet-card">
@@ -174,7 +175,7 @@ export default function KanbanTask({ task, index }) {
                 </Dropdown> */}
               </div>
               <div className="d-flex">
-                <h5 className="text-dark">{task.title}</h5>
+                <h5 className="text-dark">{task.name}</h5>
               </div>
 
               {task.commentsCount > 0 && (

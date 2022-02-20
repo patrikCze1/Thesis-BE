@@ -8,7 +8,8 @@ const {
 } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
+const { findUsersByProject } = require("../../repo/userRepo");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   try {
@@ -83,15 +84,22 @@ router.post(
         order: 2,
         projectId,
         boardId: board.id,
+        type: STAGE_TYPE.IN_PROGRESS,
       });
       Stage.create({
         name: req.t("stage.complete"),
         order: 3,
         projectId,
         boardId: board.id,
+        type: STAGE_TYPE.COMPLETED,
       });
 
       res.json({ board });
+
+      const projectUsers = await findUsersByProject(board.projectId);
+      for (const u of projectUsers) {
+        if (u.id !== user.id) io.to(u.id).emit(SOCKET_EMIT.BOARD_NEW, { task });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }

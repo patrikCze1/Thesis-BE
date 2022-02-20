@@ -9,7 +9,7 @@ module.exports = (sequelize) => {
         primaryKey: true,
         autoIncrement: true,
       },
-      title: {
+      name: {
         type: DataTypes.STRING,
         allowNull: false,
       },
@@ -52,6 +52,9 @@ module.exports = (sequelize) => {
       boardId: {
         type: DataTypes.INTEGER,
       },
+      estimation: {
+        type: DataTypes.FLOAT,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
@@ -64,7 +67,6 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
       },
       //begin / hours
-      //estimation time
       //muted, favourites...
       // todo proverit taskId
     },

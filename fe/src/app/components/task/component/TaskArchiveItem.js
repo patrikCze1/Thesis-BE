@@ -2,7 +2,7 @@ import React from "react";
 import { useInitShowTask } from "../../../hooks/task";
 
 export default function TaskArchiveItem({ task }) {
-  const { click } = useInitShowTask(task);
+  const { click } = useInitShowTask();
 
   return (
     <a
@@ -10,13 +10,13 @@ export default function TaskArchiveItem({ task }) {
       className="tickets-card row mx-0"
       onClick={(e) => {
         e.preventDefault();
-        click();
+        click(task);
       }}
     >
       <div className="tickets-details col-lg-7">
         <div className="wrapper">
           <h5>
-            {task.number} - {task.title}
+            {task.number} - {task.name}
           </h5>
         </div>
         <div className="wrapper text-muted d-none d-md-block">

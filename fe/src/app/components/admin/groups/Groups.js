@@ -24,7 +24,6 @@ const { SearchBar } = Search;
 export default function Groups() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const history = useHistory();
   const MySwal = withReactContent(Swal);
   const { groups, groupsLoaded } = useSelector((state) => state.groupReducer);
   const [showGroupForm, setShowGroupForm] = useState(false);

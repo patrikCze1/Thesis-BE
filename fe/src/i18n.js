@@ -214,6 +214,8 @@ i18n
             completedAfterDeadline: "Dokončeno po termínu",
             archive: "Archiv",
             backlog: "Nevyřízené",
+            estimation: "Odhad",
+            hoursCount: "Počet hodin",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",

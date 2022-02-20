@@ -1,5 +1,4 @@
 const { DataTypes } = require("sequelize");
-const { PROJECT_STAGE_TYPE } = require("../../enum/enum");
 
 module.exports = (sequelize) => {
   const Stage = sequelize.define(

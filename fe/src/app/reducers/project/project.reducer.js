@@ -9,7 +9,7 @@ const initialState = {
   project: {},
   projectLoaded: false,
   errorMessage: null,
-  stages: [],
+  // stages: [],
   savingProject: false,
 };
 
@@ -60,12 +60,12 @@ export default function projectReducer(state = initialState, action) {
         savingProject: false,
       };
 
-    case "project/createStage":
-      toast.success(i18next.t("project.stageAdded"));
-      return {
-        ...state,
-        stages: [...state.stages, action.payload.stage],
-      };
+    // case "project/createStage":
+    //   toast.success(i18next.t("project.stageAdded"));
+    //   return {
+    //     ...state,
+    //     stages: [...state.stages, action.payload.stage],
+    //   };
 
     case "project/socketNew":
       return {
@@ -73,13 +73,13 @@ export default function projectReducer(state = initialState, action) {
         projects: [...state.projects, action.payload],
       };
 
-    case "project/socketNewStage":
-      if (!state.stages.some((stage) => stage.id == action.payload.id))
-        return {
-          ...state,
-          stages: [...state.stages, action.payload],
-        };
-      return state;
+    // case "project/socketNewStage":
+    //   if (!state.stages.some((stage) => stage.id == action.payload.id))
+    //     return {
+    //       ...state,
+    //       stages: [...state.stages, action.payload],
+    //     };
+    //   return state;
 
     case "project/edit":
       toast.success(i18next.t("Project updated"));
@@ -93,12 +93,12 @@ export default function projectReducer(state = initialState, action) {
         }),
       };
 
-    case "project/editStages":
-      toast.success(i18next.t("project.changesSaved"));
-      return {
-        ...state,
-        stages: action.payload,
-      };
+    // case "project/editStages":
+    //   toast.success(i18next.t("project.changesSaved"));
+    //   return {
+    //     ...state,
+    //     stages: action.payload,
+    //   };
 
     case "project/socketEdit":
       return {
@@ -109,11 +109,11 @@ export default function projectReducer(state = initialState, action) {
         }),
       };
 
-    case "project/socketEditStage":
-      return {
-        ...state,
-        stages: action.payload,
-      };
+    // case "project/socketEditStage":
+    //   return {
+    //     ...state,
+    //     stages: action.payload,
+    //   };
 
     case "project/delete":
       toast.success(i18next.t("Project deleted"));
@@ -124,12 +124,12 @@ export default function projectReducer(state = initialState, action) {
         ),
       };
 
-    case "project/deleteStage":
-      toast.success(i18next.t("project.stageRemoved"));
-      return {
-        ...state,
-        stages: state.stages.filter((stage) => stage.id != action.payload),
-      };
+    // case "project/deleteStage":
+    //   toast.success(i18next.t("project.stageRemoved"));
+    //   return {
+    //     ...state,
+    //     stages: state.stages.filter((stage) => stage.id != action.payload),
+    //   };
 
     case "project/socketDelete":
       return {
@@ -139,11 +139,11 @@ export default function projectReducer(state = initialState, action) {
         ),
       };
 
-    case "project/socketDeleteStage":
-      return {
-        ...state,
-        stages: state.stages.filter((stage) => stage.id != action.payload),
-      };
+    // case "project/socketDeleteStage":
+    //   return {
+    //     ...state,
+    //     stages: state.stages.filter((stage) => stage.id != action.payload),
+    //   };
 
     default:
       return state;
@@ -217,24 +217,24 @@ export const editProjectAction = (id, data) => async (dispatch) => {
   }
 };
 
-export const editStagesAction = (projectId, stages) => async (dispatch) => {
-  try {
-    await axios.patch(`/api/projects/${projectId}/stages`, {
-      stages,
-    });
-    dispatch({ type: "project/editStages", payload: stages });
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-  }
-};
+// export const editStagesAction = (projectId, stages) => async (dispatch) => {
+//   try {
+//     await axios.patch(`/api/projects/${projectId}/stages`, {
+//       stages,
+//     });
+//     dispatch({ type: "project/editStages", payload: stages });
+//   } catch (error) {
+//     toast.error(error.response?.data?.message);
+//   }
+// };
 
 export const socketEditProject = (project) => (dispatch) => {
   dispatch({ type: "project/socketEdit", payload: project });
 };
 
-export const socketEditStages = (stages) => (dispatch) => {
-  dispatch({ type: "project/socketEditStage", payload: stages });
-};
+// export const socketEditStages = (stages) => (dispatch) => {
+//   dispatch({ type: "project/socketEditStage", payload: stages });
+// };
 
 export const deleteProjectAction = (id) => async (dispatch) => {
   try {
@@ -245,19 +245,19 @@ export const deleteProjectAction = (id) => async (dispatch) => {
   }
 };
 
-export const deleteStageAction = (id) => async (dispatch) => {
-  try {
-    await axios.delete(`/api/projects/stages/${id}`);
-    dispatch({ type: "project/deleteStage", payload: id });
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-  }
-};
+// export const deleteStageAction = (id) => async (dispatch) => {
+//   try {
+//     await axios.delete(`/api/projects/stages/${id}`);
+//     dispatch({ type: "project/deleteStage", payload: id });
+//   } catch (error) {
+//     toast.error(error.response?.data?.message);
+//   }
+// };
 
 export const socketDeleteProject = (id) => (dispatch) => {
   dispatch({ type: "project/socketDelete", payload: id });
 };
 
-export const socketDeleteStage = (id) => (dispatch) => {
-  dispatch({ type: "project/socketDeleteStage", payload: id });
-};
+// export const socketDeleteStage = (id) => (dispatch) => {
+//   dispatch({ type: "project/socketDeleteStage", payload: id });
+// };

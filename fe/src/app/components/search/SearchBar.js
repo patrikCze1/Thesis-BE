@@ -60,7 +60,7 @@ export default function SearchBar() {
         const { tasks, projects } = res.data;
         const taskSuggestions = tasks.map((task) => ({
           id: task.id,
-          text: task.title,
+          text: task.name,
           projectId: task.projectId,
         }));
         const projectSuggestions = projects.map((project) => ({

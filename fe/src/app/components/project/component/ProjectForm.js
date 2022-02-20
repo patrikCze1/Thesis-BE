@@ -18,7 +18,7 @@ import { getFullName } from "../../../service/user/user.service";
 import LoaderTransparent from "../../common/LoaderTransparent";
 import { PROJECT_STATE } from "../../../../utils/enum";
 
-export default function ProjectForm({ projectId = false }) {
+export default function ProjectForm({ projectId = false, closeForm }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
@@ -95,6 +95,7 @@ export default function ProjectForm({ projectId = false }) {
         dispatch(editProjectAction(project.id, data));
       } else {
         dispatch(createProjectAction(data));
+        closeForm();
       }
     }
   };

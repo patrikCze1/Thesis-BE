@@ -5,15 +5,15 @@ import { createTaskAction } from "../../../reducers/task/task.reducer";
 
 export default function NewTaskForm({ projectId, boardId, onHide }) {
   const dispatch = useDispatch();
-  const [title, setTitle] = useState("");
+  const [name, setName] = useState("");
 
   const handleCreateTask = (e) => {
     e.preventDefault();
 
-    if (title) {
+    if (name) {
       dispatch(
         createTaskAction(projectId, {
-          title,
+          name,
           projectId,
           boardId,
         })
@@ -27,12 +27,12 @@ export default function NewTaskForm({ projectId, boardId, onHide }) {
       <form onSubmit={handleCreateTask} className="d-flex ">
         <input
           type="text"
-          name="title"
+          name="name"
           className="form-control h-auto"
-          placeholder={i18n.t("label.title")}
+          placeholder={i18n.t("label.name")}
           required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
         />
         <button
           type="submit"

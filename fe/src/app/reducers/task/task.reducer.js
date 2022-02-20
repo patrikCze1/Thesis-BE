@@ -219,6 +219,12 @@ export const socketNewTask = (task) => (dispatch) => {
   dispatch({ type: "task/socketNew", payload: task });
 };
 
+/**
+ *
+ * @param {number} projectId
+ * @param {number} taskId
+ * @param {object} data
+ */
 export const editTaskAction = (projectId, taskId, data) => async (dispatch) => {
   dispatch({ type: "task/actionStart", payload: null });
   console.log("editTaskAction", data);

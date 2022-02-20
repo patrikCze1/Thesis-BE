@@ -10,6 +10,8 @@ exports.SOCKET_EMIT = Object.freeze({
   BOARD_STAGE_EDIT: "BOARD_STAGE_EDIT",
   BOARD_STAGE_DELETE: "BOARD_STAGE_DELETE",
   TASK_COMMENT_NEW: "TASK_COMMENT_NEW",
+  BOARD_NEW: "BOARD_NEW",
+  BOARD_DELETE: "BOARD_DELETE",
 });
 
 exports.PROJECT_STATE = Object.freeze({
@@ -19,7 +21,7 @@ exports.PROJECT_STATE = Object.freeze({
   STATUS_CANCELLED: 20,
 });
 
-exports.PROJECT_STAGE_TYPE = Object.freeze({
+exports.STAGE_TYPE = Object.freeze({
   IN_PROGRESS: 1,
   COMPLETED: 5,
 });

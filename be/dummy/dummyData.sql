@@ -7,4 +7,3 @@ insert into users (roles, username, firstName, lastName, email, password, sex, p
 insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"user\"]','user2', 'Pert', 'Nový', 'user2@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec');
 insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"user\"]','user3', 'Jan', 'Starý', 'user3@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec');
 insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"management\"]','management', 'Petra', 'Svobodová', 'mng@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'F', 'Manažer');
-

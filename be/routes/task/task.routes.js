@@ -32,7 +32,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const where = {};
     const { projectId } = req.params;
-    const skipParams = ["offset", "archive", "limit"];
+    const skipParams = ["offset", "archive", "limit", "orderBy", "sort"];
 
     if (projectId && projectId != "-1") where.ProjectId = projectId;
     if (req.query.archive) {
@@ -190,7 +190,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const io = getIo();
   const { projectId } = req.params;
 
-  const requiredAttr = ["title"];
+  const requiredAttr = ["name"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {
     res.status(400).json({
@@ -207,14 +207,18 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
   data.projectId = parseInt(projectId) || projectId;
   data.createdById = user.id;
 
+  if (data.boardId === "null") data.boardId = null;
+
   try {
-    let firstStage = null;
-    try {
-      firstStage = await stageRepo.findFirstByBoard(req.body.boardId);
-      console.log("firstStage", firstStage);
-      data.stageId = firstStage?.id;
-    } catch (error) {
-      console.error("stageRepo.findFirstByBoard", error);
+    if (data.boardId) {
+      let firstStage = null;
+      try {
+        firstStage = await stageRepo.findFirstByBoard(data.boardId);
+        console.log("firstStage", firstStage);
+        data.stageId = firstStage?.id;
+      } catch (error) {
+        console.error("stageRepo.findFirstByBoard", error);
+      }
     }
 
     const projectTasksCount = await Task.count({
@@ -277,7 +281,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               "priority",
               "deadline",
               "parentId",
-              "title",
+              "name",
               "description",
             ].includes(field)
           ) {
@@ -313,14 +317,14 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               "new_assignment",
               {
                 taskLink: getFeTaskUrl(task.projectId, task.id),
-                taskName: task.title,
+                taskName: task.name,
                 username: getFullName(user),
               }
             );
 
           const newNotification = await createTaskNotification(
             task.id,
-            `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${task.title}`,
+            `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${task.name}`,
             task.solverId,
             user.id
           );
@@ -345,14 +349,14 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               "removed_assignment",
               {
                 taskLink: getFeTaskUrl(task.projectId, task.id),
-                taskName: task.title,
+                taskName: task.name,
                 username: getFullName(user),
               }
             );
 
           const newNotification = await createTaskNotification(
             task.id,
-            `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.title}`,
+            `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.name}`,
             taskSolverId,
             user.id
           );
@@ -366,7 +370,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           const newNotification = await createTaskNotification(
             task.id,
             `Uživatel ${getFullName(user)} změnil prioritu úkolu: ${
-              task.title
+              task.name
             } na ${TASK_PRIORITY[task.priority]}`,
             taskSolverId,
             user.id
@@ -377,6 +381,13 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
             notification: newNotification,
           });
+        } else if (field === "boardId" && task.boardId && !task.stageId) {
+          try {
+            const s = await stageRepo.findFirstByBoard(task.boardId);
+            task.stageId = s.id;
+          } catch (error) {
+            console.error(error);
+          }
         }
       });
 
@@ -425,7 +436,7 @@ router.patch(
       ) {
         try {
           const io = getIo();
-          const taskName = `[${task.number}] ${task.title}`;
+          const taskName = `[${task.number}] ${task.name}`;
 
           if (task.createdById !== user.id) {
             const creator = await findOneById(task.createdById);
@@ -449,7 +460,7 @@ router.patch(
 
             const newNotification = await createTaskNotification(
               task.id,
-              `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
+              `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
               task.createdById,
               user.id
             );
@@ -488,7 +499,7 @@ router.patch(
             }
             const newNotification = await createTaskNotification(
               task.id,
-              `Uživatel ${getFullName(user)} dokončil úkol: ${task.title}`,
+              `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
               task.solverId,
               user.id
             );

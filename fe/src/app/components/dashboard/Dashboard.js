@@ -19,7 +19,7 @@ import Loader from "./../common/Loader";
 import NotificationListItem from "./../notification/NotificationListItem";
 import { ROUTE } from "./../../../utils/enum";
 import { loadMyTimeTracksAction } from "../../reducers/timeTrack/timeTrack.reducer";
-import TaskTableItem from "../task/TaskTableItem";
+import TaskTableItem from "../task/component/TaskTableItem";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -125,7 +125,7 @@ export default function Dashboard() {
   ));
 
   const taskComponents = tasks.map((task, i) => {
-    return <TaskTableItem task={task} key={i} />;
+    return <TaskTableItem task={task} key={i} view="dashboard" />;
   });
 
   return (

@@ -88,7 +88,7 @@ router.post(
                 {
                   commentText: data.text,
                   username: getFullName(user),
-                  taskName: task.title,
+                  taskName: task.name,
                   taskLink: `${getFeUrl()}/projekty/${task.projectId}?ukol=${
                     task.id
                   }`,
@@ -98,7 +98,7 @@ router.post(
             const newNotification = await createTaskNotification(
               task.id,
               `Uživatel ${getFullName(user)} Vás označil v komentáři v úkolu ${
-                task.title
+                task.name
               }`,
               mentionUser.id,
               user.id

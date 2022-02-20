@@ -3,10 +3,13 @@ import { Modal } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { ROUTE } from "../../utils/enum";
 
 import Loader from "../components/common/Loader";
+import NewTaskForm from "../components/task/component/NewTaskForm";
 import TaskForm from "../components/task/TaskForm";
 import { loadTaskDetailAction } from "../reducers/task/task.reducer";
+import { createRouteWithParams } from "../service/router.service";
 
 export function useTaskDetail(projectId) {
   const dispatch = useDispatch();
@@ -80,18 +83,52 @@ export function useTaskDetail(projectId) {
   };
 }
 
-export const useInitShowTask = (task) => {
+export const useInitShowTask = () => {
   const history = useHistory();
   const dispatch = useDispatch();
 
-  const click = () => {
+  const click = (task) => {
     dispatch(loadTaskDetailAction(task.projectId, task.id));
-    history.push({
-      search: `?ukol=${task.id}`,
-    });
+    if (task.boardId)
+      history.push(
+        createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+          ":id": task.projectId,
+          ":boardId": task.boardId,
+        }) + `?ukol=${task.id}`
+      );
+    else
+      history.push(
+        createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+          ":id": task.projectId,
+        }) + `?ukol=${task.id}`
+      );
   };
 
   return {
     click,
+  };
+};
+
+export const useCreateTask = (projectId, boardId) => {
+  const [showNewTaskForm, setShowNewTaskForm] = useState(false);
+
+  const renderForm = () => {
+    return (
+      showNewTaskForm && (
+        <div style={{ position: "relative" }}>
+          <NewTaskForm
+            projectId={projectId}
+            boardId={boardId}
+            onHide={() => setShowNewTaskForm(!showNewTaskForm)}
+          />
+        </div>
+      )
+    );
+  };
+
+  return {
+    renderForm,
+    showNewTaskForm,
+    setShowNewTaskForm,
   };
 };
