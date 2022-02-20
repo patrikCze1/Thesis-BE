@@ -93,6 +93,26 @@ export default function boardReducer(state = initialState, action) {
         stages: state.stages.filter((stage) => stage.id !== action.payload),
       };
 
+    case "stage/socketNewStage":
+      if (!state.stages.some((stage) => stage.id == action.payload.id))
+        return {
+          ...state,
+          stages: [...state.stages, action.payload],
+        };
+      return state;
+
+    case "stage/socketEditStage":
+      return {
+        ...state,
+        stages: action.payload,
+      };
+
+    case "stage/socketDeleteStage":
+      return {
+        ...state,
+        stages: state.stages.filter((stage) => stage.id != action.payload),
+      };
+
     default:
       return state;
   }
@@ -192,4 +212,16 @@ export const deleteStageAction = (stageId) => async (dispatch) => {
     dispatch({ type: "board/actionStop", payload: null });
     toast.error(error.response?.data?.message);
   }
+};
+
+export const socketNewStage = (stage) => (dispatch) => {
+  dispatch({ type: "stage/socketNewStage", payload: stage });
+};
+
+export const socketEditStages = (stages) => (dispatch) => {
+  dispatch({ type: "stage/socketEditStage", payload: stages });
+};
+
+export const socketDeleteStage = (id) => (dispatch) => {
+  dispatch({ type: "stage/socketDeleteStage", payload: id });
 };

@@ -243,7 +243,6 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     console.log("findUsersByProject", projectUsers);
     for (const u of projectUsers) {
       console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-      // if (user.id !== u.id)
       io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
   } catch (error) {

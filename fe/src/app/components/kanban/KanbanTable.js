@@ -9,12 +9,7 @@ import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import KanbanCol from "./KanbanCol";
 import Loader from "./../common/Loader";
 
-import {
-  loadProjectAction,
-  socketDeleteStage,
-  socketEditStages,
-  socketNewStage,
-} from "./../../reducers/project/project.reducer";
+import {} from "./../../reducers/project/project.reducer";
 import {
   loadTasksAction,
   editTaskAction,
@@ -34,7 +29,12 @@ import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
 import { useCreateTask, useTaskDetail } from "../../hooks/task";
 import { useProjectDetail } from "../../hooks/project";
-import { loadBoardDetailAction } from "../../reducers/project/board.reducer";
+import {
+  loadBoardDetailAction,
+  socketDeleteStage,
+  socketEditStages,
+  socketNewStage,
+} from "../../reducers/project/board.reducer";
 import BoardStagesForm from "../board/component/BoardStagesForm";
 import { hasRole } from "../../service/role.service";
 
@@ -86,29 +86,25 @@ export default function KanbanTable() {
     try {
       socket.on(SOCKET.TASK_NEW, (data) => {
         console.log("socket TASK_NEW", data);
-        if (data.task.projectId == projectId)
-          dispatch(socketNewTask(data.task));
+        if (data.task.boardId == boardId) dispatch(socketNewTask(data.task));
       });
       socket.on(SOCKET.TASK_EDIT, (data) => {
         console.log("socket TASK_EDIT");
-        if (data.task.projectId == projectId)
-          dispatch(socketEditTask(data.task));
+        if (data.task.boardId == boardId) dispatch(socketEditTask(data.task));
       });
       socket.on(SOCKET.TASK_DELETE, (data) => {
         console.log("socket.on(SOCKET.TASK_DELETE data", data);
         dispatch(socketDeleteTask(data.id));
       });
-      // socket.on(SOCKET.BOARD_STAGE_NEW, (data) => {
-      //   if (data.stage.projectId == projectId)
-      //     dispatch(socketNewStage(data.stage));
-      // });
-      // socket.on(SOCKET.BOARD_STAGE_EDIT, (data) => {
-      //   if (data.projectId == projectId)
-      //     dispatch(socketEditStages([stageZero, ...data.stages]));
-      // });
-      // socket.on(SOCKET.BOARD_STAGE_DELETE, (data) => {
-      //   dispatch(socketDeleteStage(data.id));
-      // });
+      socket.on(SOCKET.BOARD_STAGE_NEW, (data) => {
+        if (data.stage.boardId == boardId) dispatch(socketNewStage(data.stage));
+      });
+      socket.on(SOCKET.BOARD_STAGE_EDIT, (data) => {
+        if (data.boardId == boardId) dispatch(socketEditStages(data.stages));
+      });
+      socket.on(SOCKET.BOARD_STAGE_DELETE, (data) => {
+        dispatch(socketDeleteStage(data.id));
+      });
     } catch (error) {
       console.error(error);
     }

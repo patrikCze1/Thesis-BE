@@ -73,14 +73,6 @@ export default function projectReducer(state = initialState, action) {
         projects: [...state.projects, action.payload],
       };
 
-    // case "project/socketNewStage":
-    //   if (!state.stages.some((stage) => stage.id == action.payload.id))
-    //     return {
-    //       ...state,
-    //       stages: [...state.stages, action.payload],
-    //     };
-    //   return state;
-
     case "project/edit":
       toast.success(i18next.t("Project updated"));
       return {
@@ -93,13 +85,6 @@ export default function projectReducer(state = initialState, action) {
         }),
       };
 
-    // case "project/editStages":
-    //   toast.success(i18next.t("project.changesSaved"));
-    //   return {
-    //     ...state,
-    //     stages: action.payload,
-    //   };
-
     case "project/socketEdit":
       return {
         ...state,
@@ -108,12 +93,6 @@ export default function projectReducer(state = initialState, action) {
           else return project;
         }),
       };
-
-    // case "project/socketEditStage":
-    //   return {
-    //     ...state,
-    //     stages: action.payload,
-    //   };
 
     case "project/delete":
       toast.success(i18next.t("Project deleted"));
@@ -138,12 +117,6 @@ export default function projectReducer(state = initialState, action) {
           (project) => project.id != action.payload
         ),
       };
-
-    // case "project/socketDeleteStage":
-    //   return {
-    //     ...state,
-    //     stages: state.stages.filter((stage) => stage.id != action.payload),
-    //   };
 
     default:
       return state;
@@ -202,10 +175,6 @@ export const socketNewProject = (project) => (dispatch) => {
   dispatch({ type: "project/socketNew", payload: project });
 };
 
-export const socketNewStage = (stage) => (dispatch) => {
-  dispatch({ type: "project/socketNewStage", payload: stage });
-};
-
 export const editProjectAction = (id, data) => async (dispatch) => {
   dispatch({ type: "project/saving" });
   try {
@@ -232,10 +201,6 @@ export const socketEditProject = (project) => (dispatch) => {
   dispatch({ type: "project/socketEdit", payload: project });
 };
 
-// export const socketEditStages = (stages) => (dispatch) => {
-//   dispatch({ type: "project/socketEditStage", payload: stages });
-// };
-
 export const deleteProjectAction = (id) => async (dispatch) => {
   try {
     await axios.delete(`/api/projects/${id}`);
@@ -257,7 +222,3 @@ export const deleteProjectAction = (id) => async (dispatch) => {
 export const socketDeleteProject = (id) => (dispatch) => {
   dispatch({ type: "project/socketDelete", payload: id });
 };
-
-// export const socketDeleteStage = (id) => (dispatch) => {
-//   dispatch({ type: "project/socketDeleteStage", payload: id });
-// };

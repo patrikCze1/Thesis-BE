@@ -10,6 +10,7 @@ const {
 const { validator } = require("../../service");
 const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { getIo } = require("../../service/io");
+const { findUsersByProject } = require("../../repo/userRepo");
 
 const io = getIo();
 
@@ -17,8 +18,6 @@ router.post(
   "/:boardId/stages",
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
-    const currentUser = getUser(req, res);
-
     const requiredAttr = ["name"];
     const result = validator.validateRequiredFields(requiredAttr, req.body);
     if (!result.valid) {
@@ -42,7 +41,12 @@ router.post(
       const stage = await Stage.create(data);
       res.json({ stage });
 
-      io.emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });
+      const board = await Board.findByPk(req.params.boardId);
+      const projectUsers = await findUsersByProject(board.projectId);
+
+      for (const u of projectUsers) {
+        io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -63,12 +67,17 @@ router.patch(
         });
       }
 
-      res.json({ success: true });
+      const board = await Board.findByPk(req.params.boardId);
+      const projectUsers = await findUsersByProject(board.projectId);
 
-      io.emit(SOCKET_EMIT.BOARD_STAGE_EDIT, {
-        boardId: req.params.boardId,
-        stages,
-      });
+      res.json({ stages });
+
+      for (const u of projectUsers) {
+        io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_EDIT, {
+          boardId: req.params.boardId,
+          stages,
+        });
+      }
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -93,9 +102,9 @@ router.delete("/stages/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   try {
     await Stage.destroy({ where: { id } });
+    res.json({ success: true });
 
     io.emit(SOCKET_EMIT.BOARD_STAGE_DELETE, { id });
-    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
