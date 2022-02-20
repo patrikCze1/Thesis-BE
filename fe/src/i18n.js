@@ -319,6 +319,8 @@ i18n
             recordRemoved: "Záznam odstraněn",
             boardCreated: "Nástěnka vytvořena",
             boardDeleted: "Nástěnka ostraněna",
+            stageCreated: "Fáze přidána",
+            stageDeleted: "Fáze odstraněna",
           },
           alert: {
             changesSaved: "Změny uloženy",

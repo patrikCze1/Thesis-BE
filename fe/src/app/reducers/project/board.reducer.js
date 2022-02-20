@@ -72,10 +72,11 @@ export default function boardReducer(state = initialState, action) {
       return { ...state, working: false };
 
     case "stage/create":
+      toast.success(i18n.t("message.stageCreated"));
       return {
         ...state,
         working: false,
-        stages: [...state.stages, action.payload.stage],
+        // stages: [...state.stages, action.payload.stage],
       };
 
     case "stage/edit":
@@ -87,6 +88,7 @@ export default function boardReducer(state = initialState, action) {
       };
 
     case "stage/delete":
+      toast.success(i18n.t("message.stageDeleted"));
       return {
         ...state,
         working: false,

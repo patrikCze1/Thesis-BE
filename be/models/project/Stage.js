@@ -39,6 +39,7 @@ module.exports = (sequelize) => {
       foreignKey: "boardId",
     });
     Stage.hasMany(models.Task, {
+      as: "tasks",
       foreignKey: "stageId",
       onDelete: "set null",
     });

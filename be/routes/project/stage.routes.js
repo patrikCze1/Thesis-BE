@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { Project, Stage } = require("../../models/modelHelper");
+const { Board, Stage } = require("../../models/modelHelper");
 const {
   authenticateToken,
   getUser,
@@ -39,10 +39,11 @@ router.post(
 
     try {
       const stage = await Stage.create(data);
-      res.json({ stage });
 
       const board = await Board.findByPk(req.params.boardId);
       const projectUsers = await findUsersByProject(board.projectId);
+
+      res.json({ stage });
 
       for (const u of projectUsers) {
         io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });

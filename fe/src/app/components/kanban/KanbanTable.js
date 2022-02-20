@@ -118,20 +118,11 @@ export default function KanbanTable() {
     dispatch(loadBoardDetailAction(projectId, boardId));
     const sockets = handleWebsockets();
 
-    // if (selectedTask) {
-    //   dispatch(loadTaskDetailAction(projectId, selectedTask));
-    // }
-
     return () => {
       console.log("close sockets");
       sockets?.close();
     };
   }, [projectId, boardId]);
-
-  // useEffect(() => {
-  //   if (project.projectStages)
-  //     setProjectStages([stageZero, ...project.projectStages]);
-  // }, [project]);
 
   useEffect(() => {
     refreshTableState();

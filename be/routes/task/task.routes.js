@@ -11,6 +11,7 @@ const {
   TaskCheck,
   TaskChangeLog,
   Project,
+  Stage,
 } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
@@ -27,6 +28,7 @@ const { findOneById } = require("../../repo/user/user.repository");
 const { stageRepo } = require("../../repo");
 const { addTimeToDate } = require("../../service/date");
 const { getFeTaskUrl } = require("../../service/utils");
+const ResponseError = require("../../models/common/ResponseError");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
@@ -89,6 +91,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
       ],
       group: ["Task.id"],
     });
+
     res.json({ rows: tasks.rows, count: tasks.count?.length || 0 }); //sequelize bug
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -256,6 +259,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // await User.findByIdAndUpdate(userId, update);
   const io = getIo();
   const { projectId } = req.params;
+
   try {
     let task = await Task.findByPk(req.params.id);
     const taskSolverId = task.solverId;
@@ -294,13 +298,13 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         });
       }
 
-      changedFileds.forEach(async (field) => {
+      for (const field of changedFileds) {
         await TaskChangeLog.create({
           taskId: req.params.id,
           userId: user.id,
           name: `Změna pole: ${field}`,
         });
-
+        console.log("changedFileds", changedFileds);
         if (
           field === "solverId" &&
           (taskSolverId === null || taskSolverId !== task.solverId) &&
@@ -387,8 +391,29 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           } catch (error) {
             console.error(error);
           }
+        } else if (field === "stageId") {
+          const stage = await Stage.findOne({
+            subQuery: false,
+            attributes: {
+              include: [
+                [
+                  sequelize.fn("COUNT", sequelize.col("tasks.id")),
+                  "tasksCount",
+                ],
+              ],
+            },
+            include: [{ model: Task, as: "tasks", attributes: [] }],
+            where: {
+              id: task.stageId,
+            },
+            group: ["tasks.id"],
+          });
+
+          if (stage.limit && stage.dataValues.tasksCount >= stage?.limit) {
+            throw new ResponseError(400, req.t("error.cantAssignToStage"));
+          }
         }
-      });
+      }
 
       await task.save();
     }
@@ -397,13 +422,17 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       const solver = await User.findByPk(parseInt(task.solverId));
       task.setDataValue("solver", solver);
     }
-    res.json({ task });
 
     const projectUsers = await findUsersByProject(projectId);
+
+    res.json({ task });
+
     for (const u of projectUsers) {
-      if (u.id !== user.id) io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+      io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
     }
   } catch (error) {
+    if (error instanceof ResponseError)
+      return res.status(error.status).json({ message: error.message });
     res.status(500).json({ message: error.message });
   }
 });

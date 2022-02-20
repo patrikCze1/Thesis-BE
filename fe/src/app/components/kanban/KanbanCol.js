@@ -6,6 +6,10 @@ export default function KanbanCol({ kanbanCol, tasks }) {
   // dont display first column if is empty
   if (kanbanCol.id === null && !tasks.length > 0) return "";
 
+  const isColFull = () => {
+    return kanbanCol.limit !== null && kanbanCol.limit <= tasks.length;
+  };
+
   return (
     <div className="kanban-col">
       <div className="board-wrapper p-3">
@@ -16,7 +20,7 @@ export default function KanbanCol({ kanbanCol, tasks }) {
             >
               {kanbanCol.name}
             </span>{" "}
-            <small>
+            <small className={`${isColFull() ? "text-danger" : ""}`}>
               ({tasks.length}
               {kanbanCol.limit ? ` / ${kanbanCol.limit}` : ""})
             </small>
@@ -25,6 +29,7 @@ export default function KanbanCol({ kanbanCol, tasks }) {
         <Droppable
           droppableId={`droppableCol-${kanbanCol.id}`}
           index={kanbanCol.id}
+          isDropDisabled={isColFull()}
         >
           {(provided) => (
             <div
