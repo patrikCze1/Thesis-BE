@@ -22,7 +22,8 @@ exports.PROJECT_STATE = Object.freeze({
 });
 
 exports.STAGE_TYPE = Object.freeze({
-  IN_PROGRESS: 1,
+  WAITING: 1,
+  IN_PROGRESS: 3,
   COMPLETED: 5,
 });
 

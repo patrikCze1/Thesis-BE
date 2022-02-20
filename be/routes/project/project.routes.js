@@ -142,7 +142,7 @@ router.post("/", authenticateToken, async (req, res) => {
       order: 1,
       projectId: project.id,
       boardId: board.id,
-      type: null,
+      type: STAGE_TYPE.WAITING,
     });
     Stage.create({
       name: req.t("stage.workInProgress"),

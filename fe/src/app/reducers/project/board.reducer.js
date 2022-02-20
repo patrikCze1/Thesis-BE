@@ -61,6 +61,7 @@ export default function boardReducer(state = initialState, action) {
       toast.success(i18n.t("message.boardDeleted"));
       return {
         ...state,
+        working: false,
         boards: state.boards.filter((board) => board.id !== action.payload),
       };
 
@@ -69,6 +70,28 @@ export default function boardReducer(state = initialState, action) {
 
     case "board/actionStop":
       return { ...state, working: false };
+
+    case "stage/create":
+      return {
+        ...state,
+        working: false,
+        stages: [...state.stages, action.payload.stage],
+      };
+
+    case "stage/edit":
+      toast.success(i18n.t("alert.changesSaved"));
+      return {
+        ...state,
+        working: false,
+        stages: action.payload,
+      };
+
+    case "stage/delete":
+      return {
+        ...state,
+        working: false,
+        stages: state.stages.filter((stage) => stage.id !== action.payload),
+      };
 
     default:
       return state;
@@ -134,6 +157,39 @@ export const deleteBoardAction = (boardId) => async (dispatch) => {
     await axios.delete(`/api/projects/boards/${boardId}`);
     dispatch({ type: "board/delete", payload: boardId });
   } catch (error) {
+    toast.error(error.response?.data?.message);
+  }
+};
+
+export const createStageAction = (boardId, data) => async (dispatch) => {
+  dispatch({ type: "board/actionStart", payload: null });
+  try {
+    const response = await axios.post(`/api/boards/${boardId}/stages`, data);
+    dispatch({ type: "stage/create", payload: response.data });
+  } catch (error) {
+    dispatch({ type: "board/actionStop", payload: null });
+    toast.error(error.response?.data?.message);
+  }
+};
+
+export const editStagesAction = (boardId, data) => async (dispatch) => {
+  dispatch({ type: "board/actionStart", payload: null });
+  try {
+    await axios.patch(`/api/boards/${boardId}/stages`, { stages: data });
+    dispatch({ type: "stage/edit", payload: data });
+  } catch (error) {
+    dispatch({ type: "board/actionStop", payload: null });
+    toast.error(error.response?.data?.message);
+  }
+};
+
+export const deleteStageAction = (stageId) => async (dispatch) => {
+  dispatch({ type: "board/actionStart", payload: null });
+  try {
+    await axios.delete(`/api/boards/stages/${stageId}`);
+    dispatch({ type: "stage/delete", payload: stageId });
+  } catch (error) {
+    dispatch({ type: "board/actionStop", payload: null });
     toast.error(error.response?.data?.message);
   }
 };

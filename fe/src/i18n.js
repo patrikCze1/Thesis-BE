@@ -192,6 +192,7 @@ i18n
             change: "Změnit",
             color: "Barva",
             filter: "Filtr",
+            saveChanges: "Uložit změny",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -257,6 +258,12 @@ i18n
             email: "E-mail",
             notifications: "Notifikace",
           },
+          stage: {
+            waiting: "Co udělat",
+            inProgress: "Pracuje se",
+            completed: "Dokončeno",
+            limit: "Limit",
+          },
           notification: {
             readAll: "Přečíst vše",
             allowEmailNotifications: "Povolit e-mailové notifikace",
@@ -315,6 +322,9 @@ i18n
           },
           alert: {
             changesSaved: "Změny uloženy",
+            deleteStage: "Odstranit fázi",
+            stageWillBeDeleted:
+              "Fáze bude odstraněna a nebude možné ji obnovit",
           },
           board: {
             deleteBoard: "Odstranit nástěnku",

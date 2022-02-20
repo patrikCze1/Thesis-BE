@@ -36,6 +36,7 @@ router.get(
       const board = await Board.findByPk(req.params.boardId);
       const stages = await Stage.findAll({
         where: { boardId: req.params.boardId },
+        order: [["order", "ASC"]],
       });
       res.json({ board, stages });
     } catch (error) {

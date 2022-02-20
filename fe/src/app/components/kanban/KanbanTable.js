@@ -4,7 +4,7 @@ import { DragDropContext } from "react-beautiful-dnd";
 import { useParams, NavLink } from "react-router-dom";
 import i18next from "i18next";
 import { Trans, useTranslation } from "react-i18next";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 
 import KanbanCol from "./KanbanCol";
 import Loader from "./../common/Loader";
@@ -28,14 +28,15 @@ import {
   socketNewTask,
 } from "../../reducers/task/task.reducer";
 import { getIo } from "../../../utils/websocket.config";
-import { ROUTE, SOCKET } from "../../../utils/enum";
+import { ROLES, ROUTE, SOCKET } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
 import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
 import { useCreateTask, useTaskDetail } from "../../hooks/task";
 import { useProjectDetail } from "../../hooks/project";
 import { loadBoardDetailAction } from "../../reducers/project/board.reducer";
-import NewTaskForm from "../task/component/NewTaskForm";
+import BoardStagesForm from "../board/component/BoardStagesForm";
+import { hasRole } from "../../service/role.service";
 
 // const initialFilter = {
 //   query: "",
@@ -77,6 +78,7 @@ export default function KanbanTable() {
   });
   const [showFilter, setShowFilter] = useState(false);
   const [filterObject, setFilterObject] = useState({});
+  const [showBoardSettings, setShowBoardSettings] = useState(false);
 
   const handleWebsockets = () => {
     const socket = getIo();
@@ -344,13 +346,16 @@ export default function KanbanTable() {
               <i className="mdi mdi-archive"></i>
             </NavLink>
 
-            <button
-              type="button"
-              className="btn btn-icons bg-white mr-0"
-              title={i18n.t("board.editStages")}
-            >
-              <i className="mdi mdi-menu"></i>
-            </button>
+            {hasRole([ROLES.MANAGEMENT, ROLES.ADMIN], currentUser.roles) && (
+              <button
+                type="button"
+                className="btn btn-icons bg-white mr-0"
+                title={i18n.t("board.editStages")}
+                onClick={() => setShowBoardSettings(true)}
+              >
+                <i className="mdi mdi-menu"></i>
+              </button>
+            )}
           </div>
         </div>
       </div>
@@ -413,6 +418,29 @@ export default function KanbanTable() {
       </DragDropContext>
 
       {renderModal()}
+
+      {showBoardSettings && (
+        <Modal
+          size="md"
+          show={showBoardSettings}
+          onHide={() => setShowBoardSettings(false)}
+          aria-labelledby="example-modal-sizes-title-sm"
+        >
+          <Modal.Body>
+            <button
+              type="button"
+              className="close close-modal"
+              onClick={() => setShowBoardSettings(false)}
+            >
+              <span aria-hidden="true">×</span>
+              <span className="sr-only">
+                <Trans>Close</Trans>
+              </span>
+            </button>
+            <BoardStagesForm boardId={boardId} />
+          </Modal.Body>
+        </Modal>
+      )}
     </>
   );
 }

@@ -57,13 +57,18 @@ router.patch(
       const { stages } = req.body;
 
       for (const stage of stages) {
-        await Stage.update(stage, { where: { id: stage.id } });
+        if (stage.limit < 1) stage.limit = null;
+        await Stage.update(stage, {
+          where: { id: stage.id, boardId: req.params.boardId },
+        });
       }
+
+      res.json({ success: true });
+
       io.emit(SOCKET_EMIT.BOARD_STAGE_EDIT, {
         boardId: req.params.boardId,
         stages,
       });
-      res.json({ success: true });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
