@@ -238,3 +238,7 @@
     background-color: lighten($green, 15%);
   }
 }
+
+.kanban-page-content {
+  max-height: calc(100vh - 177px);
+}

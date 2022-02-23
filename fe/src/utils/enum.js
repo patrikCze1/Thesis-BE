@@ -73,3 +73,9 @@ export const STAGE_TYPE = Object.freeze({
   IN_PROGRESS: 3,
   COMPLETED: 5,
 });
+
+export const TASK_ACTION_TYPE = Object.freeze({
+  NORMAL: "NORMAL",
+  BACKLOG: "BACKLOG",
+  ARCHIVE: "ARCHIVE",
+});

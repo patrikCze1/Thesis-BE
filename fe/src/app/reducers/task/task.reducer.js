@@ -2,9 +2,12 @@ import axios from "../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
 import i18n from "../../../i18n";
+import { TASK_ACTION_TYPE } from "../../../utils/enum";
 
 const initialState = {
   tasks: [],
+  backlogTasks: [],
+  backlogTasksCount: 0,
   archiveTasks: [],
   archiveTasksCount: 0,
   tasksLoaded: false,
@@ -34,6 +37,14 @@ export default function taskReducer(state = initialState, action) {
         archiveTasksCount: action.payload.count,
       };
 
+    case "tasks/backlogTasksLoaded":
+      return {
+        ...state,
+        tasksLoaded: true,
+        backlogTasks: action.payload.rows,
+        backlogTasksCount: action.payload.count,
+      };
+
     case "tasks/loadFail":
       return { ...state, tasksLoaded: true, tasksError: true };
 
@@ -59,14 +70,24 @@ export default function taskReducer(state = initialState, action) {
 
     case "task/create":
       toast.success(i18n.t("task.taskCreated"));
-      return {
-        ...state,
-        actionSuccess: true,
-        actionProcessing: false,
-        task: action.payload.task,
-        taskLoaded: true,
-        tasks: [...state.tasks, action.payload.task],
-      };
+      if (action.payload.task.stageId)
+        return {
+          ...state,
+          actionSuccess: true,
+          actionProcessing: false,
+          task: {},
+          taskLoaded: true,
+          tasks: [...state.tasks, action.payload.task],
+        };
+      else
+        return {
+          ...state,
+          actionSuccess: true,
+          actionProcessing: false,
+          task: {},
+          taskLoaded: true,
+          backlogTasks: [...state.backlogTasks, action.payload.task],
+        };
 
     case "task/socketNew":
       if (!state.tasks.some((task) => task.id == action.payload.id)) {
@@ -77,15 +98,45 @@ export default function taskReducer(state = initialState, action) {
       } else return state;
 
     case "task/edit":
-      return {
+      const editedState = {
         ...state,
         actionSuccess: true,
         actionProcessing: false,
-        tasks: state.tasks.map((task) => {
-          if (task.id === action.payload.task.id) return action.payload.task;
-          else return task;
-        }),
       };
+
+      if (action.payload.type === TASK_ACTION_TYPE.NORMAL) {
+        if (action.payload.removeFromArr === true)
+          editedState.tasks = state.tasks.filter(
+            (task) => task.id !== action.payload.task.id
+          );
+        else
+          editedState.tasks = state.tasks.map((task) => {
+            if (task.id === action.payload.task.id) return action.payload.task;
+            else return task;
+          });
+      } else if (action.payload.type === TASK_ACTION_TYPE.BACKLOG) {
+        if (action.payload.removeFromArr === true)
+          editedState.backlogTasks = state.backlogTasks.filter(
+            (task) => task.id !== action.payload.task.id
+          );
+        else
+          editedState.backlogTasks = state.backlogTasks.map((task) => {
+            if (task.id === action.payload.task.id) return action.payload.task;
+            else return task;
+          });
+      } else if (action.payload.type === TASK_ACTION_TYPE.ARCHIVE) {
+        if (action.payload.removeFromArr === true)
+          editedState.archivedTasks = state.archivedTasks.filter(
+            (task) => task.id !== action.payload.task.id
+          );
+        else
+          editedState.archivedTasks = state.archivedTasks.map((task) => {
+            if (task.id === action.payload.task.id) return action.payload.task;
+            else return task;
+          });
+      }
+
+      return editedState;
 
     case "task/socketEdit":
       return {
@@ -115,13 +166,38 @@ export default function taskReducer(state = initialState, action) {
       };
 
     case "task/delete":
-      return {
-        ...state,
-        task: {},
-        actionSuccess: true,
-        actionProcessing: false,
-        tasks: state.tasks.filter((task) => task.id !== action.payload),
-      };
+      if (action.payload.type === TASK_ACTION_TYPE.NORMAL)
+        return {
+          ...state,
+          task: {},
+          actionSuccess: true,
+          actionProcessing: false,
+          tasks: state.tasks.filter(
+            (task) => task.id !== action.payload.taskId
+          ),
+        };
+      else if (action.payload.type === TASK_ACTION_TYPE.BACKLOG)
+        return {
+          ...state,
+          task: {},
+          actionSuccess: true,
+          actionProcessing: false,
+          backlogTasks: state.tasks.filter(
+            (task) => task.id !== action.payload.taskId
+          ),
+          backlogTasksCount: state.backlogTasksCount - 1,
+        };
+      else
+        return {
+          ...state,
+          task: {},
+          actionSuccess: true,
+          actionProcessing: false,
+          archiveTasks: state.tasks.filter(
+            (task) => task.id !== action.payload.taskId
+          ),
+          archiveTasksCount: state.archiveTasksCount - 1,
+        };
 
     case "task/socketDelete":
       return {
@@ -180,6 +256,21 @@ export const loadArchiveTasksAction =
     }
   };
 
+export const loadBacklogTasksAction =
+  (projectId, params = "") =>
+  async (dispatch) => {
+    dispatch({ type: "tasks/loadStart", payload: null });
+    try {
+      const response = await axios.get(
+        `/api/projects/${projectId}/tasks/${params}`
+      );
+      dispatch({ type: "tasks/backlogTasksLoaded", payload: response.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+      dispatch({ type: "tasks/loadFail", payload: null });
+    }
+  };
+
 export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
   dispatch({ type: "task/loadStart", payload: null });
   try {
@@ -224,22 +315,34 @@ export const socketNewTask = (task) => (dispatch) => {
  * @param {number} projectId
  * @param {number} taskId
  * @param {object} data
+ * @param {boolean} removeFromArr
  */
-export const editTaskAction = (projectId, taskId, data) => async (dispatch) => {
-  dispatch({ type: "task/actionStart", payload: null });
-  console.log("editTaskAction", data);
-  try {
-    const response = await axios.patch(
-      `/api/projects/${projectId}/tasks/${taskId}`,
-      data
-    );
-    dispatch({ type: "task/edit", payload: response.data });
-    toast.success(i18next.t("project.changesSaved"));
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-    dispatch({ type: "task/actionFail", payload: null });
-  }
-};
+export const editTaskAction =
+  (
+    type = TASK_ACTION_TYPE.NORMAL,
+    projectId,
+    taskId,
+    data,
+    removeFromArr = false
+  ) =>
+  async (dispatch) => {
+    dispatch({ type: "task/actionStart", payload: null });
+    console.log("editTaskAction", data);
+    try {
+      const response = await axios.patch(
+        `/api/projects/${projectId}/tasks/${taskId}`,
+        data
+      );
+      dispatch({
+        type: "task/edit",
+        payload: { ...response.data, type, removeFromArr },
+      });
+      toast.success(i18next.t("project.changesSaved"));
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+      dispatch({ type: "task/actionFail", payload: null });
+    }
+  };
 
 export const socketEditTask = (task) => (dispatch) => {
   dispatch({ type: "task/socketEdit", payload: task });
@@ -260,17 +363,19 @@ export const completeTaskAction = (projectId, taskId) => async (dispatch) => {
   }
 };
 
-export const deleteTaskAction = (projectId, taskId) => async (dispatch) => {
-  dispatch({ type: "task/actionStart", payload: null });
-  try {
-    await axios.delete(`/api/projects/${projectId}/tasks/${taskId}`);
-    dispatch({ type: "task/delete", payload: taskId });
-    toast.success(i18next.t("task.taskDeleted"));
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-    dispatch({ type: "task/actionFail", payload: null });
-  }
-};
+export const deleteTaskAction =
+  (type = TASK_ACTION_TYPE.NORMAL, projectId, taskId) =>
+  async (dispatch) => {
+    dispatch({ type: "task/actionStart", payload: null });
+    try {
+      await axios.delete(`/api/projects/${projectId}/tasks/${taskId}`);
+      dispatch({ type: "task/delete", payload: { taskId, type } });
+      toast.success(i18next.t("task.taskDeleted"));
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+      dispatch({ type: "task/actionFail", payload: null });
+    }
+  };
 
 export const socketDeleteTask = (id) => (dispatch) => {
   console.log("socketDeleteTask action");

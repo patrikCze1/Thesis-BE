@@ -55,6 +55,10 @@ module.exports = (sequelize) => {
       estimation: {
         type: DataTypes.FLOAT,
       },
+      // archived:{
+      //   type: DataTypes.BOOLEAN,
+      //   allowNull: false,
+      // },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
@@ -66,7 +70,7 @@ module.exports = (sequelize) => {
       completedAt: {
         type: DataTypes.DATE,
       },
-      //begin / hours
+      //begin
       //muted, favourites...
       // todo proverit taskId
     },

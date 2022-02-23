@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams, NavLink } from "react-router-dom";
 
 import i18n from "../../../i18n";
-import { ROUTE } from "../../../utils/enum";
+import { ROUTE, TASK_ACTION_TYPE } from "../../../utils/enum";
 import { useProjectDetail } from "../../hooks/project";
 import { useInitShowTask, useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
@@ -18,7 +18,7 @@ const paginationLimit = 20;
 export default function TaskArchiveScreen() {
   const dispatch = useDispatch();
   const { id: projectId } = useParams();
-  const { renderModal } = useTaskDetail(projectId);
+  const { renderModal } = useTaskDetail(projectId, TASK_ACTION_TYPE.ARCHIVE);
   const { project } = useProjectDetail(projectId);
 
   const { archiveTasks, archiveTasksCount, tasksLoaded } = useSelector(

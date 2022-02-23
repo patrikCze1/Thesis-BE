@@ -4,7 +4,10 @@ import { NavLink } from "react-router-dom";
 
 import { ROUTE, TASK_PRIORITY } from "../../../../utils/enum";
 import { useInitShowTask } from "../../../hooks/task";
-import { getDayMonthShort } from "../../../service/date/date.service";
+import {
+  getDayMonthShort,
+  getMonthDayTime,
+} from "../../../service/date/date.service";
 
 export default function TaskTableItem({ task, view }) {
   const now = new Date();
@@ -83,8 +86,8 @@ export default function TaskTableItem({ task, view }) {
           <Trans>{TASK_PRIORITY[task.priority]}</Trans>
         </span>
       </td>
-      <td> {task.estimation} </td>
-      <td> {task.deadline} </td>
+      <td> {task.estimation ? `${task.estimation} h` : ""} </td>
+      <td> {task.deadline && getMonthDayTime(new Date(task.deadline))} </td>
     </tr>
   );
 }

@@ -11,7 +11,7 @@ import TaskForm from "../components/task/TaskForm";
 import { loadTaskDetailAction } from "../reducers/task/task.reducer";
 import { createRouteWithParams } from "../service/router.service";
 
-export function useTaskDetail(projectId) {
+export function useTaskDetail(projectId, taskType) {
   const dispatch = useDispatch();
   const history = useHistory();
   const [showTaskDetail, setShowTaskDetail] = useState(false);
@@ -65,7 +65,11 @@ export function useTaskDetail(projectId) {
                   <Trans>Close</Trans>
                 </span>
               </button>
-              <TaskForm task={task} hideModal={handleHideTaskDetail} />
+              <TaskForm
+                task={task}
+                hideModal={handleHideTaskDetail}
+                taskType={taskType}
+              />
             </Modal.Body>
           ) : (
             <Loader />

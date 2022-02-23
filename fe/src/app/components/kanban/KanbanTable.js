@@ -23,7 +23,7 @@ import {
   socketNewTask,
 } from "../../reducers/task/task.reducer";
 import { getIo } from "../../../utils/websocket.config";
-import { ROLES, ROUTE, SOCKET } from "../../../utils/enum";
+import { ROLES, ROUTE, SOCKET, TASK_ACTION_TYPE } from "../../../utils/enum";
 import KanbanFilter from "./component/KanbanFilter";
 import i18n from "../../../i18n";
 import { createRouteWithParams } from "../../service/router.service";
@@ -37,6 +37,7 @@ import {
 } from "../../reducers/project/board.reducer";
 import BoardStagesForm from "../board/component/BoardStagesForm";
 import { hasRole } from "../../service/role.service";
+import { useModuleInfoModal } from "../../hooks/common";
 
 // const initialFilter = {
 //   query: "",
@@ -51,12 +52,13 @@ export default function KanbanTable() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { id: projectId, boardId } = useParams();
-  const { renderModal } = useTaskDetail(projectId);
+  const { renderModal } = useTaskDetail(projectId, TASK_ACTION_TYPE.NORMAL);
   const { renderForm, setShowNewTaskForm, showNewTaskForm } = useCreateTask(
     projectId,
     boardId
   );
   const { project, projectLoaded } = useProjectDetail(projectId);
+  const { handleShow } = useModuleInfoModal();
 
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
@@ -184,7 +186,14 @@ export default function KanbanTable() {
           ...task,
           stageId: tableState.columns[destination.droppableId].id,
         };
-        dispatch(editTaskAction(projectId, updatedTask.id, updatedTask));
+        dispatch(
+          editTaskAction(
+            TASK_ACTION_TYPE.NORMAL,
+            projectId,
+            updatedTask.id,
+            updatedTask
+          )
+        );
         return updatedTask;
       }
       return task;
@@ -236,7 +245,7 @@ export default function KanbanTable() {
   }
 
   return (
-    <>
+    <div className="d-flex flex-column h-100 kanban-page-content">
       <div className="d-flex align-items-center flex-wrap pb-4">
         <div className="wrapper d-flex align-items-center">
           <h4 className="mb-md-0 mb-4 text-dark">
@@ -249,6 +258,10 @@ export default function KanbanTable() {
             </NavLink>{" "}
             / {board?.name}
           </h4>
+
+          <a href="#" onClick={handleShow} className="ml-1">
+            <i className="mdi mdi-information-outline"></i>
+          </a>
 
           <div className="image-grouped ml-md-4">
             {projectUsers &&
@@ -360,7 +373,7 @@ export default function KanbanTable() {
       {renderForm()}
 
       <DragDropContext onDragEnd={handleDragEnd}>
-        <div className="kanban-wrapper">
+        <div className="kanban-wrapper h-100">
           {projectLoaded &&
             tableState.columnOrder.length &&
             tableState.columnOrder.map((columnOrder) => {
@@ -428,6 +441,6 @@ export default function KanbanTable() {
           </Modal.Body>
         </Modal>
       )}
-    </>
+    </div>
   );
 }

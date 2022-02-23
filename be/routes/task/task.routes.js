@@ -242,11 +242,13 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       name: req.t("task.message.created"),
     });
 
-    const projectUsers = await findUsersByProject(projectId);
-    console.log("findUsersByProject", projectUsers);
-    for (const u of projectUsers) {
-      console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+    if (task.boardId) {
+      const projectUsers = await findUsersByProject(projectId);
+      console.log("findUsersByProject", projectUsers);
+      for (const u of projectUsers) {
+        console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
+        io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+      }
     }
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -254,8 +256,6 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
-  // const update = req.body
-  // const userId = req.params.userId;
   // await User.findByIdAndUpdate(userId, update);
   const io = getIo();
   const { projectId } = req.params;
@@ -270,7 +270,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     });
 
     const changedFileds = task.changed();
-    console.log("changed fields: ", changedFileds);
+    console.log("changed fields: ", changedFileds, task);
     if (changedFileds.length > 0) {
       if (
         !user.roles.includes(ROLE.ADMIN) &&
@@ -391,7 +391,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           } catch (error) {
             console.error(error);
           }
-        } else if (field === "stageId") {
+        } else if (field === "stageId" && task.stageId) {
           const stage = await Stage.findOne({
             subQuery: false,
             attributes: {
@@ -422,13 +422,32 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       const solver = await User.findByPk(parseInt(task.solverId));
       task.setDataValue("solver", solver);
     }
-
+    console.log("task prev vals", task.previous("stageId"));
     const projectUsers = await findUsersByProject(projectId);
 
     res.json({ task });
 
-    for (const u of projectUsers) {
-      io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+    if (changedFileds.includes("boardId")) {
+      if (task.boardId) {
+        if (task.previous("boardId") === task.boardId) {
+          for (const u of projectUsers) {
+            io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+          }
+        } else {
+          for (const u of projectUsers) {
+            io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+          }
+        }
+      } else {
+        // hide task in kanban
+        for (const u of projectUsers) {
+          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, { id: task.id });
+        }
+      }
+    } else {
+      for (const u of projectUsers) {
+        io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+      }
     }
   } catch (error) {
     if (error instanceof ResponseError)
@@ -575,8 +594,8 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     const projectUsers = await findUsersByProject(task.projectId);
     for (const u of projectUsers) {
       console.log("SOCKET TASK_DELETE to", u.id);
-      // if (u.id !== user.id)
-      io.to(u.id).emit("TASK_DELETE", { id: task.id });
+
+      io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, { id: task.id });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

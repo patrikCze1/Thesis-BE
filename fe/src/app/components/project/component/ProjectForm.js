@@ -17,6 +17,7 @@ import Loader from "../../common/Loader";
 import { getFullName } from "../../../service/user/user.service";
 import LoaderTransparent from "../../common/LoaderTransparent";
 import { PROJECT_STATE } from "../../../../utils/enum";
+import ReactQuill from "react-quill";
 
 export default function ProjectForm({ projectId = false, closeForm }) {
   const dispatch = useDispatch();
@@ -229,21 +230,17 @@ export default function ProjectForm({ projectId = false, closeForm }) {
               </Form.Row>
 
               <Form.Row>
-                <Form.Group as={Col} md="12" controlId="validationCustom05">
-                  <Form.Label>
+                <div className="form-group col-md-12">
+                  <label className="form-label">
                     <Trans>Description</Trans>
-                  </Form.Label>
-                  <textarea
-                    className="form-control"
-                    id="validationCustom05"
-                    name="description"
-                    rows="4"
+                  </label>
+
+                  <ReactQuill
                     value={formData.description}
-                    onChange={(e) =>
-                      handleChange(e.target.name, e.target.value)
-                    }
-                  ></textarea>
-                </Form.Group>
+                    onChange={(value) => handleChange("description", value)}
+                    theme="snow"
+                  />
+                </div>
               </Form.Row>
 
               <Form.Row>

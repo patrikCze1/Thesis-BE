@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Form, ProgressBar } from "react-bootstrap";
+import { Dropdown, Form, ProgressBar } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { Trans, useTranslation } from "react-i18next";
 import Mentions from "rc-mentions";
@@ -32,7 +32,13 @@ import {
 } from "../../reducers/task/taskAttachmentReducer";
 import Editable from "../form/Editable";
 import { getIo } from "../../../utils/websocket.config";
-import { ROLES, SOCKET, TASK_COLORS, TASK_PRIORITY } from "../../../utils/enum";
+import {
+  ROLES,
+  SOCKET,
+  TASK_ACTION_TYPE,
+  TASK_COLORS,
+  TASK_PRIORITY,
+} from "../../../utils/enum";
 import { getFullName } from "../../service/user/user.service";
 import { hasRole } from "../../service/role.service";
 import TaskCommentItem from "./TaskCommentItem";
@@ -41,7 +47,11 @@ import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
 import i18n from "../../../i18n";
 
-export default function TaskForm({ task, hideModal }) {
+export default function TaskForm({
+  task,
+  hideModal,
+  taskType = TASK_ACTION_TYPE.NORMAL,
+}) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({ description: "" });
@@ -68,7 +78,7 @@ export default function TaskForm({ task, hideModal }) {
   const disableEdit = false;
   const { Option } = Mentions;
   const MySwal = withReactContent(Swal);
-  console.log("task attachments", attachments);
+  console.log("task attachments", task, attachments);
   const handleWebsockets = () => {
     try {
       const socket = getIo();
@@ -113,7 +123,11 @@ export default function TaskForm({ task, hideModal }) {
     if (checks?.length) calculateChecklistProgress(checks);
   }, [checks]);
 
-  const handleChangeAndSave = (e) => {
+  const handleSave = (data) => {
+    dispatch(editTaskAction(taskType, task.projectId, task.id, data));
+  };
+
+  const handleChangeAndSave = (e, save = true) => {
     console.log("e.target", e.target);
     const { name, value } = e.target;
     const updatedTask = {
@@ -124,28 +138,18 @@ export default function TaskForm({ task, hideModal }) {
     if (!value) updatedTask[name] = null;
     console.log("updatedTask", updatedTask);
     setFormData(updatedTask);
-    dispatch(editTaskAction(task.projectId, task.id, updatedTask));
+    if (save) handleSave(updatedTask);
   };
 
   const handleDeadlineChange = (value) => {
     setDeadline(value);
     dispatch(
-      editTaskAction(task.projectId, task.id, { ...formData, deadline: value })
-    );
-  };
-
-  function handleQuillChange(value) {
-    setFormData({
-      ...formData,
-      description: value,
-    });
-    dispatch(
-      editTaskAction(task.projectId, task.id, {
+      editTaskAction(taskType, task.projectId, task.id, {
         ...formData,
-        description: value,
+        deadline: value,
       })
     );
-  }
+  };
 
   const handleCreateCheck = (e) => {
     e.preventDefault();
@@ -258,7 +262,7 @@ export default function TaskForm({ task, hideModal }) {
       cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.value) {
-        dispatch(deleteTaskAction(task.projectId, task.id));
+        dispatch(deleteTaskAction(taskType, task.projectId, task.id));
         hideModal();
       }
     });
@@ -284,24 +288,50 @@ export default function TaskForm({ task, hideModal }) {
 
   const handleMoveToBacklog = () => {
     dispatch(
-      editTaskAction(task.projectId, task.id, { boardId: null, stageId: null })
+      editTaskAction(
+        taskType,
+        task.projectId,
+        task.id,
+        {
+          boardId: null,
+          stageId: null,
+        },
+        true
+      )
     );
+    hideModal();
   };
   console.log("boards", boards);
   return (
     <div className="card-body">
+      <Dropdown className="modal-options">
+        <Dropdown.Toggle variant="btn" className="py-0">
+          <i className="mdi mdi-dots-horizontal fs-1-2"></i>
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {canDelete && (
+            <Dropdown.Item
+              className="btn btn-inverse-danger"
+              onClick={handleRemoveClick}
+            >
+              <Trans>task.delete</Trans>
+            </Dropdown.Item>
+          )}
+        </Dropdown.Menu>
+      </Dropdown>
+
       <div className="row">
         <div className="col-md-10 order-md-1 order-2">
           <Form.Group>
             <h4>
               <Editable
                 type="text"
-                name="title"
+                name="name"
                 placeholder={`${t("label.title")}...`}
-                value={formData.title || ""}
+                value={formData.name || ""}
                 disabled={disableEdit}
                 onSave={(val) =>
-                  handleChangeAndSave({ target: { name: "title", value: val } })
+                  handleChangeAndSave({ target: { name: "name", value: val } })
                 }
                 disabled={!canEdit}
               />
@@ -316,7 +346,9 @@ export default function TaskForm({ task, hideModal }) {
                   : t("task.description")
               }
               type="quill"
-              onSave={(val) => handleQuillChange(val)}
+              onSave={(value) =>
+                handleChangeAndSave({ target: { name: "description", value } })
+              }
               placeholder={`${t("task.description")}...`}
               label={t("task.description")}
               disabled={!canEdit}
@@ -483,7 +515,7 @@ export default function TaskForm({ task, hideModal }) {
           <h4>
             <Trans>label.settings</Trans>
           </h4>
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>Priority</Trans>
             </label>
@@ -504,7 +536,7 @@ export default function TaskForm({ task, hideModal }) {
             </select>
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>Stage</Trans>
             </label>
@@ -528,7 +560,7 @@ export default function TaskForm({ task, hideModal }) {
             </select>
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>Creator</Trans>
             </label>
@@ -550,7 +582,7 @@ export default function TaskForm({ task, hideModal }) {
             </select>
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>Solver</Trans>
             </label>
@@ -572,7 +604,7 @@ export default function TaskForm({ task, hideModal }) {
             </select>
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>label.color</Trans>
             </label>
@@ -605,7 +637,7 @@ export default function TaskForm({ task, hideModal }) {
             </button>
           </Form.Group>
 
-          <Form.Group className="react-datepicker-flex">
+          <Form.Group className="react-datepicker-flex mb-3">
             <label>
               <Trans>Deadline</Trans>
             </label>
@@ -631,7 +663,7 @@ export default function TaskForm({ task, hideModal }) {
               )}
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>task.estimation</Trans>
             </label>
@@ -639,13 +671,17 @@ export default function TaskForm({ task, hideModal }) {
               className="form-control form-control-sm"
               name="estimation"
               value={formData.estimation}
-              onChange={(e) => handleChangeAndSave(e)}
+              onChange={(e) => handleChangeAndSave(e, false)}
               disabled={!canEdit}
               placeholder={i18n.t("task.hoursCount")}
+              onBlur={() => {
+                if (formData.estimation != task.estimation)
+                  handleSave(formData);
+              }}
             />
           </Form.Group>
 
-          <Form.Group>
+          <Form.Group className="mb-3">
             <label>
               <Trans>label.actions</Trans>
             </label>
@@ -705,17 +741,6 @@ export default function TaskForm({ task, hideModal }) {
                 <i className="mdi mdi-check btn-icon-prepend"></i>
                 <Trans>task.completeTask</Trans>
               </button>
-            )}
-            {canDelete && (
-              <div>
-                <button
-                  className="btn btn-outline-danger btn-icon-text w-100 mt-2"
-                  onClick={handleRemoveClick}
-                >
-                  <i className="mdi mdi-delete btn-icon-prepend"></i>
-                  <Trans>task.delete</Trans>
-                </button>
-              </div>
             )}
           </Form.Group>
         </div>

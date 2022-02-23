@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 
 import { ROLES } from "../../../utils/enum";
+import { useModuleInfoModal } from "../../hooks/common";
 import {
   loadBoardDetailAction,
   loadBoardsAction,
@@ -23,6 +24,7 @@ export default function ProjectBoardsScreen() {
   const history = useHistory();
   const editBoardRef = useRef(false);
   const { id: projectId } = useParams();
+  const { handleShow } = useModuleInfoModal();
   const [showForm, setShowForm] = useState(false);
   const { user } = useSelector((state) => state.currentUserReducer);
   const { project } = useSelector((state) => state.projectReducer);
@@ -66,6 +68,9 @@ export default function ProjectBoardsScreen() {
       <div className="page-header flex-wrap">
         <h4>
           {project.name} / <Trans>project.boards</Trans>
+          <a href="#" onClick={handleShow} className="ml-1">
+            <i className="mdi mdi-information-outline"></i>
+          </a>
         </h4>
         {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
           <div className="d-flex">
