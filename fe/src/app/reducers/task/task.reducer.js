@@ -151,19 +151,19 @@ export default function taskReducer(state = initialState, action) {
             : state.task,
       };
 
-    case "task/complete":
-      return {
-        ...state,
-        tasks: state.tasks.map((task) => {
-          if (task.id === action.payload.id)
-            return { ...task, ...action.payload };
-          else return task;
-        }),
-        task:
-          state.task.id === action.payload.id
-            ? { ...state.task, ...action.payload }
-            : state.task,
-      };
+    // case "task/complete":
+    //   return {
+    //     ...state,
+    //     tasks: state.tasks.map((task) => {
+    //       if (task.id === action.payload.id)
+    //         return { ...task, ...action.payload };
+    //       else return task;
+    //     }),
+    //     task:
+    //       state.task.id === action.payload.id
+    //         ? { ...state.task, ...action.payload }
+    //         : state.task,
+    //   };
 
     case "task/delete":
       if (action.payload.type === TASK_ACTION_TYPE.NORMAL)
@@ -348,20 +348,20 @@ export const socketEditTask = (task) => (dispatch) => {
   dispatch({ type: "task/socketEdit", payload: task });
 };
 
-export const completeTaskAction = (projectId, taskId) => async (dispatch) => {
-  dispatch({ type: "task/actionStart", payload: null });
+// export const completeTaskAction = (projectId, taskId) => async (dispatch) => {
+//   dispatch({ type: "task/actionStart", payload: null });
 
-  try {
-    const response = await axios.patch(
-      `/api/projects/${projectId}/tasks/${taskId}/complete`
-    );
-    dispatch({ type: "task/complete", payload: response.data.task });
-    toast.success(i18next.t("project.changesSaved"));
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-    dispatch({ type: "task/actionFail", payload: null });
-  }
-};
+//   try {
+//     const response = await axios.patch(
+//       `/api/projects/${projectId}/tasks/${taskId}/complete`
+//     );
+//     dispatch({ type: "task/complete", payload: response.data.task });
+//     toast.success(i18next.t("project.changesSaved"));
+//   } catch (error) {
+//     toast.error(error.response?.data?.message);
+//     dispatch({ type: "task/actionFail", payload: null });
+//   }
+// };
 
 export const deleteTaskAction =
   (type = TASK_ACTION_TYPE.NORMAL, projectId, taskId) =>

@@ -236,21 +236,21 @@ export default function TaskForm({
     }
   };
 
-  const handleCompleteClick = () => {
-    MySwal.fire({
-      icon: task.completedAt ? "warning" : "info",
-      title: task.completedAt
-        ? t("task.unCompleteTask") + "?"
-        : `${t("task.completeTask")}?`,
-      confirmButtonText: task.completedAt
-        ? t("label.change")
-        : t("label.complete"),
-      showCancelButton: true,
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.value) dispatch(completeTaskAction(task.projectId, task.id));
-    });
-  };
+  // const handleCompleteClick = () => {
+  //   MySwal.fire({
+  //     icon: task.completedAt ? "warning" : "info",
+  //     title: task.completedAt
+  //       ? t("task.unCompleteTask") + "?"
+  //       : `${t("task.completeTask")}?`,
+  //     confirmButtonText: task.completedAt
+  //       ? t("label.change")
+  //       : t("label.complete"),
+  //     showCancelButton: true,
+  //     cancelButtonText: t("cancel"),
+  //   }).then((result) => {
+  //     if (result.value) dispatch(completeTaskAction(task.projectId, task.id));
+  //   });
+  // };
 
   const handleRemoveClick = () => {
     MySwal.fire({
@@ -714,7 +714,7 @@ export default function TaskForm({
               </select>
             </Form.Group>
 
-            {task.completedAt ? (
+            {/* {task.completedAt ? (
               <>
                 <span className="text-primary d-block">
                   <i className="mdi mdi-check btn-icon-prepend"></i>
@@ -741,7 +741,7 @@ export default function TaskForm({
                 <i className="mdi mdi-check btn-icon-prepend"></i>
                 <Trans>task.completeTask</Trans>
               </button>
-            )}
+            )} */}
           </Form.Group>
         </div>
       </div>

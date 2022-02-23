@@ -19,7 +19,8 @@
   },
   "task": {
     "message": {
-      "created": "Vytvoření úkolu"
+      "created": "Vytvoření úkolu",
+      "stageChangedTo": "Změna stavu úkolu na {{stage}} ({{type}})"
     }
   },
   "stage": {

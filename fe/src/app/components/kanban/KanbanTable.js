@@ -172,8 +172,8 @@ export default function KanbanTable() {
     }
 
     if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
+      destination.droppableId === source.droppableId
+      // && destination.index === source.index // handle order in col
     ) {
       return;
     }
@@ -183,14 +183,14 @@ export default function KanbanTable() {
 
       if (task.id == draggableId.substring(index + 1)) {
         const updatedTask = {
-          ...task,
+          ...task, // todo remove not needed
           stageId: tableState.columns[destination.droppableId].id,
         };
         dispatch(
           editTaskAction(
             TASK_ACTION_TYPE.NORMAL,
             projectId,
-            updatedTask.id,
+            task.id,
             updatedTask
           )
         );

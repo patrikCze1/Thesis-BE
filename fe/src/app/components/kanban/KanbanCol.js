@@ -26,6 +26,7 @@ export default function KanbanCol({ kanbanCol, tasks }) {
             </small>
           </h4>
         </div>
+
         <Droppable
           droppableId={`droppableCol-${kanbanCol.id}`}
           index={kanbanCol.id}
