@@ -10,9 +10,10 @@ const { Op } = require("sequelize");
 exports.findByUser = async (user, filter) => {
   return await Project.findAndCountAll({
     // attributes: { exclude: ['user'] },
+    subQuery: false,
     where: {
       [Op.or]: [
-        { "$creator.id$": user.id },
+        { createdById: user.id },
         { "$groups.groupUsers.UserGroup.userId$": user.id },
         { "$users.ProjectUser.userId$": user.id },
       ],

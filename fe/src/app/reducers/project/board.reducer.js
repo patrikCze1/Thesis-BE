@@ -42,8 +42,16 @@ export default function boardReducer(state = initialState, action) {
       return {
         ...state,
         working: false,
-        boards: [...state.boards, action.payload.board],
+        boards: [action.payload.board, ...state.boards],
       };
+
+    case "board/socketNew":
+      if (!state.working) {
+        return {
+          ...state,
+          boards: [action.payload, ...state.boards],
+        };
+      } else return state;
 
     case "board/edit":
       toast.success(i18n.t("message.boardUpdated"));
@@ -76,7 +84,7 @@ export default function boardReducer(state = initialState, action) {
       return {
         ...state,
         working: false,
-        // stages: [...state.stages, action.payload.stage],
+        stages: [...state.stages, action.payload.stage],
       };
 
     case "stage/edit":
@@ -96,7 +104,7 @@ export default function boardReducer(state = initialState, action) {
       };
 
     case "stage/socketNewStage":
-      if (!state.stages.some((stage) => stage.id == action.payload.id))
+      if (!state.working)
         return {
           ...state,
           stages: [...state.stages, action.payload],
@@ -157,6 +165,10 @@ export const createBoardAction = (projectId, data) => async (dispatch) => {
     dispatch({ type: "board/actionStop", payload: null });
     toast.error(error.response?.data?.message);
   }
+};
+
+export const socketNewBoardAction = (board) => async (dispatch) => {
+  dispatch({ type: "board/socketNew", payload: board });
 };
 
 export const editBoardAction =

@@ -79,7 +79,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
 
     if (projectId || Object.keys(project).length > 0) setIsEdit(true);
   }, [project]);
-
+  console.log("formData", formData);
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -91,7 +91,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
         users: formData.users.map((user) => user.value),
         groups: formData.groups.map((group) => group.value),
       };
-
+      console.log("data", data);
       if (projectId || project.id) {
         dispatch(editProjectAction(project.id, data));
       } else {

@@ -3,12 +3,15 @@ import { Modal } from "react-bootstrap";
 import { Trans } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
+import i18n from "../../../i18n";
 
-import { ROLES } from "../../../utils/enum";
+import { ROLES, SOCKET } from "../../../utils/enum";
+import { getIo } from "../../../utils/websocket.config";
 import { useModuleInfoModal } from "../../hooks/common";
 import {
   loadBoardDetailAction,
   loadBoardsAction,
+  socketNewBoardAction,
 } from "../../reducers/project/board.reducer";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { hasRole } from "../../service/role.service";
@@ -24,18 +27,39 @@ export default function ProjectBoardsScreen() {
   const history = useHistory();
   const editBoardRef = useRef(false);
   const { id: projectId } = useParams();
-  const { handleShow } = useModuleInfoModal();
+  const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal();
   const [showForm, setShowForm] = useState(false);
   const { user } = useSelector((state) => state.currentUserReducer);
   const { project } = useSelector((state) => state.projectReducer);
   const { boards, boardsLoaded } = useSelector((state) => state.boardReducer);
   console.log("boards", boards);
   console.log("projectId", projectId);
+
+  const handleWebsockets = () => {
+    const socket = getIo();
+
+    try {
+      socket.on(SOCKET.PROJECT_BOARD_NEW, (data) => {
+        if (data.board.projectId === projectId)
+          dispatch(socketNewBoardAction(data.board));
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    return socket;
+  };
+
   useEffect(() => {
     if (projectId) {
       dispatch(loadProjectAction(projectId));
       dispatch(loadBoardsAction(projectId));
     }
+
+    const sockets = handleWebsockets();
+    return () => {
+      sockets?.close();
+    };
   }, [projectId]);
 
   useEffect(() => {
@@ -68,11 +92,14 @@ export default function ProjectBoardsScreen() {
       <div className="page-header flex-wrap">
         <h4>
           {project.name} / <Trans>project.boards</Trans>
-          <a href="#" onClick={handleShow} className="ml-1">
+          <button
+            onClick={handleShowInfoModal}
+            className="ml-1 p-0 btn btn-link"
+          >
             <i className="mdi mdi-information-outline"></i>
-          </a>
+          </button>
         </h4>
-        {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
+        {hasRole([ROLES.ADMIN, ROLES.MANAGEMENT], user.roles) && (
           <div className="d-flex">
             <button
               onClick={() => handleShowForm()}
@@ -115,6 +142,8 @@ export default function ProjectBoardsScreen() {
           </Modal.Body>
         </Modal>
       )}
+
+      {renderInfoModal(i18n.t("label.projectDescription"), project.description)}
     </>
   );
 }

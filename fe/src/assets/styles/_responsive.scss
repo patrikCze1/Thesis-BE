@@ -56,11 +56,3 @@
     }
   }
 }
-
-.modal.show {
-  @media (min-width: 576px) {
-    .modal-dialog {
-      max-width: 90%;
-    }
-  }
-}

@@ -97,7 +97,7 @@ export default function Projects() {
         <h4>
           <Trans>Projects</Trans>
         </h4>
-        {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
+        {hasRole([ROLES.ADMIN, ROLES.MANAGEMENT], user.roles) && (
           <div className="d-flex">
             <button
               onClick={() => handleShowForm()}

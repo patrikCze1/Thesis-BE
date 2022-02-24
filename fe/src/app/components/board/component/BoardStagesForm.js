@@ -99,6 +99,7 @@ export default function BoardStagesForm({ boardId }) {
           type: STAGE_TYPE.WAITING,
         })
       );
+      setNewPhaseTitle("");
       setShowNewStageForm(false);
     }
   };
@@ -192,7 +193,7 @@ export default function BoardStagesForm({ boardId }) {
                           <input
                             className="form-control-sm form-control"
                             type="text"
-                            value={stage.name}
+                            value={stage.name || ""}
                             onChange={(e) =>
                               handleEditStage("name", e.target.value, stage.id)
                             }
@@ -203,7 +204,7 @@ export default function BoardStagesForm({ boardId }) {
                           <input
                             className="form-control-sm form-control"
                             type="number"
-                            value={stage.limit}
+                            value={stage.limit || ""}
                             min={1}
                             onChange={(e) =>
                               handleEditStage("limit", e.target.value, stage.id)

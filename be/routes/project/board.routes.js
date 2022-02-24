@@ -72,13 +72,15 @@ router.post(
     };
 
     try {
+      const socket = getIo();
       const board = await Board.create(data);
-
+      console.log("board", board);
       Stage.create({
         name: req.t("stage.todo"),
         order: 1,
         projectId,
         boardId: board.id,
+        type: STAGE_TYPE.WAITING,
       });
       Stage.create({
         name: req.t("stage.workInProgress"),
@@ -95,11 +97,12 @@ router.post(
         type: STAGE_TYPE.COMPLETED,
       });
 
+      const projectUsers = await findUsersByProject(projectId);
+
       res.json({ board });
 
-      const projectUsers = await findUsersByProject(board.projectId);
       for (const u of projectUsers) {
-        if (u.id !== user.id) io.to(u.id).emit(SOCKET_EMIT.BOARD_NEW, { task });
+        socket.to(u.id).emit(SOCKET_EMIT.PROJECT_BOARD_NEW, { board });
       }
     } catch (error) {
       res.status(500).json({ message: error.message });

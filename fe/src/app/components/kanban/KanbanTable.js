@@ -58,7 +58,7 @@ export default function KanbanTable() {
     boardId
   );
   const { project, projectLoaded } = useProjectDetail(projectId);
-  const { handleShow } = useModuleInfoModal();
+  const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal();
 
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
@@ -259,9 +259,12 @@ export default function KanbanTable() {
             / {board?.name}
           </h4>
 
-          <a href="#" onClick={handleShow} className="ml-1">
+          <button
+            onClick={handleShowInfoModal}
+            className="ml-1 p-0 btn btn-link"
+          >
             <i className="mdi mdi-information-outline"></i>
-          </a>
+          </button>
 
           <div className="image-grouped ml-md-4">
             {projectUsers &&
@@ -336,7 +339,7 @@ export default function KanbanTable() {
               <Trans>label.add</Trans>
             </button>
 
-            <NavLink
+            {/* <NavLink
               to={createRouteWithParams(ROUTE.PROJECTS_DETAIL_ARCHIVE, {
                 ":id": projectId,
               })}
@@ -344,7 +347,7 @@ export default function KanbanTable() {
               className="btn btn-icons bg-white align-items-center d-flex"
             >
               <i className="mdi mdi-archive"></i>
-            </NavLink>
+            </NavLink> */}
 
             {hasRole([ROLES.MANAGEMENT, ROLES.ADMIN], currentUser.roles) && (
               <button
@@ -441,6 +444,8 @@ export default function KanbanTable() {
           </Modal.Body>
         </Modal>
       )}
+
+      {renderInfoModal(i18n.t("label.boardDescription", board.description))}
     </div>
   );
 }

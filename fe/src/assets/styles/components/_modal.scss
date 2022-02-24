@@ -1,9 +1,14 @@
 .modal {
   .modal-dialog {
     height: 100%;
+
     .modal-content {
       max-height: 90%;
       overflow-y: scroll;
+    }
+
+    &.modal-lg {
+      max-width: 500px;
     }
     .modal-options {
       position: absolute;

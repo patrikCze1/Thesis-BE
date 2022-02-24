@@ -15,7 +15,7 @@ import i18n from "../../../i18n";
 export default function TodoScreen() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { handleShow } = useModuleInfoModal();
+  const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal();
 
   const { todos } = useSelector((state) => state.todoReducer);
 
@@ -52,9 +52,12 @@ export default function TodoScreen() {
         <div className="page-header">
           <h4 className="card-title">
             <Trans>menu.myTodos</Trans>
-            <a href="#" onClick={handleShow} className="ml-1">
+            <button
+              onClick={handleShowInfoModal}
+              className="ml-1 p-0 btn btn-link"
+            >
               <i className="mdi mdi-information-outline"></i>
-            </a>
+            </button>
           </h4>
         </div>
         <div className="card px-3">
@@ -96,6 +99,7 @@ export default function TodoScreen() {
           </div>
         </div>
       </div>
+      {renderInfoModal(i18n.t("label.info"), i18n.t("todo.infoText"))}
     </div>
   );
 }

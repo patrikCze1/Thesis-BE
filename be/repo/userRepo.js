@@ -74,6 +74,7 @@ exports.findUsersByProject = async (id) => {
       }
     );
   } catch (error) {
+    console.error("findUsersByProject", error);
     throw error.message;
   }
 };

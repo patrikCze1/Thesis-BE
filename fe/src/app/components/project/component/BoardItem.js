@@ -53,7 +53,7 @@ export default function BoardItem({ board, user }) {
                 {board.name}
               </h3>
             </NavLink>
-            {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
+            {hasRole([ROLES.ADMIN, ROLES.MANAGEMENT], user.roles) && (
               <Dropdown>
                 <Dropdown.Toggle className="p-0">
                   <i className="mdi mdi-dots-vertical"></i>

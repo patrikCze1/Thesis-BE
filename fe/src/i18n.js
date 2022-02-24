@@ -170,6 +170,8 @@ i18n
           },
           todo: {
             name: "Název",
+            infoText:
+              "Zde jsou Vaše osobní todočka, která jsou přístupná pouze Vám.",
           },
           label: {
             showAll: "Zobrazit vše",
@@ -193,6 +195,11 @@ i18n
             color: "Barva",
             filter: "Filtr",
             saveChanges: "Uložit změny",
+            close: "Zavřít",
+            projectDescription: "Popis projektu",
+            boardDescription: "Popis nástěnky",
+            noDescription: "Žádný popis",
+            info: "Informace",
           },
           task: {
             myTasks: "Moje úkoly",
