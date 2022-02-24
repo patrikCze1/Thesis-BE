@@ -7,9 +7,6 @@
       overflow-y: scroll;
     }
 
-    &.modal-lg {
-      max-width: 500px;
-    }
     .modal-options {
       position: absolute;
       right: 1.5rem;
@@ -22,6 +19,18 @@
         i {
           font-size: 1.45rem;
         }
+      }
+    }
+  }
+}
+
+.modal.show {
+  @media (min-width: 576px) {
+    .modal-dialog {
+      max-width: 90%;
+
+      &.modal-lg {
+        max-width: 500px;
       }
     }
   }

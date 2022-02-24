@@ -30,7 +30,7 @@ router.get("/", authenticateToken, async (req, res) => {
       });
     }
     let tasksWhere = {
-      title: {
+      name: {
         [Op.like]: `%${query}%`,
       },
     };
@@ -47,7 +47,6 @@ router.get("/", authenticateToken, async (req, res) => {
     }
     tasks = await Task.findAll({
       where: tasksWhere,
-
       include: [
         {
           model: Project,
@@ -74,7 +73,6 @@ router.get("/", authenticateToken, async (req, res) => {
       ],
     });
 
-    // console.log(tasks);
     res.json({ tasks, projects });
   } catch (error) {
     res.status(500).json({ message: error.message });

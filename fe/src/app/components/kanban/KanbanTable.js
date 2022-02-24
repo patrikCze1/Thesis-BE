@@ -424,7 +424,6 @@ export default function KanbanTable() {
 
       {showBoardSettings && (
         <Modal
-          size="md"
           show={showBoardSettings}
           onHide={() => setShowBoardSettings(false)}
           aria-labelledby="example-modal-sizes-title-sm"

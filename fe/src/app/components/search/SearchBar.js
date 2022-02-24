@@ -5,6 +5,7 @@ import { useHistory } from "react-router-dom";
 
 import axios from "./../../../utils/axios.config";
 import { ROUTE } from "../../../utils/enum";
+import { createRouteWithParams } from "../../service/router.service";
 
 const getSuggestionValue = (suggestion) => suggestion.text;
 
@@ -32,18 +33,34 @@ export default function SearchBar() {
   const [value, setValue] = useState("");
 
   const onSuggestionSelected = (
-    event,
+    e,
     { suggestion, sectionIndex, suggestionIndex }
   ) => {
-    event.preventDefault();
+    console.log("suggestion", suggestion);
+    e.preventDefault();
     setSuggestions([]);
     if (sectionIndex === 0) {
-      history.push(`${ROUTE.PROJECTS}/${suggestion.id}`);
-    } else if (sectionIndex === 1) {
+      //project
       history.push(
-        `${ROUTE.PROJECTS}/${suggestion.projectId}/?ukol=${suggestion.id}`
+        createRouteWithParams(ROUTE.PROJECTS_BOARDS, { ":id": suggestion.id })
       );
+    } else if (sectionIndex === 1) {
+      //task
+      if (suggestion.boardId)
+        history.push(
+          createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+            ":id": suggestion.projectId,
+            ":boardId": suggestion.boardId,
+          }) + `?ukol=${suggestion.id}`
+        );
+      else
+        history.push(
+          createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+            ":id": suggestion.projectId,
+          }) + `?ukol=${suggestion.id}`
+        );
     }
+    setValue("");
   };
 
   const handleSearch = (e) => {
@@ -62,6 +79,7 @@ export default function SearchBar() {
           id: task.id,
           text: task.name,
           projectId: task.projectId,
+          boardId: task.boardId,
         }));
         const projectSuggestions = projects.map((project) => ({
           id: project.id,

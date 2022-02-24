@@ -48,7 +48,6 @@ export function useTaskDetail(projectId, taskType) {
     if (showTaskDetail)
       return (
         <Modal
-          size="lg"
           show={showTaskDetail}
           onHide={handleHideTaskDetail}
           aria-labelledby="example-modal-sizes-title-sm"
