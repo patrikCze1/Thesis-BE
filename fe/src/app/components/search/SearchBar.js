@@ -59,6 +59,7 @@ export default function SearchBar() {
             ":id": suggestion.projectId,
           }) + `?ukol=${suggestion.id}`
         );
+      //todo check if task is in archive
     }
     setValue("");
   };
@@ -80,6 +81,7 @@ export default function SearchBar() {
           text: task.name,
           projectId: task.projectId,
           boardId: task.boardId,
+          // archived: task.archived
         }));
         const projectSuggestions = projects.map((project) => ({
           id: project.id,
