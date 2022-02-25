@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Modal } from "react-bootstrap";
 import Swal2 from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
@@ -48,4 +48,60 @@ export const useSwalAlert = () => {
   const Swal = withReactContent(Swal2);
 
   return { Swal };
+};
+
+export const useScript = (url) => {
+  useEffect(() => {
+    const script = document.createElement("script");
+
+    script.src = url;
+    script.async = true;
+
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, [url]);
+};
+
+export const useGoogleCharts = () => {
+  const [google, setGoogle] = useState(null);
+
+  useEffect(() => {
+    if (!google) {
+      const head = document.head;
+      let script = document.getElementById("googleChartsScript");
+      if (!script) {
+        script = document.createElement("script");
+        script.src = "https://www.gstatic.com/charts/loader.js";
+        script.id = "googleChartsScript";
+        script.onload = () => {
+          if (window.google && window.google.charts) {
+            window.google.charts.load("current", { packages: ["corechart"] });
+
+            window.google.charts.setOnLoadCallback(() =>
+              setGoogle(window.google)
+            );
+          }
+        };
+        head.appendChild(script);
+      } else if (
+        window.google &&
+        window.google.charts &&
+        window.google.visualization
+      ) {
+        setGoogle(window.google);
+      }
+    }
+
+    return () => {
+      let script = document.getElementById("googleChartsScript");
+      if (script) {
+        script.remove();
+      }
+    };
+  }, [google]);
+
+  return google;
 };

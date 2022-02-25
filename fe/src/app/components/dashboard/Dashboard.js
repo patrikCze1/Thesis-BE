@@ -114,7 +114,7 @@ export default function Dashboard() {
     setWeekTracksByProject(weekTracks);
     setTodayTracksByProject(todayTracks);
   };
-
+  console.log("weekTracksByProject", weekTracksByProject);
   const notificationComponents = notifications.map((notification, i) => (
     <NotificationListItem
       key={i}
@@ -242,7 +242,8 @@ export default function Dashboard() {
                     {formatSecondsToString(
                       secondsWorkedTodayRef.current,
                       false
-                    )}
+                    )}{" "}
+                    h
                   </small>
                 </h4>
 
@@ -259,6 +260,7 @@ export default function Dashboard() {
                       ]}
                       options={{
                         legend: { position: "bottom" },
+                        enableInteractivity: false,
                       }}
                       rootProps={{ "data-testid": "1" }}
                     />
@@ -283,7 +285,8 @@ export default function Dashboard() {
                     {formatSecondsToString(
                       secondsWorkedThisWeekRef.current,
                       false
-                    )}
+                    )}{" "}
+                    h
                   </small>
                 </h4>
 
@@ -300,6 +303,7 @@ export default function Dashboard() {
                       ]}
                       options={{
                         legend: { position: "bottom" },
+                        enableInteractivity: false,
                       }}
                       rootProps={{ "data-testid": "1" }}
                     />

@@ -90,7 +90,6 @@ export default function App() {
 
   useEffect(() => {
     dispatch(loadFromSessionAction());
-    initWebsocket();
 
     const interceptor = axios.interceptors.response.use(
       (response) => response,
@@ -132,6 +131,7 @@ export default function App() {
   useEffect(() => {
     console.log("APP user", user);
     if (user && Object.keys(user).length > 0) {
+      initWebsocket();
       setShowMenu(true);
       if (location.pathname !== ROUTE.TIME_TRACKS)
         dispatch(loadMyTimeTracksAction(0, 0, false, true));

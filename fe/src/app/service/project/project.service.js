@@ -1,5 +1,5 @@
 import i18n from "../../../i18n";
-import { getSecondsDiff } from "../date/date.service";
+import { getStringTimeFromSeconds, getSecondsDiff } from "../date/date.service";
 
 /**
  *
@@ -27,7 +27,7 @@ export const getTrackDatesByProjectForChart = (tracks, projects) => {
     });
     const hours = total / (60 * 60);
 
-    return [project, hours];
+    return [project, hours, getStringTimeFromSeconds(total) + " h"];
   });
 };
 

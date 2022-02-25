@@ -1,13 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Chart from "react-google-charts";
+import { Chart } from "react-google-charts";
 import Select from "react-select";
 import ReactDatePicker from "react-datepicker";
 import { CSVLink } from "react-csv";
 
 import Loader from "./../common/Loader";
 import { useTranslation, Trans } from "react-i18next";
-import { getSecondsDiff } from "../../service/date/date.service";
+import {
+  formatSecondsToString,
+  getSecondsDiff,
+  getStringTimeFromSeconds,
+} from "../../service/date/date.service";
 import {
   loadMyTimeTracksAction,
   loadAllTimeTracksAction,
@@ -28,6 +32,7 @@ const csvHaders = [
   { label: "Příjmení", key: "lastName" },
   { label: "Projekt", key: "project" },
   { label: "Počet hodin", key: "hours" },
+  { label: "Hodiny a minuty", key: "hoursMinutes" },
 ];
 
 export default function ReportScreen() {
@@ -43,7 +48,7 @@ export default function ReportScreen() {
     [ROLES.ADMIN, ROLES.MANAGEMENT],
     currentUser.roles
   );
-
+  console.log("tracks", tracks);
   const [groupedTracks, setGroupedTracks] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
   const [fromDate, setFromDate] = useState(null);
@@ -56,6 +61,7 @@ export default function ReportScreen() {
   const csvData = useRef([]);
   const projectNames = useRef({});
 
+  console.log("tracksByProject", tracksByProject);
   useEffect(() => {
     if (isManagement) {
       if (fromDate && toDate)
@@ -76,7 +82,8 @@ export default function ReportScreen() {
   useEffect(() => {
     prepareData(tracks);
     csvData.current = tracks.map((track) => {
-      const hours = getSecondsDiff(track.beginAt, track.endAt) / (60 * 60);
+      const seconds = getSecondsDiff(track.beginAt, track.endAt);
+      const hours = seconds / (60 * 60);
       return {
         name: track.name,
         beginAt:
@@ -103,6 +110,7 @@ export default function ReportScreen() {
         lastName: track.user?.lastName,
         project: projectNames.current[track.projectId],
         hours: hours.toFixed(2),
+        hoursMinutes: getStringTimeFromSeconds(seconds),
       };
     });
   }, [tracks]);
@@ -146,12 +154,14 @@ export default function ReportScreen() {
           year: "numeric",
         }).format(new Date(date)),
         hours,
+        getStringTimeFromSeconds(total) + " h",
       ];
     });
 
     console.log("groupTracks", groupTracks);
     setGroupedTracks(groupTracks);
     setTotalHours(totalHours.toFixed(2));
+
     setTracksByProject(getTrackDatesByProjectForChart(tracks, projects));
     setIsLoaded(true);
   };
@@ -262,14 +272,21 @@ export default function ReportScreen() {
           <div className="col-md-12 mt-3">
             <div className="card">
               <div className="card-body">
+                <h2 className="card-title">
+                  {`${t("track.workedHours")}: ${totalHours} h`}
+                </h2>
                 {groupedTracks.length > 0 ? (
                   <Chart
                     width={"100%"}
-                    height={"400px"}
-                    chartType="Bar" //ColumnChart
+                    // height={"400px"}
+                    chartType="ColumnChart" //Bar
                     loader={<Loader />}
                     data={[
-                      [t("track.date"), t("track.hours")],
+                      [
+                        { label: t("track.date"), type: "string" },
+                        { label: t("track.hours"), type: "number" },
+                        { type: "string", role: "tooltip" },
+                      ],
                       ...groupedTracks,
                     ]}
                     options={{
@@ -277,7 +294,7 @@ export default function ReportScreen() {
                         title: `${t("track.workedHours")}: ${totalHours}`,
                       },
                       vAxis: {
-                        title: t("track.hours"),
+                        // title: t("track.hours"),
                         minValue: 0,
                       },
                       hAxis: {
@@ -309,13 +326,21 @@ export default function ReportScreen() {
                     chartType="PieChart"
                     loader={<Loader />}
                     data={[
-                      [t("track.date"), t("track.hours")],
+                      [
+                        { label: t("track.date"), type: "string" },
+                        { label: "data", type: "number" },
+                        {
+                          type: "string",
+                          role: "tooltip",
+                        },
+                      ],
                       ...tracksByProject,
                     ]}
                     options={{
                       legend: { position: "bottom" },
                     }}
-                    rootProps={{ "data-testid": "1" }}
+                    // chartWrapperParams={{ view: { columns: [0, 1] } }}
+                    chartPackages={["corechart"]}
                   />
                 ) : (
                   <p className="text-center">

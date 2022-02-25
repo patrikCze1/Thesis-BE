@@ -17,41 +17,43 @@ export default function TimeTrackListItem({
   editTrack,
   onClickCopy,
   showUser = false,
-  projectName = null,
 }) {
   const { t } = useTranslation();
-  const [start, setStart] = useState(new Date(track.beginAt));
-  const [end, setEnd] = useState(new Date(track.endAt));
-  const nameRef = useRef(track.name);
-  const projectIdRef = useRef(track.projectId);
+  const [formData, setFormData] = useState({ ...track });
   let startVal = new Date(track.beginAt);
   let endVal = new Date(track.endAt);
   let dateEdited = false;
 
-  const handleInputChange = (e) => {
-    nameRef.current = e.target.value;
-  };
-
-  const handleProjectChange = (e) => {
-    const { value } = e.target;
-    projectIdRef.current = value;
-    handleSave();
-  };
-
-  const handleSave = () => {
+  const handleSave = (data = null) => {
     if (
-      nameRef.current !== track.name ||
-      projectIdRef.current !== track.projectId ||
-      dateEdited
+      (isEditable &&
+        (formData.name !== track.name ||
+          formData.projectId !== track.projectId ||
+          dateEdited)) ||
+      data?.name !== track.name ||
+      data?.projectId !== track.projectId
     ) {
-      editTrack({
-        ...track,
-        projectId: projectIdRef.current,
-        name: nameRef.current,
-        beginAt: startVal,
-        endAt: endVal,
-      });
+      if (data)
+        editTrack({
+          ...data,
+          beginAt: startVal,
+          endAt: endVal,
+        });
+      else
+        editTrack({
+          ...formData,
+          beginAt: startVal,
+          endAt: endVal,
+        });
       dateEdited = false;
+    }
+  };
+
+  const handleChange = (prop, val, save) => {
+    if (isEditable) {
+      const data = { ...formData, [prop]: val };
+      setFormData(data);
+      if (save) handleSave(data);
     }
   };
 
@@ -62,11 +64,11 @@ export default function TimeTrackListItem({
   const handleDateChange = (val, isStart = true) => {
     if (isStart) {
       if (startVal.getTime() !== val.getTime()) dateEdited = true;
-      setStart(val);
+      setFormData({ ...formData, start: val });
       startVal = val;
     } else {
       if (endVal.getTime() !== val.getTime()) dateEdited = true;
-      setEnd(val);
+      setFormData({ ...formData, end: val });
       endVal = val;
     }
 
@@ -90,34 +92,33 @@ export default function TimeTrackListItem({
         <input
           type="text"
           className="form-control"
-          value={nameRef.current}
-          onChange={handleInputChange}
-          onBlur={handleSave}
+          value={formData.name}
+          onChange={(e) => handleChange("name", e.target.value)}
+          onBlur={() => {
+            if (formData.name != track.name) handleSave();
+          }}
           name="name"
           disabled={!isEditable}
         />
       </div>
+
       <div className="track-info">
         <select
           className="form-control"
           name="projectId"
-          value={projectIdRef.current}
-          onChange={handleProjectChange}
+          value={formData.projectId}
+          onChange={(e) => handleChange("projectId", e.target.value, true)}
           disabled={!isEditable}
         >
-          <option>{t("track.selectProject")}</option>
-          {!isEditable ? (
-            <option>{projectName || ""}</option>
-          ) : (
-            projects &&
+          <option value="null">{t("track.selectProject")}</option>
+          {projects &&
             projects.map((project, i) => {
               return (
                 <option value={project.id} key={i}>
                   {project.name}
                 </option>
               );
-            })
-          )}
+            })}
         </select>
       </div>
       <div className="track-item-dates track-info">
@@ -162,7 +163,6 @@ export default function TimeTrackListItem({
           getSecondsDiff(track.beginAt, track.endAt),
           false
         )}
-
         {isEditable && (
           <Dropdown>
             <Dropdown.Toggle variant="btn btn-icon">

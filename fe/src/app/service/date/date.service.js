@@ -161,3 +161,19 @@ export const isDateToday = (date) => {
     date.getFullYear() == today.getFullYear()
   );
 };
+
+/**
+ *
+ * @param {number} seconds
+ * @returns {string} HH:MM
+ */
+export const getStringTimeFromSeconds = (seconds) => {
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const h = Math.floor(seconds / 3600)
+    .toString()
+    .padStart(2, "0");
+
+  return `${h}:${m}`;
+};
