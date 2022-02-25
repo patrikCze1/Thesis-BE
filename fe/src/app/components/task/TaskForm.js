@@ -286,21 +286,12 @@ export default function TaskForm({
     }
   };
 
-  const handleMoveToBacklog = () => {
-    dispatch(
-      editTaskAction(
-        taskType,
-        task.projectId,
-        task.id,
-        {
-          boardId: null,
-          stageId: null,
-        },
-        true
-      )
-    );
+  const handleMoveTo = (data) => {
+    console.log("data", data);
+    dispatch(editTaskAction(taskType, task.projectId, task.id, data, true));
     hideModal();
   };
+
   console.log("boards", boards);
   return (
     <div className="card-body">
@@ -536,29 +527,31 @@ export default function TaskForm({
             </select>
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <label>
-              <Trans>Stage</Trans>
-            </label>
-            <select
-              className="form-control form-control-sm"
-              name="stageId"
-              value={formData.stageId || null}
-              onChange={(e) => handleChangeAndSave(e)}
-            >
-              {!formData.stageId && (
-                <option value={null}>{t("project.stage.choose")}</option>
-              )}
-              {stages &&
-                stages.map((stage, i) => {
-                  return (
-                    <option value={stage.id} key={i}>
-                      {stage.name}
-                    </option>
-                  );
-                })}
-            </select>
-          </Form.Group>
+          {formData.boardId && (
+            <Form.Group className="mb-3">
+              <label>
+                <Trans>Stage</Trans>
+              </label>
+              <select
+                className="form-control form-control-sm"
+                name="stageId"
+                value={formData.stageId || null}
+                onChange={handleChangeAndSave}
+              >
+                {!formData.stageId && (
+                  <option value={null}>{t("project.stage.choose")}</option>
+                )}
+                {stages &&
+                  stages.map((stage, i) => {
+                    return (
+                      <option value={stage.id} key={i}>
+                        {stage.name}
+                      </option>
+                    );
+                  })}
+              </select>
+            </Form.Group>
+          )}
 
           <Form.Group className="mb-3">
             <label>
@@ -687,32 +680,57 @@ export default function TaskForm({
             </label>
 
             {task.boardId && (
-              <button onClick={handleMoveToBacklog} className="btn btn-link">
+              <button
+                onClick={() =>
+                  handleMoveTo({
+                    boardId: null,
+                    stageId: null,
+                  })
+                }
+                className="btn btn-link btn-outline-behance"
+              >
                 {i18n.t("task.moveToBacklog")}
+                <i className="mdi mdi-chevron-right"></i>
               </button>
             )}
 
-            <Form.Group>
-              <label>
-                <Trans>task.board</Trans>
-              </label>
-              <select
-                className="form-control form-control-sm"
-                name="boardId"
-                value={formData.boardId}
-                onChange={(e) => handleChangeAndSave(e)}
+            {/* {!task.archived && (
+              <button
+                onClick={() =>
+                  handleMoveTo({
+                    stageId: null,
+                    archived: true,
+                  })
+                }
+                className="btn btn-link"
               >
-                {!formData.boardId && <option value="">{t("Choose")}</option>}
-                {boards &&
-                  boards.map((board, i) => {
-                    return (
-                      <option value={board.id} key={i}>
-                        {board.name}
-                      </option>
-                    );
-                  })}
-              </select>
-            </Form.Group>
+                {i18n.t("task.moveToArchive")}
+              </button>
+            )} */}
+
+            {!formData.boardId && (
+              <Form.Group>
+                <label>
+                  <Trans>task.moveToBoard</Trans>
+                </label>
+                <select
+                  className="form-control form-control-sm"
+                  name="boardId"
+                  value={formData.boardId}
+                  onChange={(e) => handleMoveTo({ boardId: e.target.value })}
+                >
+                  {!formData.boardId && <option value="">{t("Choose")}</option>}
+                  {boards &&
+                    boards.map((board, i) => {
+                      return (
+                        <option value={board.id} key={i}>
+                          {board.name}
+                        </option>
+                      );
+                    })}
+                </select>
+              </Form.Group>
+            )}
 
             {/* {task.completedAt ? (
               <>

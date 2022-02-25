@@ -59,7 +59,7 @@ router.get("/me/", authenticateToken, async (req, res) => {
     },
   };
 
-  if (req.query.from && req.query.to) {
+  if (req.query.from != "null" && req.query.to != "null") {
     const to = new Date(req.query.to);
     to.setHours(23, 59, 59);
     where.beginAt = {
@@ -178,13 +178,11 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     let track = await TimeTrack.findByPk(req.params.id);
     console.log(track);
     if (track.userId != user.id) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 
@@ -206,13 +204,11 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     let track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 
@@ -220,7 +216,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     track.beginAt = req.body.beginAt;
     track.endAt = req.body.endAt;
     track.taskId = req.body.taskId;
-    track.projectId = req.body.projectId;
+    if (req.body.projectId === "" || req.body.projectId === "null")
+      track.projectId = null;
+    else track.projectId = req.body.projectId;
 
     await track.save();
 
@@ -237,13 +235,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const track = await TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 

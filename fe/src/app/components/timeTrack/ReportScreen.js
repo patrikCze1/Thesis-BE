@@ -273,7 +273,9 @@ export default function ReportScreen() {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">
-                  {`${t("track.workedHours")}: ${totalHours} h`}
+                  {`${t("track.workedHours")}: ${getStringTimeFromSeconds(
+                    totalHours * 3600
+                  )} h (${totalHours})`}
                 </h2>
                 {groupedTracks.length > 0 ? (
                   <Chart

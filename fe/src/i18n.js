@@ -224,6 +224,8 @@ i18n
             backlog: "Nevyřízené",
             estimation: "Odhad",
             hoursCount: "Počet hodin",
+            moveToBoard: "Přesunout do nástěnky",
+            moveToBacklog: "Přesunout od nevyřízených",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",
