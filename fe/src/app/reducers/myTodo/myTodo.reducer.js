@@ -54,7 +54,6 @@ export const createTodoAction = (name) => async (dispatch) => {
   try {
     const res = await axios.post(`/api/todos/`, {
       name,
-      withCredentials: true,
     });
     dispatch({ type: "todos/created", payload: res.data });
   } catch (error) {

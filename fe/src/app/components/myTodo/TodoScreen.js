@@ -70,6 +70,7 @@ export default function TodoScreen() {
                 value={todoName}
                 onInput={handleNameInput}
                 required
+                maxLength="255"
               />
               <button
                 type="submit"
@@ -78,7 +79,7 @@ export default function TodoScreen() {
                 <Trans>Add</Trans>
               </button>
             </form>
-            <div className="list-wrapper">
+            <div className="list-wrapper todo-list">
               {todos.length > 0 ? (
                 <ul className="d-flex flex-column todo-list">
                   {todos.map((todo, i) => {

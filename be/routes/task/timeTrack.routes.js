@@ -5,6 +5,8 @@ const { authenticateToken, getUser } = require("../../auth/auth");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
 const { validator } = require("../../service");
+const { SOCKET_EMIT } = require("../../enum/enum");
+const { getIo } = require("../../service/io");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -175,6 +177,7 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
+    const io = getIo();
     let track = await TimeTrack.findByPk(req.params.id);
     console.log(track);
     if (track.userId != user.id) {
@@ -190,6 +193,8 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
 
     track.endAt = new Date();
     (track.projectId = projectId), (track.name = name), await track.save();
+
+    io.to(user.id).emit(SOCKET_EMIT.TIME_TRACK_STOP, { id: req.params.id });
 
     res.send({ track });
   } catch (error) {

@@ -25,7 +25,10 @@ import axios from "./../utils/axios.config";
 import { initIo } from "../utils/websocket.config";
 import { SOCKET, ROUTE } from "./../utils/enum";
 import { socketNewNotification } from "./reducers/notification/notification.reducer";
-import { loadMyTimeTracksAction } from "./reducers/timeTrack/timeTrack.reducer";
+import {
+  loadMyTimeTracksAction,
+  socketStopTimeTrackAction,
+} from "./reducers/timeTrack/timeTrack.reducer";
 import AnonymRoutes from "./router/AnonymRoutes";
 import i18n from "../i18n";
 
@@ -83,6 +86,9 @@ export default function App() {
       socket.on(SOCKET.NOTIFICATION_NEW, (data) => {
         console.log("SOCKET.NOTIFICATION_NEW", data);
         dispatch(socketNewNotification(data.notification));
+      });
+      socket.on(SOCKET.TIME_TRACK_STOP, (data) => {
+        dispatch(socketStopTimeTrackAction(data.id));
       });
       return () => socket.disconnect();
     }

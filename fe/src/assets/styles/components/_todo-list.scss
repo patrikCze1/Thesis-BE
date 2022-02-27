@@ -84,3 +84,13 @@
     }
   }
 }
+
+.todo-list {
+  .form-check {
+    overflow: visible !important;
+    white-space: inherit !important;
+    .form-check-label {
+      white-space: normal !important;
+    }
+  }
+}

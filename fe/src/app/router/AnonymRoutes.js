@@ -22,9 +22,9 @@ export default function AnonymRoutes() {
       <Route exact path={ROUTE.HOME}>
         <Login />
       </Route>
-      <Route>
-        <p>tady nic neni</p>
-      </Route>
+      {/* <Route>
+        <Login />
+      </Route> */}
     </Switch>
   );
 }

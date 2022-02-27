@@ -17,7 +17,7 @@ export function useModuleInfoModal() {
     if (show)
       return (
         <Modal
-          size="md"
+          size="lg"
           aria-labelledby="contained-modal-title-vcenter"
           centered
           onHide={() => setShow(false)}

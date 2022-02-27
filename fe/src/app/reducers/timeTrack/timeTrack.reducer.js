@@ -1,6 +1,7 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
+import i18n from "../../../i18n";
 
 const initialState = {
   activeTrack: null,
@@ -43,6 +44,10 @@ export default function timeTrackReducer(state = initialState, action) {
         activeTrack: null,
         tracks: [action.payload.track, ...state.tracks],
       };
+
+    case "tracks/socketStop":
+      document.title = i18n.t("app.title");
+      return { ...state, activeTrack: {} };
 
     case "tracks/edit":
       return {
@@ -99,20 +104,6 @@ export const loadAllTimeTracksAction =
     }
   };
 
-// export const loadMyOlderTracks =
-//   (from = "", to = "") =>
-//   async (dispatch) => {
-//     dispatch({ type: "tracks/loadStart", payload: null });
-//     try {
-//       const response = await axios.get(
-//         `/api/tracks/me/?from=${from}&to=${to}&returnActive=false&returnTracks=true`
-//       );
-//       dispatch({ type: "tracks/loadOlder", payload: response.data });
-//     } catch (error) {
-//       toast.error(error.response?.data?.message);
-//     }
-//   };
-
 export const startTimeTrackAction = (data) => async (dispatch) => {
   try {
     const response = await axios.post(`/api/tracks/start`, data);
@@ -126,6 +117,14 @@ export const stopTimeTrackAction = (track) => async (dispatch) => {
   try {
     const response = await axios.post(`/api/tracks/stop/${track.id}`, track);
     dispatch({ type: "tracks/stop", payload: response.data });
+  } catch (error) {
+    toast.error(error.response?.data?.message);
+  }
+};
+
+export const socketStopTimeTrackAction = (id) => async (dispatch) => {
+  try {
+    dispatch({ type: "tracks/socketStop", payload: id });
   } catch (error) {
     toast.error(error.response?.data?.message);
   }
