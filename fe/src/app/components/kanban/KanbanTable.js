@@ -116,7 +116,12 @@ export default function KanbanTable() {
   console.log("projectStages", stages);
 
   useEffect(() => {
-    dispatch(loadTasksAction(projectId, `?archive=false&boardId=${boardId}`));
+    dispatch(
+      loadTasksAction(
+        projectId,
+        `?archive=false&boardId=${boardId}&orderBy=priority`
+      )
+    );
     dispatch(loadBoardDetailAction(projectId, boardId));
     const sockets = handleWebsockets();
 

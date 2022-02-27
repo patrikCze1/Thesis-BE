@@ -8,6 +8,7 @@ import {
   getDayMonthShort,
   getMonthDayTime,
 } from "../../../service/date/date.service";
+import { createRouteWithParams } from "../../../service/router.service";
 
 export default function TaskTableItem({ task, view }) {
   const now = new Date();
@@ -18,20 +19,27 @@ export default function TaskTableItem({ task, view }) {
     click(task);
   };
 
+  let url = task.stageId
+    ? createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+        ":id": task.projectId,
+        ":boardId": task.boardId,
+      })
+    : createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+        ":id": task.projectId,
+      });
   if (view === "dashboard")
     return (
       <tr>
         <td>
-          <NavLink
-            to={`${ROUTE.PROJECTS}/${task.projectId}/?ukol=${task.id}`}
-            className="project-title p-0"
-          >
+          <NavLink to={url} className="project-title p-0">
             {task.name}
           </NavLink>
         </td>
         <td>
           <NavLink
-            to={`${ROUTE.PROJECTS}/${task.projectId}`}
+            to={createRouteWithParams(ROUTE.PROJECTS_BOARDS, {
+              ":id": task.projectId,
+            })}
             className="project-title p-0"
           >
             {task.project && task.project.name}

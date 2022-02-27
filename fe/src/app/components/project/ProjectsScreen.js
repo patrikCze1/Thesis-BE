@@ -166,7 +166,7 @@ export default function Projects() {
       </div>
 
       {formVisible && (
-        <Modal size="lg" show={formVisible} onHide={handleHideForm}>
+        <Modal show={formVisible} onHide={handleHideForm}>
           <Modal.Body>
             <button
               type="button"

@@ -200,6 +200,7 @@ i18n
             boardDescription: "Popis nástěnky",
             noDescription: "Žádný popis",
             info: "Informace",
+            goToLogin: "Jít na přihlášení",
           },
           task: {
             myTasks: "Moje úkoly",

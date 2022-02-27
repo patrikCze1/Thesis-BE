@@ -55,10 +55,11 @@ module.exports = (sequelize) => {
       estimation: {
         type: DataTypes.FLOAT,
       },
-      // archived:{
-      //   type: DataTypes.BOOLEAN,
-      //   allowNull: false,
-      // },
+      archived: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),

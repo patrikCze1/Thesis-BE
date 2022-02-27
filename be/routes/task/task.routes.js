@@ -211,19 +211,22 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     return;
   }
 
-  const data = req.body;
-  data.projectId = parseInt(projectId) || projectId;
-  data.createdById = user.id;
+  const task = Task.build({
+    ...req.body,
+    projectId: parseInt(projectId) || projectId,
+    createdById: user.id,
+  });
+  console.log("task", task);
 
-  if (data.boardId === "null") data.boardId = null;
+  // if (task.boardId === "null") task.boardId = null;
 
   try {
-    if (data.boardId) {
+    if (task.boardId) {
       let firstStage = null;
       try {
-        firstStage = await stageRepo.findFirstByBoard(data.boardId);
+        firstStage = await stageRepo.findFirstByBoard(task.boardId);
         console.log("firstStage", firstStage);
-        data.stageId = firstStage?.id;
+        task.stageId = firstStage?.id;
       } catch (error) {
         console.error("stageRepo.findFirstByBoard", error);
       }
@@ -233,13 +236,15 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       where: { projectId: projectId },
       paranoid: false,
     });
-    const newTask = await Task.create({
-      ...data,
-      number: projectTasksCount + 1,
-    });
+    task.number = projectTasksCount + 1;
+    // const newTask = await Task.create({
+    //   ...data,
+    //   number: projectTasksCount + 1,
+    // });
+    const newTask = await task.save();
+
     newTask.setDataValue("createdAt", new Date());
     newTask.setDataValue("updatedAt", new Date());
-    res.json({ task: newTask });
 
     TaskChangeLog.create({
       taskId: newTask.id,
@@ -247,14 +252,16 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       name: req.t("task.message.created"),
     });
 
-    if (task.boardId) {
+    if (newTask.boardId) {
       const projectUsers = await findUsersByProject(projectId);
       console.log("findUsersByProject", projectUsers);
+
       for (const u of projectUsers) {
         console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
         io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
       }
     }
+    res.json({ task: newTask });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

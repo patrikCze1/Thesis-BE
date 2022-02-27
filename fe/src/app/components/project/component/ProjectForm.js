@@ -17,18 +17,11 @@ import Loader from "../../common/Loader";
 import { getFullName } from "../../../service/user/user.service";
 import LoaderTransparent from "../../common/LoaderTransparent";
 import { PROJECT_STATE } from "../../../../utils/enum";
-import ReactQuill from "react-quill";
+import Quill from "../../form/Quill";
 
 export default function ProjectForm({ projectId = false, closeForm }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const [formData, setFormData] = useState({
-    name: null,
-    description: null,
-    client: [],
-    groups: [],
-    users: [],
-  });
   const { clients } = useSelector((state) => state.clientReducer);
   const { groups } = useSelector((state) => state.groupReducer);
   const { users } = useSelector((state) => state.userReducer);
@@ -39,20 +32,20 @@ export default function ProjectForm({ projectId = false, closeForm }) {
     (state) => state.currentUserReducer
   );
   const [isEdit, setIsEdit] = useState(projectId ? true : false);
+  const [formData, setFormData] = useState({ ...project });
 
   useEffect(() => {
     console.log("ProjectForm effect projectId project", projectId, project);
     dispatch(loadClietntsAction());
     dispatch(loadGroupsAction());
     dispatch(loadUsersAction());
-    // if (projectId) dispatch(loadProjectAction(projectId));
   }, []);
 
   useEffect(() => {
     if (project && Object.keys(project).length > 0) {
       setFormData({
         ...formData,
-        name: project.name,
+        name: project.name || "",
         description: project.description || "",
         key: project.key || "",
         clientId: project.clientId
@@ -73,13 +66,13 @@ export default function ProjectForm({ projectId = false, closeForm }) {
             })
           : [],
         createdById: project.createdById,
-        status: project.status,
+        status: project.status || 1,
       });
     }
 
     if (projectId || Object.keys(project).length > 0) setIsEdit(true);
   }, [project]);
-  console.log("formData", formData);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -102,6 +95,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
   };
 
   const handleChange = (prop, val) => {
+    console.log("handleChange", formData, prop, val);
     setFormData({
       ...formData,
       [prop]: val,
@@ -119,15 +113,14 @@ export default function ProjectForm({ projectId = false, closeForm }) {
   const usersArr = users.map((user) => {
     return {
       value: user.id,
-      firstName: user.firstName,
-      lastName: user.lastName,
+      label: getFullName(user),
     };
   });
 
   if (!projectLoaded) {
     return <Loader />;
   }
-
+  console.log("formData", formData);
   return (
     <div className="row">
       <div className="col-md-12 grid-margin">
@@ -175,7 +168,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                   <select
                     className="form-control"
                     name="status"
-                    value={formData.status}
+                    value={formData.status || 5}
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
@@ -235,11 +228,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                     <Trans>Description</Trans>
                   </label>
 
-                  <ReactQuill
-                    value={formData.description}
-                    onChange={(value) => handleChange("description", value)}
-                    theme="snow"
-                  />
+                  <Quill onChange={handleChange} value={formData.description} />
                 </div>
               </Form.Row>
 
@@ -267,9 +256,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                   <Typeahead
                     id="projectUsers"
                     multiple={true}
-                    labelKey={(option) =>
-                      `${option.firstName} ${option.lastName}`
-                    }
+                    labelKey={(option) => getFullName(option)}
                     options={usersArr}
                     name="users"
                     selected={formData.users}

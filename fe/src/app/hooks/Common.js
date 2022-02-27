@@ -29,7 +29,11 @@ export function useModuleInfoModal() {
             </Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            {content ? content : i18n.t("label.noDescription")}
+            {content ? (
+              <div dangerouslySetInnerHTML={{ __html: content }}></div>
+            ) : (
+              i18n.t("label.noDescription")
+            )}
           </Modal.Body>
           <Modal.Footer>
             <Button onClick={() => setShow(false)}>

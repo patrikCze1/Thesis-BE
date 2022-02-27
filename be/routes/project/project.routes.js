@@ -77,7 +77,6 @@ router.get("/:id", authenticateToken, async (req, res) => {
         { model: User, as: "creator" },
         { model: Group, as: "groups" },
         { model: User, as: "users" },
-        // { model: Board, as: "boards" },
       ],
     });
 
@@ -124,34 +123,28 @@ router.post("/", authenticateToken, async (req, res) => {
   };
   console.log("data", data);
   try {
+    const io = getIo();
     const project = await Project.create(data);
     const board = await Board.create({
       projectId: project.id,
       name: project.name,
     });
-    if (data.clientId) {
-      project.setDataValue("Client", await Client.findByPk(data.clientId));
-    }
-    if (data.users) project.setDataValue("users", data.users);
-    if (data.groups) project.setDataValue("users", data.groups);
 
-    res.json({ project });
-
-    Stage.create({
+    await Stage.create({
       name: req.t("stage.todo"),
       order: 1,
       projectId: project.id,
       boardId: board.id,
       type: STAGE_TYPE.WAITING,
     });
-    Stage.create({
+    await Stage.create({
       name: req.t("stage.workInProgress"),
       order: 2,
       projectId: project.id,
       boardId: board.id,
       type: STAGE_TYPE.IN_PROGRESS,
     });
-    Stage.create({
+    await Stage.create({
       name: req.t("stage.complete"),
       order: 3,
       projectId: project.id,
@@ -160,12 +153,19 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     for (let groupId of req.body.groups) {
-      ProjectGroup.create({ projectId: project.id, groupId });
+      await ProjectGroup.create({ projectId: project.id, groupId });
     }
 
     for (let userId of req.body.users) {
-      ProjectUser.create({ projectId: project.id, userId });
+      await ProjectUser.create({ projectId: project.id, userId });
     }
+
+    if (data.clientId) {
+      project.setDataValue("Client", await Client.findByPk(data.clientId));
+    }
+    if (data.users) project.setDataValue("users", data.users);
+    if (data.groups) project.setDataValue("users", data.groups);
+    project.setDataValue("creator", user);
 
     res.json({ project });
 

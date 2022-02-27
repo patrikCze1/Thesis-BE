@@ -90,7 +90,10 @@ export default function taskReducer(state = initialState, action) {
         };
 
     case "task/socketNew":
-      if (!state.tasks.some((task) => task.id == action.payload.id)) {
+      if (
+        !state.tasks.some((task) => task.id == action.payload.id) &&
+        !state.actionProcessing
+      ) {
         return {
           ...state,
           tasks: [...state.tasks, action.payload],
