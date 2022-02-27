@@ -35,8 +35,11 @@
         background: initial;
       }
     }
-    &.show {
-      top: -14px !important;
+
+    &.menu-position-updated {
+      &.show {
+        top: -14px !important;
+      }
     }
   }
 }

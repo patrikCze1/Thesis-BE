@@ -39,7 +39,7 @@ export default function TaskArchiveScreen() {
       dispatch(
         loadArchiveTasksAction(
           projectId,
-          `?archive=true&offset=${paginationOffset}`
+          `?archived=true&offset=${paginationOffset}`
         )
       );
   }, [project, paginationOffset]);
@@ -48,7 +48,7 @@ export default function TaskArchiveScreen() {
     <>
       <div className="page-header flex-wrap">
         <h4>
-          {project.name} / {i18n.t("task.archive")}
+          {project.name} / {i18n.t("task.archive")} ({archiveTasksCount})
         </h4>
       </div>
 
@@ -56,15 +56,6 @@ export default function TaskArchiveScreen() {
         <div className="col-lg-12">
           <div className="card">
             <div className="card-body">
-              {/* <div className="d-sm-flex pb-4 mb-4 border-bottom">
-              <div className="d-flex align-items-center">
-                <h5 className="page-title">
-                  
-                </h5>
-                <p className=" mb-0 ml-3 text-muted">({archiveTasksCount})</p>
-              </div>
-            </div> */}
-
               <div className="row">
                 <div className="col-12">
                   {tasksLoaded ? (

@@ -47,7 +47,7 @@ export default function TaskBacklogScreen() {
       dispatch(
         loadBacklogTasksAction(
           projectId,
-          `?archive=false&boardId=null&stageId=null&offset=${paginationOffset}&orderBy=priority`
+          `?archived=false&stageId=null&offset=${paginationOffset}&orderBy=priority`
         )
       );
   }, [project, paginationOffset]);
@@ -56,7 +56,7 @@ export default function TaskBacklogScreen() {
     <>
       <div className="page-header flex-wrap p-relative">
         <h4>
-          {project.name} / {i18n.t("task.backlog")}
+          {project.name} / {i18n.t("task.backlog")} ({backlogTasksCount})
         </h4>
         <div className="d-lg-flex flex-column flex-md-row ml-md-0 ml-md-auto my-2 wrapper">
           <div className="d-flex mt-4 mt-md-0 mb-2">

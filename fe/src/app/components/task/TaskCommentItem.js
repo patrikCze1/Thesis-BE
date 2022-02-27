@@ -52,7 +52,10 @@ export default function TaskCommentItem({ comment, currentUser }) {
           </small>
         </div>
         <div className="d-flex align-items-center">
-          <p className="d-block">{comment.text}</p>
+          <div
+            className="comment-text-content"
+            dangerouslySetInnerHTML={{ __html: comment.text }}
+          ></div>
         </div>
         {comment?.commentAttachments.length > 0 && (
           <ul className="comment-attachment-list">

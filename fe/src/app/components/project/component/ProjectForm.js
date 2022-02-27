@@ -111,6 +111,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
   });
 
   const usersArr = users.map((user) => {
+    console.log("users", users);
     return {
       value: user.id,
       label: getFullName(user),
@@ -228,7 +229,11 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                     <Trans>Description</Trans>
                   </label>
 
-                  <Quill onChange={handleChange} value={formData.description} />
+                  <Quill
+                    onChange={handleChange}
+                    value={formData.description}
+                    prop="description"
+                  />
                 </div>
               </Form.Row>
 
@@ -256,7 +261,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                   <Typeahead
                     id="projectUsers"
                     multiple={true}
-                    labelKey={(option) => getFullName(option)}
+                    labelKey={(option) => option.label}
                     options={usersArr}
                     name="users"
                     selected={formData.users}

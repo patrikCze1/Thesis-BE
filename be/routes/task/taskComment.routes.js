@@ -145,10 +145,10 @@ router.post(
       const projectUsers = await findUsersByProject(task.projectId);
       for (const u of projectUsers) {
         console.log("socket ", u.id);
-        if (u.id !== user.id)
-          io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
-            comment: newComment,
-          });
+
+        io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
+          comment: newComment,
+        });
       }
 
       res.json({ comment: newComment });

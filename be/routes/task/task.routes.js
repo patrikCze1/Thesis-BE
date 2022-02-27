@@ -39,11 +39,11 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const where = {};
     const { projectId } = req.params;
-    const skipParams = ["offset", "archive", "limit", "orderBy", "sort"];
+    const skipParams = ["offset", "archived", "limit", "orderBy", "sort"];
 
     if (projectId && projectId != "-1") where.ProjectId = projectId;
-    if (req.query.archive) {
-      if (req.query.archive === "true")
+    if (req.query.archived) {
+      if (req.query.archived === "true")
         where.completedAt = { [Op.lt]: addTimeToDate(new Date(), -86400 * 7) };
       else
         where.completedAt = {
@@ -141,7 +141,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         { model: TaskAttachment, as: "attachments" },
         { model: Task, as: "parentTask" },
         { model: User, as: "creator" },
-        { model: User, as: "solver" },
+        // { model: User, as: "solver" },
         {
           model: TaskComment,
           as: "taskComments",

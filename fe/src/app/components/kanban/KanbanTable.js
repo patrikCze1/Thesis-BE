@@ -119,7 +119,7 @@ export default function KanbanTable() {
     dispatch(
       loadTasksAction(
         projectId,
-        `?archive=false&boardId=${boardId}&orderBy=priority`
+        `?archived=false&boardId=${boardId}&orderBy=priority` //&stageId=!%3Dnull
       )
     );
     dispatch(loadBoardDetailAction(projectId, boardId));

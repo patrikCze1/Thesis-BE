@@ -1,6 +1,6 @@
 .modal {
   .modal-dialog {
-    height: 100%;
+    height: calc(100% - 60px);
 
     .modal-content {
       max-height: 90%;

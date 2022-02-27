@@ -46,6 +46,7 @@ import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
 import i18n from "../../../i18n";
+import TaskCommentForm from "../form/TaskCommentForm";
 
 export default function TaskForm({
   task,
@@ -57,14 +58,12 @@ export default function TaskForm({
   const [formData, setFormData] = useState({ description: "" });
   const [checkInput, setCheckInput] = useState(null);
   const [checklistProgress, setChecklistProgress] = useState(0);
-  const [commentFormData, setCommentFormData] = useState({
-    text: "",
-    files: [],
-  });
   const [deadline, setDeadline] = useState(task.deadline || null);
   const [projectUsers, setProjectUsers] = useState([]); //todo users
   const [showFileForm, setShowFileForm] = useState(false);
+  const [showCheckForm, setShowCheckForm] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
+  const [showCommentForm, setShowCommentForm] = useState(false);
   const { checks } = useSelector((state) => state.taskCheckReducer);
   const { comments } = useSelector((state) => state.taskCommentReducer);
   const { stages, boards } = useSelector((state) => state.boardReducer);
@@ -113,7 +112,7 @@ export default function TaskForm({
     setProjectUsers(users);
     handleWebsockets();
   }, [task]);
-
+  console.log("task", task);
   const calculateChecklistProgress = (checks) => {
     const completed = checks.filter((check) => check.completed === true).length;
     setChecklistProgress((completed / checks.length) * 100);
@@ -128,7 +127,6 @@ export default function TaskForm({
   };
 
   const handleChangeAndSave = (e, save = true) => {
-    console.log("e.target", e.target);
     const { name, value } = e.target;
     const updatedTask = {
       ...formData,
@@ -166,74 +164,6 @@ export default function TaskForm({
   const handleCheckFormInput = (e) => {
     setCheckInput(e.target.value);
     console.log(e.target.value);
-  };
-
-  const handleCommentTextInput = (val) => {
-    setCommentFormData({
-      ...commentFormData,
-      text: val,
-    });
-  };
-
-  const handleCommentFileInput = (e) => {
-    const files = Array.from(e.target.files).map((file) => file);
-    setCommentFormData({
-      ...commentFormData,
-      files: files,
-    });
-  };
-
-  const handleCreateComment = (e) => {
-    console.log(commentFormData);
-    e.preventDefault();
-    if (commentFormData.text) {
-      const fd = new FormData();
-
-      fd.append("text", commentFormData.text);
-
-      commentFormData.files.forEach((file) => {
-        fd.append(`files`, file);
-      });
-
-      dispatch(createCommentAction(task.id, fd));
-      setCommentFormData({ text: "", files: [] });
-    }
-  };
-
-  const handleRemoveCommentAttachment = (index) => {
-    setCommentFormData({
-      ...commentFormData,
-      files: commentFormData?.files.filter((val, i) => i !== index),
-    });
-  };
-
-  const getUploadedFiles = () => {
-    if (commentFormData?.files.length) {
-      return (
-        <aside>
-          <h5 className="my-2">
-            <Trans>comment.files</Trans>
-          </h5>
-          <ul className="list-ticked">
-            {commentFormData.files.map((file, i) => {
-              console.log("file", file.name, i);
-              return (
-                <li key={i} className="d-flex">
-                  <i className="mdi mdi-check-all mr-1"></i>
-                  {file.name}
-                  <button
-                    className="btn btn-link p-0 d-inline-block text-right ml-auto"
-                    onClick={() => handleRemoveCommentAttachment(i)}
-                  >
-                    <i className="mdi mdi-close-circle-outline text-danger "></i>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
-        </aside>
-      );
-    }
   };
 
   // const handleCompleteClick = () => {
@@ -293,23 +223,26 @@ export default function TaskForm({
   };
 
   console.log("boards", boards);
+  console.log("formData", formData);
   return (
     <div className="card-body">
-      <Dropdown className="modal-options">
-        <Dropdown.Toggle variant="btn" className="py-0">
-          <i className="mdi mdi-dots-horizontal fs-1-2"></i>
-        </Dropdown.Toggle>
-        <Dropdown.Menu>
-          {canDelete && (
-            <Dropdown.Item
-              className="btn btn-inverse-danger"
-              onClick={handleRemoveClick}
-            >
-              <Trans>task.delete</Trans>
-            </Dropdown.Item>
-          )}
-        </Dropdown.Menu>
-      </Dropdown>
+      {canDelete && (
+        <Dropdown className="modal-options">
+          <Dropdown.Toggle variant="btn" className="py-0">
+            <i className="mdi mdi-dots-horizontal fs-1-2"></i>
+          </Dropdown.Toggle>
+          <Dropdown.Menu className="menu-position-updated">
+            {canDelete && (
+              <Dropdown.Item
+                className="btn btn-inverse-danger"
+                onClick={handleRemoveClick}
+              >
+                <Trans>task.delete</Trans>
+              </Dropdown.Item>
+            )}
+          </Dropdown.Menu>
+        </Dropdown>
+      )}
 
       <div className="row">
         <div className="col-md-10 order-md-1 order-2">
@@ -348,7 +281,13 @@ export default function TaskForm({
 
           <div className="form-group">
             <h6>
-              <Trans>task.files</Trans>
+              <span
+                className={canEdit && "editable-text"}
+                onClick={() => setShowFileForm(!showFileForm)}
+              >
+                <Trans>task.files</Trans>
+                <i className="mdi mdi-upload"></i>
+              </span>
             </h6>
             {uploading && <Loader />}
 
@@ -366,23 +305,6 @@ export default function TaskForm({
             </ul>
             {canEdit && (
               <>
-                <button
-                  className="btn btn-outline-primary btn-icon-text mb-2 d-block"
-                  onClick={() => setShowFileForm(!showFileForm)}
-                >
-                  {showFileForm ? (
-                    <>
-                      <i className="mdi mdi-chevron-up va-middle mr-1"></i>
-                      <Trans>label.hide</Trans>
-                    </>
-                  ) : (
-                    <>
-                      <i className="mdi mdi-chevron-down va-middle mr-1"></i>
-                      <Trans>task.uploadFiles</Trans>
-                    </>
-                  )}
-                </button>
-
                 {showFileForm && <Dropzone onSubmit={handleUploadTaskFiles} />}
               </>
             )}
@@ -392,7 +314,13 @@ export default function TaskForm({
           <div className="row mb-3">
             <div className="col-md-12">
               <h5 className="card-title">
-                <Trans>Checklist</Trans>
+                <span
+                  className={canEdit && "editable-text"}
+                  onClick={() => setShowCheckForm(!showCheckForm)}
+                >
+                  <Trans>Checklist</Trans>
+                  <i className="mdi mdi-checkbox-multiple-marked-outline ml-1"></i>
+                </span>
               </h5>
               {checks?.length > 0 && (
                 <div className="mb-2">
@@ -403,7 +331,7 @@ export default function TaskForm({
                   />
                 </div>
               )}
-              {canEdit && (
+              {canEdit && showCheckForm && (
                 <form
                   className="add-items d-sm-flex mb-2"
                   onSubmit={handleCreateCheck}
@@ -416,6 +344,7 @@ export default function TaskForm({
                     value={checkInput || ""}
                     onChange={handleCheckFormInput}
                     required
+                    maxLength="255"
                   />
                   <button
                     type="submit"
@@ -439,55 +368,25 @@ export default function TaskForm({
           <h5 className="card-title">
             <Trans>Comments</Trans>
           </h5>
-          <form className="" onSubmit={handleCreateComment}>
-            <div className="form-group mb-1">
-              {
-                //todo fix options
-                <Mentions
-                  rows={3}
-                  className="h-auto form-mention"
-                  onChange={(val) => handleCommentTextInput(val)}
-                  value={commentFormData.text || ""}
-                  required
-                  autoFocus
-                >
-                  {projectUsers.map((user) => (
-                    <Option value={user.username} key={user.id}>
-                      {getFullName(user)}
-                    </Option>
-                  ))}
-                </Mentions>
-              }
-            </div>
 
-            <div className="form-group mb-3">
-              <div className="custom-file">
-                <input
-                  type="file"
-                  id="commentAttachment"
-                  className="form-control visibility-hidden form-control-file"
-                  onChange={handleCommentFileInput}
-                  multiple
-                />
-                <label
-                  className="custom-file-label"
-                  htmlFor="commentAttachment"
-                >
-                  <Trans>comment.addFiles</Trans>
-                </label>
-              </div>
-              {getUploadedFiles()}
-            </div>
-
-            <div>
-              <button
-                type="submit"
-                className="btn btn-primary font-weight-bold"
+          {!showCommentForm && (
+            <div className="form-group">
+              <span
+                className="form-control-sm form-control text-black-50 cursor-pointer"
+                onClick={() => setShowCommentForm(true)}
               >
-                <Trans>Add</Trans>
-              </button>
+                {i18n.t("label.yourComment")}...
+              </span>
             </div>
-          </form>
+          )}
+
+          {showCommentForm && (
+            <TaskCommentForm
+              taskId={task.id}
+              onHide={() => setShowCommentForm(false)}
+            />
+          )}
+
           <div className="comment-list">
             {comments?.length > 0 &&
               comments.map((comment) => {
@@ -526,6 +425,32 @@ export default function TaskForm({
               })}
             </select>
           </Form.Group>
+
+          {!formData.stageId && (
+            <Form.Group>
+              <label>
+                <Trans>task.board</Trans>
+              </label>
+              <select
+                className="form-control form-control-sm"
+                name="boardId"
+                value={formData.boardId}
+                onChange={(e) =>
+                  handleMoveTo({ boardId: e.target.value, archived: false })
+                }
+              >
+                {!formData.boardId && <option value="">{t("Choose")}</option>}
+                {boards &&
+                  boards.map((board, i) => {
+                    return (
+                      <option value={board.id} key={i}>
+                        {board.name}
+                      </option>
+                    );
+                  })}
+              </select>
+            </Form.Group>
+          )}
 
           {formData.boardId && (
             <Form.Group className="mb-3">
@@ -674,93 +599,49 @@ export default function TaskForm({
             />
           </Form.Group>
 
-          <Form.Group className="mb-3">
-            <label>
-              <Trans>label.actions</Trans>
-            </label>
+          {canEdit && (
+            <Form.Group className="mb-3">
+              <label>
+                <Trans>label.actions</Trans>
+              </label>
 
-            {task.boardId && (
-              <button
-                onClick={() =>
-                  handleMoveTo({
-                    boardId: null,
-                    stageId: null,
-                  })
-                }
-                className="btn btn-link btn-outline-behance"
-              >
-                {i18n.t("task.moveToBacklog")}
-                <i className="mdi mdi-chevron-right"></i>
-              </button>
-            )}
+              <Dropdown>
+                <Dropdown.Toggle variant="btn btn-light">
+                  {i18n.t("task.moveTo")}
+                  <i className="mdi mdi-chevron-down"></i>
+                </Dropdown.Toggle>
+                <Dropdown.Menu>
+                  {task.stageId && (
+                    <Dropdown.Item
+                      onClick={() =>
+                        handleMoveTo({
+                          boardId: null,
+                          stageId: null,
+                          archived: false,
+                        })
+                      }
+                    >
+                      {i18n.t("task.backlog")}
+                      <i className="mdi mdi-chevron-right"></i>
+                    </Dropdown.Item>
+                  )}
 
-            {/* {!task.archived && (
-              <button
-                onClick={() =>
-                  handleMoveTo({
-                    stageId: null,
-                    archived: true,
-                  })
-                }
-                className="btn btn-link"
-              >
-                {i18n.t("task.moveToArchive")}
-              </button>
-            )} */}
-
-            {!formData.boardId && (
-              <Form.Group>
-                <label>
-                  <Trans>task.moveToBoard</Trans>
-                </label>
-                <select
-                  className="form-control form-control-sm"
-                  name="boardId"
-                  value={formData.boardId}
-                  onChange={(e) => handleMoveTo({ boardId: e.target.value })}
-                >
-                  {!formData.boardId && <option value="">{t("Choose")}</option>}
-                  {boards &&
-                    boards.map((board, i) => {
-                      return (
-                        <option value={board.id} key={i}>
-                          {board.name}
-                        </option>
-                      );
-                    })}
-                </select>
-              </Form.Group>
-            )}
-
-            {/* {task.completedAt ? (
-              <>
-                <span className="text-primary d-block">
-                  <i className="mdi mdi-check btn-icon-prepend"></i>
-                  <Trans>task.taskCompleted</Trans>
-                </span>
-                <span className="text-right d-block mt-1 mb-1">
-                  <a
-                    href="#"
-                    className="text-small text-warning"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleCompleteClick();
-                    }}
-                  >
-                    <Trans>label.change</Trans>
-                  </a>
-                </span>
-              </>
-            ) : (
-              <button
-                className="btn btn-outline-primary btn-icon-text w-100"
-                onClick={handleCompleteClick}
-              >
-                <i className="mdi mdi-check btn-icon-prepend"></i>
-                <Trans>task.completeTask</Trans>
-              </button>
-            )} */}
-          </Form.Group>
+                  {task.archived === false && (
+                    <Dropdown.Item
+                      onClick={() =>
+                        handleMoveTo({
+                          archived: true,
+                        })
+                      }
+                    >
+                      {i18n.t("task.archive")}
+                      <i className="mdi mdi-chevron-right"></i>
+                    </Dropdown.Item>
+                  )}
+                </Dropdown.Menu>
+              </Dropdown>
+            </Form.Group>
+          )}
         </div>
       </div>
     </div>

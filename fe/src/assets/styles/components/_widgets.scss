@@ -308,6 +308,11 @@
     &:first-child {
       padding-top: 20px;
     }
+    .comment-text-content {
+      p {
+        margin-bottom: 0;
+      }
+    }
   }
 }
 

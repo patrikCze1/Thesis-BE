@@ -201,6 +201,7 @@ i18n
             noDescription: "Žádný popis",
             info: "Informace",
             goToLogin: "Jít na přihlášení",
+            yourComment: "Váš komentář",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -227,6 +228,8 @@ i18n
             hoursCount: "Počet hodin",
             moveToBoard: "Přesunout do nástěnky",
             moveToBacklog: "Přesunout od nevyřízených",
+            moveTo: "Přesunout do",
+            board: "Nástěnka",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",

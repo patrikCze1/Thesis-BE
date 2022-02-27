@@ -92,19 +92,18 @@ export const useInitShowTask = () => {
 
   const click = (task) => {
     dispatch(loadTaskDetailAction(task.projectId, task.id));
-    if (task.boardId)
+    if (task.stageId)
       history.push(
         createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
           ":id": task.projectId,
           ":boardId": task.boardId,
         }) + `?ukol=${task.id}`
       );
-    else
-      history.push(
-        createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
-          ":id": task.projectId,
-        }) + `?ukol=${task.id}`
-      );
+    else history.push(`?ukol=${task.id}`);
+    //   createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+    //     ":id": task.projectId,
+    //   }) + `?ukol=${task.id}`
+    // );
   };
 
   return {

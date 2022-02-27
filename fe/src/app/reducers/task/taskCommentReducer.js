@@ -41,7 +41,10 @@ export default function taskCommentReducer(state = initialState, action) {
       };
 
     case "comment/socketNew":
-      if (state.comments.some((comm) => comm.id === action.payload.id))
+      if (
+        state.comments.some((comm) => comm.id === action.payload.id) ||
+        state.actionProcessing
+      )
         return state;
       return {
         ...state,
