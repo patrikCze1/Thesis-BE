@@ -9,7 +9,6 @@ import {
   createUserAction,
 } from "./../../../reducers/user/userReducer";
 
-import Loader from "./../../common/Loader";
 import { getRoles } from "../../../service/role.service";
 import UserGroups from "./UserGroups";
 
@@ -18,6 +17,7 @@ export default function UserForm({ closeModal }) {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
     roles: [{ label: t(`role.user`), value: "user" }],
+    sex: "M",
   });
   const [isEdit, setIsEdit] = useState(false);
   const { user, error } = useSelector((state) => state.userReducer);

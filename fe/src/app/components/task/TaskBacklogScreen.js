@@ -12,8 +12,7 @@ import { loadBoardsAction } from "../../reducers/project/board.reducer";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { loadBacklogTasksAction } from "../../reducers/task/task.reducer";
 import { objectIsNotEmpty } from "../../service/utils";
-import Loader from "../common/Loader";
-import TaskTableItem from "./component/TaskTableItem";
+import TaskTable from "./component/TaskTable";
 
 const paginationLimit = 20;
 export default function TaskBacklogScreen() {
@@ -74,36 +73,11 @@ export default function TaskBacklogScreen() {
 
       <div className="row">
         <div className="col-lg-12">
-          <div className="card">
-            <div className="card-body">
-              {backlogTasks.length > 0 ? (
-                <div className="table-responsive">
-                  <table className="table table-bordered table-hover">
-                    <thead>
-                      <tr>
-                        <th> # </th>
-                        <th> {i18n.t("label.name")} </th>
-                        <th> {i18n.t("task.priority")} </th>
-                        <th> {i18n.t("task.estimation")} </th>
-                        <th> {i18n.t("task.deadline")} </th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {tasksLoaded &&
-                        backlogTasks.map((task) => (
-                          <TaskTableItem task={task} key={task.id} />
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              ) : (
-                <p className="text-center">{i18n.t("label.noRecords")}</p>
-              )}
-              {!tasksLoaded && <Loader />}
-            </div>
-            {renderPagination()}
-          </div>
+          <TaskTable
+            tasks={backlogTasks}
+            tasksLoaded={tasksLoaded}
+            renderPagination={renderPagination}
+          />
         </div>
         {renderModal()}
       </div>

@@ -6,8 +6,6 @@ import paginationFactory from "react-bootstrap-table2-paginator";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import { Trans, useTranslation } from "react-i18next";
 import { Modal, Dropdown } from "react-bootstrap";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 
 import {
   loadUsersAction,
@@ -17,6 +15,8 @@ import {
 } from "./../../../reducers/user/userReducer";
 import UserForm from "./UserForm";
 import Loader from "./../../common/Loader";
+import i18n from "../../../../i18n";
+import { useSwalAlert } from "../../../hooks/common";
 
 const { SearchBar } = Search;
 
@@ -24,7 +24,7 @@ export default function Users() {
   const dispatch = useDispatch();
   const history = useHistory();
   const { t } = useTranslation();
-  const MySwal = withReactContent(Swal);
+  const { Swal } = useSwalAlert();
 
   const columns = [
     {
@@ -106,17 +106,8 @@ export default function Users() {
     dispatch(loadUserDetailAction(id));
   };
 
-  const tableRowEvents = {
-    // onClick: (e, user, rowIndex) => {
-    //   handleUserDetail(user.id);
-    //   history.push({
-    //     search: `?uzivatel=${user.id}`,
-    //   });
-    // },
-  };
-
   const handleDelete = (id) => {
-    MySwal.fire({
+    Swal.fire({
       icon: "warning",
       title: t("user.deleteUser") + "?",
       text: t("user.userWillBeDeleted"),
@@ -144,9 +135,9 @@ export default function Users() {
   return (
     <>
       <div className="page-header">
-        <h3 className="page-title">
+        <h1 className="page-title">
           <Trans>Users</Trans>
-        </h3>
+        </h1>
         <div className="d-lg-flex flex-column flex-md-row ml-md-0 ml-md-auto my-2 wrapper">
           <div className="d-flex mt-4 mt-md-0">
             <button
@@ -184,11 +175,10 @@ export default function Users() {
                           </div>
                           <BootstrapTable
                             hover
-                            // defaultSorted={defaultSorted}
                             pagination={paginationFactory()}
                             {...props.baseProps}
                             wrapperClasses="table-responsive"
-                            rowEvents={tableRowEvents}
+                            noDataIndication={i18n.t("label.noRecords")}
                           />
                         </div>
                       )}
@@ -205,26 +195,24 @@ export default function Users() {
 
       {showUserForm && (
         <Modal
-          size="lg"
+          size="xxl"
           show={showUserForm}
           onHide={handleCloseModal}
           aria-labelledby="example-modal-sizes-title-sm"
         >
-          <div>
-            <Modal.Body>
-              <button
-                type="button"
-                className="close close-modal"
-                onClick={() => handleCloseModal()}
-              >
-                <span aria-hidden="true">×</span>
-                <span className="sr-only">
-                  <Trans>Close</Trans>
-                </span>
-              </button>
-              <UserForm closeModal={handleCloseModal} />
-            </Modal.Body>
-          </div>
+          <Modal.Body>
+            <button
+              type="button"
+              className="close close-modal"
+              onClick={() => handleCloseModal()}
+            >
+              <span aria-hidden="true">×</span>
+              <span className="sr-only">
+                <Trans>Close</Trans>
+              </span>
+            </button>
+            <UserForm closeModal={handleCloseModal} />
+          </Modal.Body>
         </Modal>
       )}
     </>

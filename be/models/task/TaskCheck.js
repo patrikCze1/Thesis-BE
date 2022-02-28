@@ -1,11 +1,11 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes } = require("sequelize");
 
 module.exports = (sequelize) => {
-  const TaskCheck = sequelize.define('TaskCheck', {
+  const TaskCheck = sequelize.define("TaskCheck", {
     id: {
-      type: DataTypes.INTEGER, 
-      primaryKey: true, 
-      autoIncrement: true 
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
     title: {
       type: DataTypes.STRING,
@@ -25,18 +25,18 @@ module.exports = (sequelize) => {
     },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
     updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
   });
 
-  TaskCheck.associate = function(models) {
-    TaskCheck.belongsTo(models.Task, {foreignKey: 'taskId', as: 'task'});
-    TaskCheck.belongsTo(models.User, {foreignKey: 'solverId', as: 'solver'});
-  }
-  
+  TaskCheck.associate = function (models) {
+    TaskCheck.belongsTo(models.Task, { foreignKey: "taskId", as: "task" });
+    TaskCheck.belongsTo(models.User, { foreignKey: "solverId", as: "solver" });
+  };
+
   return TaskCheck;
 };

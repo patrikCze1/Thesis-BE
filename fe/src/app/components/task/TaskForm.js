@@ -41,7 +41,7 @@ import {
 } from "../../../utils/enum";
 import { getFullName } from "../../service/user/user.service";
 import { hasRole } from "../../service/role.service";
-import TaskCommentItem from "./TaskCommentItem";
+import TaskCommentItem from "./component/TaskCommentItem";
 import Dropzone from "../common/Dropzone";
 import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
@@ -225,7 +225,7 @@ export default function TaskForm({
   console.log("boards", boards);
   console.log("formData", formData);
   return (
-    <div className="card-body">
+    <div className="card-body pt-4">
       {canDelete && (
         <Dropdown className="modal-options">
           <Dropdown.Toggle variant="btn" className="py-0">

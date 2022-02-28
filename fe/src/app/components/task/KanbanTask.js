@@ -104,7 +104,7 @@ export default function KanbanTask({ task, index }) {
     <Draggable draggableId={`draggableTask-${task.id}`} index={index}>
       {(provided) => (
         <div
-          className="mt-2 board-portlet"
+          className="mt-2 board-portlet kanban-task-item"
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           ref={provided.innerRef}
@@ -118,44 +118,8 @@ export default function KanbanTask({ task, index }) {
               ></div>
 
               <div className="d-flex justify-content-between w-100">
-                {task.deadline && (
-                  <>
-                    {task.completedAt ? (
-                      <small
-                        className={`task-date ${
-                          new Date(task.deadline) < new Date(task.completedAt)
-                            ? "text-warning"
-                            : ""
-                        }`}
-                      >
-                        {task.deadline &&
-                          new Intl.DateTimeFormat("cs-CZ", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          }).format(new Date(task.deadline))}
-                      </small>
-                    ) : (
-                      <small
-                        className={
-                          task.deadline && now > new Date(task.deadline)
-                            ? "task-date text-danger"
-                            : "task-date"
-                        }
-                      >
-                        {task.deadline && now > new Date(task.deadline) && (
-                          <i className="fa fa-exclamation-circle mr-1"></i>
-                        )}
-                        {task.deadline &&
-                          new Intl.DateTimeFormat("cs-CZ", {
-                            year: "numeric",
-                            month: "2-digit",
-                            day: "2-digit",
-                          }).format(new Date(task.deadline))}
-                      </small>
-                    )}
-                  </>
-                )}
+                <h5 className="text-dark">{task.name}</h5>
+
                 <small className="d-inline-block ml-auto">{`${
                   project.key !== null ? `${project.key}-` : ""
                 }${task.number}`}</small>
@@ -174,48 +138,84 @@ export default function KanbanTask({ task, index }) {
                   </Dropdown.Menu>
                 </Dropdown> */}
               </div>
-              <div className="d-flex">
-                <h5 className="text-dark">{task.name}</h5>
-              </div>
 
               {task.commentsCount > 0 && (
-                <>
+                <span className="info-badget">
                   <i className="fa fa-comments-o pr-1"></i>
                   {task.commentsCount}
-                </>
+                </span>
               )}
               {task.attachmentsCount > 0 && (
-                <>
+                <span className="info-badget">
                   <i className="fa fa-paperclip pr-1"></i>
                   {task.attachmentsCount}
-                </>
+                </span>
               )}
-              <div className="">
-                {task.solver && (
-                  <span
-                    className={`text-avatar ${
-                      currentUser.id === task.solver.id ? "highlited" : ""
-                    }`}
-                  >
-                    <OverlayTrigger
-                      overlay={
-                        <Tooltip id="tooltip-disabled">
-                          {getFullName(task.solver)}
-                        </Tooltip>
-                      }
-                    >
-                      <span>{getShortName(task.solver)}</span>
-                    </OverlayTrigger>
-                  </span>
-                )}
-              </div>
-              <div className="d-flex justify-content-between">
-                {renderBadget()}
 
-                {task.completedAt && (
+              <div className="d-flex align-items-baseline justify-content-between">
+                <div className="d-flex align-items-baseline">
+                  {task.solver && (
+                    <span
+                      className={`text-avatar mr-1 ${
+                        currentUser.id === task.solver.id ? "highlited" : ""
+                      }`}
+                    >
+                      <OverlayTrigger
+                        overlay={
+                          <Tooltip id="tooltip-disabled">
+                            {getFullName(task.solver)}
+                          </Tooltip>
+                        }
+                      >
+                        <span>{getShortName(task.solver)}</span>
+                      </OverlayTrigger>
+                    </span>
+                  )}
+
+                  {renderBadget()}
+                </div>
+                {/* {task.completedAt && (
                   <i className="mdi mdi-checkbox-marked-circle-outline text-primary mdi-24px"></i>
+                )} */}
+
+                {task.deadline && (
+                  <>
+                    {task.completedAt ? (
+                      <p
+                        className={`due-date task-date ${
+                          new Date(task.deadline) < new Date(task.completedAt)
+                            ? "text-warning"
+                            : ""
+                        }`}
+                      >
+                        {task.deadline &&
+                          new Intl.DateTimeFormat("cs-CZ", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(new Date(task.deadline))}
+                      </p>
+                    ) : (
+                      <p
+                        className={
+                          task.deadline && now > new Date(task.deadline)
+                            ? "due-date task-date text-danger ml-1"
+                            : "due-date task-date"
+                        }
+                      >
+                        {task.deadline && now > new Date(task.deadline) && (
+                          <i className="fa fa-exclamation-circle mr-1"></i>
+                        )}
+                        {task.deadline &&
+                          new Intl.DateTimeFormat("cs-CZ", {
+                            year: "numeric",
+                            month: "2-digit",
+                            day: "2-digit",
+                          }).format(new Date(task.deadline))}
+                      </p>
+                    )}
+                  </>
                 )}
-                {/* <p className="due-date">12.1.2022</p> */}
               </div>
             </li>
           </ul>

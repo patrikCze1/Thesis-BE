@@ -92,7 +92,7 @@ export const useInitShowTask = () => {
 
   const click = (task) => {
     dispatch(loadTaskDetailAction(task.projectId, task.id));
-    if (task.stageId)
+    if (task.stageId && !task.archived)
       history.push(
         createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
           ":id": task.projectId,

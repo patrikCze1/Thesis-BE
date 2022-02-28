@@ -10,6 +10,7 @@ import {
   setSeenAction,
 } from "../../../reducers/notification/notification.reducer";
 import NavNotificationListItem from "./NavNotificationListItem";
+import { createTaskRoute } from "../../../service/router.service";
 
 export default function NavigationNotifications() {
   const dispatch = useDispatch();
@@ -28,9 +29,8 @@ export default function NavigationNotifications() {
     if (!notification.seen)
       dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
-      const { projectId, id } = notification.TaskNotification.task;
       // window.location = `${ROUTE.PROJECTS}/${projectId}?ukol=${id}`;
-      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
+      history.push(createTaskRoute(notification.TaskNotification.task));
     }
   };
 

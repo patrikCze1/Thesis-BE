@@ -85,6 +85,7 @@ export default function Editable({
           value={val}
           onChange={(e) => handleInputChange(e.target.value)}
           disabled={disabled}
+          maxLength="255"
         />
         {renderButtons}
       </>

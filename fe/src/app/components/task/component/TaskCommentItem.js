@@ -4,12 +4,12 @@ import withReactContent from "sweetalert2-react-content";
 import { useTranslation } from "react-i18next";
 import { useDispatch } from "react-redux";
 
-import { getShortName, getFullName } from "../../service/user/user.service";
-import { hasRole } from "../../service/role.service";
-import { ROLES } from "../../../utils/enum";
-import { deleteTaskCommentAction } from "../../reducers/task/taskCommentReducer";
-import { getServerFileUrl } from "../../service/file.service";
-import AttachmentItem from "../common/AttachmentItem";
+import { getShortName, getFullName } from "../../../service/user/user.service";
+import { hasRole } from "../../../service/role.service";
+import { ROLES } from "../../../../utils/enum";
+import { deleteTaskCommentAction } from "../../../reducers/task/taskCommentReducer";
+import { getServerFileUrl } from "../../../service/file.service";
+import AttachmentItem from "../../common/AttachmentItem";
 
 export default function TaskCommentItem({ comment, currentUser }) {
   const MySwal = withReactContent(Swal);

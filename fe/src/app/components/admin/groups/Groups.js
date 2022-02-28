@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import BootstrapTable from "react-bootstrap-table-next";
 import paginationFactory from "react-bootstrap-table2-paginator";
 import ToolkitProvider, { Search } from "react-bootstrap-table2-toolkit";
 import { Trans, useTranslation } from "react-i18next";
 import { Modal, Dropdown } from "react-bootstrap";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 
 import {
   loadGroupsAction,
@@ -18,13 +15,14 @@ import {
 import GroupForm from "./GroupForm";
 import Loader from "../../common/Loader";
 import i18n from "../../../../i18n";
+import { useSwalAlert } from "../../../hooks/common";
 
 const { SearchBar } = Search;
 
 export default function Groups() {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const MySwal = withReactContent(Swal);
+  const { Swal } = useSwalAlert();
   const { groups, groupsLoaded } = useSelector((state) => state.groupReducer);
   const [showGroupForm, setShowGroupForm] = useState(false);
 
@@ -55,7 +53,7 @@ export default function Groups() {
       formatter: (_, group) => {
         return (
           <Dropdown>
-            <Dropdown.Toggle variant="btn" id="dropdownMenuIconButton1">
+            <Dropdown.Toggle variant="btn">
               <i className="mdi mdi-dots-vertical"></i>
             </Dropdown.Toggle>
             <Dropdown.Menu>
@@ -91,7 +89,7 @@ export default function Groups() {
   };
 
   const handleDeleteGroup = (id) => {
-    MySwal.fire({
+    Swal.fire({
       icon: "warning",
       title: t("group.deleteGroup") + "?",
       text: t("group.groupWillBeDeleted"),
@@ -104,11 +102,11 @@ export default function Groups() {
   };
   console.log("groupsLoaded", groupsLoaded);
   return (
-    <div>
+    <>
       <div className="page-header">
-        <h3 className="page-title">
+        <h1 className="page-title">
           <Trans>Groups</Trans>
-        </h3>
+        </h1>
         <div className="d-lg-flex flex-column flex-md-row ml-md-0 ml-md-auto my-2 wrapper">
           <div className="d-flex mt-4 mt-md-0">
             <button
@@ -147,7 +145,7 @@ export default function Groups() {
                             hover
                             pagination={paginationFactory()}
                             {...props.baseProps}
-                            wrapperClasses="table-responsive"
+                            // wrapperClasses="table-responsive"
                             noDataIndication={i18n.t("label.noRecords")}
                           />
                         </div>
@@ -165,7 +163,7 @@ export default function Groups() {
 
       {showGroupForm && (
         <Modal
-          size="lg"
+          size="xxl"
           show={showGroupForm}
           onHide={handleCloseModal}
           aria-labelledby="example-modal-sizes-title-sm"
@@ -185,6 +183,6 @@ export default function Groups() {
           </Modal.Body>
         </Modal>
       )}
-    </div>
+    </>
   );
 }

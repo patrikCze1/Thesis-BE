@@ -242,3 +242,9 @@
 .kanban-page-content {
   max-height: calc(100vh - 177px);
 }
+
+.kanban-task-item {
+  .info-badget {
+    margin-right: 5px;
+  }
+}

@@ -12,6 +12,7 @@ import Loader from "../common/Loader";
 import Pagination from "../common/Pagination";
 import NotificationListItem from "./NotificationListItem";
 import { ROUTE } from "../../../utils/enum";
+import { createTaskRoute } from "../../service/router.service";
 
 export default function NotificationScreen() {
   const dispatch = useDispatch();
@@ -32,8 +33,7 @@ export default function NotificationScreen() {
     if (notification?.seen === false)
       dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
-      const { projectId, id } = notification.TaskNotification.task;
-      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
+      history.push(createTaskRoute(notification.TaskNotification.task));
     }
   };
 

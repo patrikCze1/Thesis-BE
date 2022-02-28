@@ -27,6 +27,7 @@ export default function TaskTableItem({ task, view }) {
     : createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
         ":id": task.projectId,
       });
+
   if (view === "dashboard")
     return (
       <tr>

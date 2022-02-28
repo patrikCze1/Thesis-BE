@@ -103,7 +103,7 @@ export default function Clients() {
 
       {showClientForm && (
         <Modal
-          size="lg"
+          size="xxl"
           show={showClientForm}
           onHide={() => setShowClientForm(false)}
           aria-labelledby="example-modal-sizes-title-sm"

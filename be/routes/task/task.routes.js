@@ -43,15 +43,15 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
 
     if (projectId && projectId != "-1") where.ProjectId = projectId;
     if (req.query.archived) {
-      if (req.query.archived === "true")
-        where.completedAt = { [Op.lt]: addTimeToDate(new Date(), -86400 * 7) };
-      else
-        where.completedAt = {
-          [Op.or]: [
-            { [Op.gt]: addTimeToDate(new Date(), -86400 * 7) },
-            { [Op.is]: null },
-          ],
-        };
+      if (req.query.archived === "true") where.archived = 1;
+      // where.completedAt = { [Op.lt]: addTimeToDate(new Date(), -86400 * 7) };
+      else where.archived = 0;
+      // where.completedAt = {
+      //   [Op.or]: [
+      //     { [Op.gt]: addTimeToDate(new Date(), -86400 * 7) },
+      //     { [Op.is]: null },
+      //   ],
+      // };
     }
 
     for (const key in req.query) {
@@ -349,7 +349,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
             const newNotification = await createTaskNotification(
               task.id,
-              `Uživatel ${getFullName(user)} Vás přiřadil k úkolu: ${
+              `Uživatel ${getFullName(user)} Vás přiřadil/a k úkolu: ${
                 task.name
               }`,
               task.solverId,
@@ -381,7 +381,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
             const newNotification = await createTaskNotification(
               task.id,
-              `Uživatel ${getFullName(user)} Vám odebral úkol: ${task.name}`,
+              `${getFullName(user)} Vám odebral/a úkol: ${task.name}`,
               taskSolverId,
               user.id
             );
@@ -401,9 +401,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
           const newNotification = await createTaskNotification(
             task.id,
-            `Uživatel ${getFullName(user)} změnil prioritu úkolu: ${
-              task.name
-            } na ${TASK_PRIORITY[task.priority]}`,
+            `${getFullName(user)} změnil/a prioritu úkolu: ${task.name} na ${
+              TASK_PRIORITY[task.priority]
+            }`,
             taskSolverId,
             user.id
           );
@@ -599,119 +599,6 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 });
-
-// router.patch(
-//   "/:projectId/tasks/:id/complete",
-//   authenticateToken,
-//   async (req, res) => {
-//     const user = getUser(req, res);
-
-//     try {
-//       const task = await Task.findByPk(req.params.id);
-//       if (task.completedAt) task.completedAt = null;
-//       else task.completedAt = new Date();
-
-//       await task.save();
-//       res.json({ task });
-
-//       TaskChangeLog.create({
-//         taskId: req.params.id,
-//         userId: user.id,
-//         name:
-//           "Změna stavu na: " + task.completedAt ? "dokončeno" : "nedokončeno",
-//       });
-
-//       if (
-//         (task.completedAt && task.createdById !== user.id) ||
-//         task.solverId !== user.id
-//       ) {
-//         try {
-//           const io = getIo();
-//           const taskName = `[${task.number}] ${task.name}`;
-
-//           if (task.createdById !== user.id) {
-//             const creator = await findOneById(task.createdById);
-
-//             if (creator && creator?.allowEmailNotification) {
-//               sendEmailNotification(
-//                 creator.email,
-//                 req.t("notification.task.taskCompleted", {
-//                   taskName,
-//                   userName: getFullName(user),
-//                 }),
-//                 "email/task/",
-//                 "completed",
-//                 {
-//                   taskLink: getFeTaskUrl(task.projectId, task.id),
-//                   username: getFullName(user),
-//                   taskName,
-//                 }
-//               );
-//             }
-
-//             const newNotification = await createTaskNotification(
-//               task.id,
-//               `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
-//               task.createdById,
-//               user.id
-//             );
-
-//             newNotification.setDataValue("creator", user);
-//             newNotification.setDataValue("createdAt", new Date());
-//             newNotification.setDataValue("TaskNotification", { task });
-
-//             io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-//               notification: newNotification,
-//             });
-//           }
-
-//           if (
-//             task.solverId &&
-//             task.solverId !== user.id &&
-//             task.solverId !== task.createdById
-//           ) {
-//             const solver = await findOneById(task.solverId);
-
-//             if (solver && solver?.allowEmailNotification) {
-//               sendEmailNotification(
-//                 solver.email,
-//                 req.t("notification.task.taskCompleted", {
-//                   taskName,
-//                   userName: getFullName(user),
-//                 }),
-//                 "email/task/",
-//                 "completed",
-//                 {
-//                   taskLink: getFeTaskUrl(task.projectId, task.id),
-//                   username: getFullName(user),
-//                   taskName,
-//                 }
-//               );
-//             }
-//             const newNotification = await createTaskNotification(
-//               task.id,
-//               `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
-//               task.solverId,
-//               user.id
-//             );
-
-//             newNotification.setDataValue("creator", user);
-//             newNotification.setDataValue("createdAt", new Date());
-//             newNotification.setDataValue("TaskNotification", { task });
-
-//             io.to(task.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-//               notification: newNotification,
-//             });
-//           }
-//         } catch (error) {
-//           console.error(error);
-//         }
-//       }
-//     } catch (error) {
-//       res.status(500).json({ message: error.message });
-//     }
-//   }
-// );
 
 router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   const io = getIo();

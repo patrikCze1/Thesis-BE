@@ -35,7 +35,9 @@ export default function notificationReducer(state = initialState, action) {
 
     case "notification/seen":
       if (!action.payload.notification.seen) {
-        document.title = `(${state.unreadCount - 1}) ${i18n.t("app.title")}`;
+        if (state.unreadCount - 1 > 0)
+          document.title = `(${state.unreadCount - 1}) ${i18n.t("app.title")}`;
+        else document.title = `${i18n.t("app.title")}`;
         return {
           ...state,
           notifications: state.notifications.map((notif) => {
