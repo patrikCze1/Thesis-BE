@@ -32,7 +32,7 @@ const {
 const { findOneById } = require("../../repo/user/user.repository");
 const { stageRepo } = require("../../repo");
 const { addTimeToDate } = require("../../service/date");
-const { getFeTaskUrl } = require("../../service/utils");
+const { getFeTaskUrl, trimString } = require("../../service/utils");
 const ResponseError = require("../../models/common/ResponseError");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
@@ -281,19 +281,19 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       task[key] = req.body[key];
     });
 
-    const changedFileds = task.changed();
-    if (typeof changedFileds === "boolean" && changedFileds === false) {
+    const changedFields = task.changed();
+    if (typeof changedFields === "boolean" && changedFields === false) {
       res.json({ task });
       return;
     }
 
-    if (changedFileds.length > 0) {
+    if (changedFields.length > 0) {
       if (
         !user.roles.includes(ROLE.ADMIN) &&
         !user.roles.includes(ROLE.MANAGEMENT) &&
         task.createdById !== user.id
       ) {
-        changedFileds.forEach((field) => {
+        changedFields.forEach((field) => {
           if (
             [
               "createdById",
@@ -314,8 +314,8 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         });
       }
 
-      for (const field of changedFileds) {
-        console.log("changedFileds", changedFileds);
+      for (const field of changedFields) {
+        console.log("changedFields", changedFields);
         if (field === "solverId") {
           const oldSolver = await User.findByPk(taskSolverId);
           const newSolver = await User.findByPk(task.solverId);
@@ -323,7 +323,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
-            name: `Změna řešitele z ${
+            name: `Změnil řešitele z ${
               oldSolver ? getFullName(oldSolver) : "nikdo"
             } na ${newSolver ? getFullName(newSolver) : "nikdo"}`,
           });
@@ -349,9 +349,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
             const newNotification = await createTaskNotification(
               task.id,
-              `Uživatel ${getFullName(user)} Vás přiřadil/a k úkolu: ${
-                task.name
-              }`,
+              `Uživatel ${getFullName(
+                user
+              )} Vás přiřadil/a k úkolu: ${trimString(task.name, 100)}`,
               task.solverId,
               user.id
             );
@@ -381,7 +381,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
             const newNotification = await createTaskNotification(
               task.id,
-              `${getFullName(user)} Vám odebral/a úkol: ${task.name}`,
+              `${getFullName(user)} Vám odebral/a úkol: ${trimString(
+                task.name,
+                100
+              )}`,
               taskSolverId,
               user.id
             );
@@ -392,27 +395,30 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               notification: newNotification,
             });
           }
-        } else if (field === "priority" && user.id != taskSolverId) {
+        } else if (field === "priority") {
           TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
-            name: `Změna priority na ${TASK_PRIORITY[task.priority]}`,
+            name: `Změnil prioritu na ${TASK_PRIORITY[task.priority]}`,
           });
 
-          const newNotification = await createTaskNotification(
-            task.id,
-            `${getFullName(user)} změnil/a prioritu úkolu: ${task.name} na ${
-              TASK_PRIORITY[task.priority]
-            }`,
-            taskSolverId,
-            user.id
-          );
-          newNotification.setDataValue("creator", user);
-          newNotification.setDataValue("createdAt", new Date());
-          newNotification.setDataValue("TaskNotification", { task });
-          io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-            notification: newNotification,
-          });
+          if (user.id != taskSolverId) {
+            const newNotification = await createTaskNotification(
+              task.id,
+              `${getFullName(user)} změnil/a prioritu úkolu: ${trimString(
+                task.name,
+                100
+              )} na ${TASK_PRIORITY[task.priority]}`,
+              taskSolverId,
+              user.id
+            );
+            newNotification.setDataValue("creator", user);
+            newNotification.setDataValue("createdAt", new Date());
+            newNotification.setDataValue("TaskNotification", { task });
+            io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+              notification: newNotification,
+            });
+          }
         } else if (field === "boardId" && task.boardId && !task.stageId) {
           try {
             const s = await stageRepo.findFirstByBoard(task.boardId);
@@ -454,7 +460,6 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             userId: user.id,
             name: req.t(`task.message.stageChangedTo`, {
               stage: stage.name,
-              type: stage.type, // todo
             }),
           });
 
@@ -475,7 +480,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                     sendEmailNotification(
                       creator.email,
                       req.t("notification.task.taskCompleted", {
-                        taskName,
+                        taskName: trimString(taskName, 100),
                         userName: getFullName(user),
                       }),
                       "email/task/",
@@ -490,7 +495,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
                   const newNotification = await createTaskNotification(
                     task.id,
-                    `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
+                    `Uživatel ${getFullName(user)} dokončil úkol: ${trimString(
+                      task.name,
+                      100
+                    )}`,
                     task.createdById,
                     user.id
                   );
@@ -529,7 +537,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                   }
                   const newNotification = await createTaskNotification(
                     task.id,
-                    `Uživatel ${getFullName(user)} dokončil úkol: ${task.name}`,
+                    `Uživatel ${getFullName(user)} dokončil úkol: ${trimString(
+                      task.name,
+                      100
+                    )}`,
                     task.solverId,
                     user.id
                   );
@@ -550,12 +561,101 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             task.completedAt = null;
           }
         } else {
-          //todo
-          TaskChangeLog.create({
-            taskId: req.params.id,
-            userId: user.id,
-            name: `Změna pole: ${field} na ${task[field]}`,
-          });
+          const transFields = {
+            name: req.t("field.task.name"),
+            description: req.t("field.task.description"),
+            // priority: req.t('field.task.priority'),
+            // projectId: req.t('field.task.projectId'),
+            // parentId: req.t('field.task.parentId'),
+            deadline: req.t("field.task.deadline"),
+            colorCode: req.t("field.task.colorCode"),
+            estimaiton: req.t("field.task.estimaiton"),
+            createdById: req.t("field.task.createdById"),
+            // archived: req.t('field.task.archived'),
+            // completedAt: req.t('field.task.completedAt'), // stageId
+            // deletedAt: req.t('field.task.deletedAt'),
+          };
+
+          if (field === "archived") {
+            if (task[field] == true)
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Přesunul úkol do archivu`,
+              });
+          } else if (field === "stageId") {
+            TaskChangeLog.create({
+              taskId: req.params.id,
+              userId: user.id,
+              name: `Přesunul úkol do nevyřízených`,
+            });
+          } else if (field === "parentId") {
+            if (task[field])
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Změnil úkol na podúkol`,
+              });
+            else
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Změnil podúkol na úkol`,
+              });
+          } else if (field === "deadline") {
+            if (task[field])
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Změnil ${
+                  transFields[field]
+                } na ${new Intl.DateTimeFormat("default", {
+                  year: "numeric",
+                  month: "numeric",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                }).format(task[field])}`,
+              });
+            else
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Odebral ${transFields[field]} úkolu`,
+              });
+          } else if (field === "deletedAt") {
+            TaskChangeLog.create({
+              taskId: req.params.id,
+              userId: user.id,
+              name: `Smazal úkol`,
+            });
+          } else if (field === "colorCode") {
+            TaskChangeLog.create({
+              taskId: req.params.id,
+              userId: user.id,
+              name: `Změnil ${transFields[field]} na <span style="color: ${task[field]}">${transFields[field]}</span>`,
+            });
+          } else if (field === "createdById") {
+            const newOwner = await User.findByPk(task.field);
+            if (newOwner)
+              TaskChangeLog.create({
+                taskId: req.params.id,
+                userId: user.id,
+                name: `Změnil ${transFields[field]} na ${getFullName(
+                  newOwner
+                )}`,
+              });
+            else if (field === "boardId") continue;
+          } else {
+            TaskChangeLog.create({
+              taskId: req.params.id,
+              userId: user.id,
+              name: `Změnil ${transFields[field]} na ${trimString(
+                task[field],
+                100
+              )}`,
+            });
+          }
         }
       }
 
@@ -571,7 +671,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
     res.json({ task });
 
-    if (changedFileds.includes("boardId")) {
+    if (changedFields.includes("boardId")) {
       if (task.boardId) {
         if (task.previous("boardId") === task.boardId) {
           for (const u of projectUsers) {

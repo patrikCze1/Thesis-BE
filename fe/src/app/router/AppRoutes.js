@@ -1,5 +1,5 @@
 import React from "react";
-import { Switch } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
 import Projects from "../components/project/ProjectsScreen";
 import ProjectBoardsScreen from "../components/project/ProjectBoardsScreen";
@@ -18,10 +18,23 @@ import TodoScreen from "../components/myTodo/TodoScreen";
 import { ROLES, ROUTE } from "../../utils/enum";
 import TaskArchiveScreen from "../components/task/TaskArchiveScreen";
 import TaskBacklogScreen from "../components/task/TaskBacklogScreen";
+import Login from "../components/auth/Login";
+import ForgottenPassword from "../components/auth/ForgottenPassword";
+import ResetPassword from "../components/auth/ResetPassword";
 
 export default function AppRoutes() {
   return (
     <Switch>
+      <Route path={ROUTE.LOGIN}>
+        <Login />
+      </Route>
+      <Route path={ROUTE.FORGOTTEN_PASSWORD}>
+        <ForgottenPassword />
+      </Route>
+      <Route path={ROUTE.RESET_PASSWORD}>
+        <ResetPassword />
+      </Route>
+
       <PrivateRoute path={ROUTE.PROJECTS_DETAIL_ARCHIVE}>
         <TaskArchiveScreen />
       </PrivateRoute>

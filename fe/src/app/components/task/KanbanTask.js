@@ -208,7 +208,7 @@ export default function KanbanTask({ task, index }) {
                         )}
                         {task.deadline &&
                           new Intl.DateTimeFormat("cs-CZ", {
-                            year: "numeric",
+                            // year: "numeric",
                             month: "2-digit",
                             day: "2-digit",
                           }).format(new Date(task.deadline))}

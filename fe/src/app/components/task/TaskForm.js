@@ -47,6 +47,7 @@ import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
 import i18n from "../../../i18n";
 import TaskCommentForm from "../form/TaskCommentForm";
+import { validateCurrencyPattern } from "../../service/utils";
 
 export default function TaskForm({
   task,
@@ -127,7 +128,8 @@ export default function TaskForm({
   };
 
   const handleChangeAndSave = (e, save = true) => {
-    const { name, value } = e.target;
+    let { name, value } = e.target;
+    if (name === "estimation") value = validateCurrencyPattern(value);
     const updatedTask = {
       ...formData,
       [name]: value,

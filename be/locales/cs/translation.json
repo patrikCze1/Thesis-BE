@@ -20,7 +20,7 @@
   "task": {
     "message": {
       "created": "Vytvoření úkolu",
-      "stageChangedTo": "Změna stavu úkolu na {{stage}} ({{type}})"
+      "stageChangedTo": "Změna stavu úkolu na {{stage}}"
     }
   },
   "stage": {
@@ -30,7 +30,15 @@
   },
   "field": {
     "title": "Název",
-    "description": "Popis"
+    "description": "Popis",
+    "task": {
+      "name": "Název",
+      "description": "Popis",
+      "deadline": "Termín",
+      "colorCode": "Barva",
+      "estimation": "Odhad",
+      "createdById": "Zadavel"
+    }
   },
   "auth": {
     "error": {
