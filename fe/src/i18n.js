@@ -167,6 +167,7 @@ i18n
             workingRecords: "Pracovní záznamy",
             withoutProject: "Bez projektu",
             timesByProject: "Časy podle projektu",
+            removed: "Záznam odstraněn",
           },
           todo: {
             name: "Název",
@@ -202,6 +203,8 @@ i18n
             info: "Informace",
             goToLogin: "Jít na přihlášení",
             yourComment: "Váš komentář",
+            choose: "Vyberte",
+            noResults: "Žádné výsledky",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -230,6 +233,7 @@ i18n
             moveToBacklog: "Přesunout od nevyřízených",
             moveTo: "Přesunout do",
             board: "Nástěnka",
+            createSubtask: "Vytvořit podúkol",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",

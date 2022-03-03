@@ -228,6 +228,14 @@
   right: 0;
   z-index: 100;
   min-width: 200px;
+  -webkit-box-shadow: 0px 10px 22px 0px rgba(0, 0, 0, 0.6);
+  box-shadow: 0px 10px 22px 0px rgba(0, 0, 0, 0.6);
+  border-radius: 6px;
+
+  &.pos-top {
+    bottom: 20px;
+    top: auto;
+  }
 }
 
 .kanban-col-type {

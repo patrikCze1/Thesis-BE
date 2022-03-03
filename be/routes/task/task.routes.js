@@ -139,7 +139,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       },
       include: [
         { model: TaskAttachment, as: "attachments" },
-        { model: Task, as: "parentTask" },
+        { model: Task, as: "parent" },
         { model: User, as: "creator" },
         // { model: User, as: "solver" },
         {

@@ -91,7 +91,7 @@ module.exports = (sequelize) => {
     });
     Task.belongsTo(models.Task, {
       foreignKey: "parentId",
-      as: "parentTask",
+      as: "parent",
       onDelete: "SET NULL",
     });
     Task.belongsTo(models.Stage, {

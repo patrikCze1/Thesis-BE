@@ -178,6 +178,10 @@ export default function KanbanTask({ task, index }) {
                   <i className="mdi mdi-checkbox-marked-circle-outline text-primary mdi-24px"></i>
                 )} */}
 
+                {task.parentId && (
+                  <i className="mdi mdi-link-variant text-info fs-1-2"></i>
+                )}
+
                 {task.deadline && (
                   <>
                     {task.completedAt ? (

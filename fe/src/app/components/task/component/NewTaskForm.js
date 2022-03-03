@@ -3,7 +3,13 @@ import { useDispatch } from "react-redux";
 import i18n from "../../../../i18n";
 import { createTaskAction } from "../../../reducers/task/task.reducer";
 
-export default function NewTaskForm({ projectId, boardId, onHide }) {
+export default function NewTaskForm({
+  projectId,
+  boardId,
+  onHide,
+  parentId,
+  className = "",
+}) {
   const dispatch = useDispatch();
   const [name, setName] = useState("");
 
@@ -16,6 +22,7 @@ export default function NewTaskForm({ projectId, boardId, onHide }) {
           name,
           projectId,
           boardId,
+          parentId,
         })
       );
       onHide();
@@ -23,7 +30,7 @@ export default function NewTaskForm({ projectId, boardId, onHide }) {
   };
 
   return (
-    <div className="mb-3 new-task-form bg-white p-2">
+    <div className={`mb-3 new-task-form bg-white p-2 ${className}`}>
       <form onSubmit={handleCreateTask} className="d-flex ">
         <input
           type="text"

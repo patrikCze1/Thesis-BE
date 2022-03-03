@@ -111,17 +111,19 @@ export const useInitShowTask = () => {
   };
 };
 
-export const useCreateTask = (projectId, boardId) => {
+export const useCreateTask = (projectId, boardId, parentId = null) => {
   const [showNewTaskForm, setShowNewTaskForm] = useState(false);
 
-  const renderForm = () => {
+  const renderForm = (className = "") => {
     return (
       showNewTaskForm && (
         <div style={{ position: "relative" }}>
           <NewTaskForm
             projectId={projectId}
             boardId={boardId}
+            parentId={parentId}
             onHide={() => setShowNewTaskForm(!showNewTaskForm)}
+            className={className}
           />
         </div>
       )

@@ -7,6 +7,7 @@ import { TASK_ACTION_TYPE } from "../../../utils/enum";
 import { useProjectDetail } from "../../hooks/project";
 import { useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
+import { loadBoardsAction } from "../../reducers/project/board.reducer";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { loadArchiveTasksAction } from "../../reducers/task/task.reducer";
 import { objectIsNotEmpty } from "../../service/utils";
@@ -30,6 +31,7 @@ export default function TaskArchiveScreen() {
 
   useEffect(() => {
     dispatch(loadProjectAction(projectId));
+    dispatch(loadBoardsAction(projectId));
   }, [projectId]);
 
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function TaskArchiveScreen() {
           `?archived=true&offset=${paginationOffset}`
         )
       );
-  }, [project, paginationOffset]);
+  }, [project.id, paginationOffset]);
 
   return (
     <>

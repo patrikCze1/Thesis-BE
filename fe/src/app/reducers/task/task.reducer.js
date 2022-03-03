@@ -101,6 +101,7 @@ export default function taskReducer(state = initialState, action) {
       } else return state;
 
     case "task/edit":
+      console.log("task/edit", action.payload);
       const editedState = {
         ...state,
         actionSuccess: true,
@@ -114,8 +115,9 @@ export default function taskReducer(state = initialState, action) {
           );
         else
           editedState.tasks = state.tasks.map((task) => {
-            if (task.id === action.payload.task.id) return action.payload.task;
-            else return task;
+            if (task.id === action.payload.task.id)
+              task = { ...task, ...action.payload.task };
+            return task;
           });
       } else if (action.payload.type === TASK_ACTION_TYPE.BACKLOG) {
         if (action.payload.removeFromArr === true)
@@ -124,18 +126,20 @@ export default function taskReducer(state = initialState, action) {
           );
         else
           editedState.backlogTasks = state.backlogTasks.map((task) => {
-            if (task.id === action.payload.task.id) return action.payload.task;
-            else return task;
+            if (task.id === action.payload.task.id)
+              task = { ...task, ...action.payload.task };
+            return task;
           });
       } else if (action.payload.type === TASK_ACTION_TYPE.ARCHIVE) {
         if (action.payload.removeFromArr === true)
-          editedState.archivedTasks = state.archivedTasks.filter(
+          editedState.archiveTasks = state.archiveTasks.filter(
             (task) => task.id !== action.payload.task.id
           );
         else
-          editedState.archivedTasks = state.archivedTasks.map((task) => {
-            if (task.id === action.payload.task.id) return action.payload.task;
-            else return task;
+          editedState.archiveTasks = state.archiveTasks.map((task) => {
+            if (task.id === action.payload.task.id)
+              task = { ...task, ...action.payload.task };
+            return task;
           });
       }
 
@@ -336,12 +340,14 @@ export const editTaskAction =
         `/api/projects/${projectId}/tasks/${taskId}`,
         data
       );
+
       dispatch({
         type: "task/edit",
         payload: { ...response.data, type, removeFromArr },
       });
       toast.success(i18next.t("project.changesSaved"));
     } catch (error) {
+      console.error("error message", error.message);
       toast.error(error.response?.data?.message);
       dispatch({ type: "task/actionFail", payload: null });
     }

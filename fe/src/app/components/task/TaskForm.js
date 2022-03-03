@@ -4,14 +4,11 @@ import { Dropdown, Form, ProgressBar } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { Trans, useTranslation } from "react-i18next";
 import Mentions from "rc-mentions";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 import { GithubPicker } from "react-color";
 
 import {
   deleteTaskAction,
   editTaskAction,
-  completeTaskAction,
 } from "../../reducers/task/task.reducer";
 import {
   createAction,
@@ -48,6 +45,10 @@ import AttachmentItem from "../common/AttachmentItem";
 import i18n from "../../../i18n";
 import TaskCommentForm from "../form/TaskCommentForm";
 import { validateCurrencyPattern } from "../../service/utils";
+import { useSwalAlert } from "../../hooks/common";
+import ReactSelect from "../form/ReactSelect";
+import { useCreateTask } from "../../hooks/task";
+import { createTaskRoute } from "../../service/router.service";
 
 export default function TaskForm({
   task,
@@ -75,9 +76,15 @@ export default function TaskForm({
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
+  const { renderForm, setShowNewTaskForm, showNewTaskForm } = useCreateTask(
+    task.projectId,
+    task.boardId,
+    task.id
+  );
+
   const disableEdit = false;
   const { Option } = Mentions;
-  const MySwal = withReactContent(Swal);
+  const { MySwal } = useSwalAlert();
   console.log("task attachments", task, attachments);
   const handleWebsockets = () => {
     try {
@@ -119,6 +126,12 @@ export default function TaskForm({
     setChecklistProgress((completed / checks.length) * 100);
   };
 
+  const projectUsersOptions = Array.isArray(projectUsers)
+    ? projectUsers.map((user) => {
+        return { value: user.id, label: getFullName(user) };
+      })
+    : [];
+
   useEffect(() => {
     if (checks?.length) calculateChecklistProgress(checks);
   }, [checks]);
@@ -134,7 +147,7 @@ export default function TaskForm({
       ...formData,
       [name]: value,
     };
-
+    console.log("handleChangeAndSave", name, value);
     if (!value) updatedTask[name] = null;
     console.log("updatedTask", updatedTask);
     setFormData(updatedTask);
@@ -248,6 +261,17 @@ export default function TaskForm({
 
       <div className="row">
         <div className="col-md-10 order-md-1 order-2">
+          {task.parentId && (
+            <a
+              href={`${createTaskRoute(task.parent)}`}
+              // onClick={(e) => {
+              //   e.preventDefault();
+              //   createTaskRoute(task.parent);
+              // }}
+            >
+              {task.parent.name}
+            </a>
+          )}
           <Form.Group>
             <h4>
               <Editable
@@ -367,6 +391,9 @@ export default function TaskForm({
             </div>
           </div>
           <hr />
+
+          {JSON.stringify(task.subtasks)}
+
           <h5 className="card-title">
             <Trans>Comments</Trans>
           </h5>
@@ -436,12 +463,14 @@ export default function TaskForm({
               <select
                 className="form-control form-control-sm"
                 name="boardId"
-                value={formData.boardId}
+                // value={formData.boardId}
+                value=""
                 onChange={(e) =>
                   handleMoveTo({ boardId: e.target.value, archived: false })
                 }
               >
-                {!formData.boardId && <option value="">{t("Choose")}</option>}
+                <option value="">{t("Choose")}</option>
+
                 {boards &&
                   boards.map((board, i) => {
                     return (
@@ -506,7 +535,16 @@ export default function TaskForm({
             <label>
               <Trans>Solver</Trans>
             </label>
-            <select
+            <ReactSelect
+              options={projectUsersOptions}
+              onChange={(val) => {
+                handleChangeAndSave({
+                  target: { name: "solverId", value: val?.value || null },
+                });
+              }}
+              value={formData.solverId}
+            />
+            {/* <select
               className="form-control form-control-sm"
               name="solverId"
               value={formData.solverId}
@@ -521,7 +559,7 @@ export default function TaskForm({
                     </option>
                   );
                 })}
-            </select>
+            </select> */}
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -604,7 +642,9 @@ export default function TaskForm({
           {canEdit && (
             <Form.Group className="mb-3">
               <label>
-                <Trans>label.actions</Trans>
+                <strong>
+                  <Trans>label.actions</Trans>
+                </strong>
               </label>
 
               <Dropdown>
@@ -613,7 +653,7 @@ export default function TaskForm({
                   <i className="mdi mdi-chevron-down"></i>
                 </Dropdown.Toggle>
                 <Dropdown.Menu>
-                  {task.stageId && (
+                  {(task.stageId || task.archived === true) && (
                     <Dropdown.Item
                       onClick={() =>
                         handleMoveTo({
@@ -642,6 +682,14 @@ export default function TaskForm({
                   )}
                 </Dropdown.Menu>
               </Dropdown>
+
+              <button
+                onClick={() => setShowNewTaskForm(!showNewTaskForm)}
+                className="btn btn-light mt-2"
+              >
+                {i18n.t("task.createSubtask")}
+              </button>
+              {showNewTaskForm ? renderForm("pos-top") : ""}
             </Form.Group>
           )}
         </div>
