@@ -10,7 +10,6 @@ import { useTranslation, Trans } from "react-i18next";
 import {
   formatSecondsToString,
   getSecondsDiff,
-  getStringTimeFromSeconds,
 } from "../../service/date/date.service";
 import {
   loadMyTimeTracksAction,
@@ -75,7 +74,9 @@ export default function ReportScreen() {
         );
     } else {
       if (fromDate && toDate)
-        dispatch(loadMyTimeTracksAction(fromDate, toDate));
+        dispatch(
+          loadMyTimeTracksAction(0, 10000000, true, false, fromDate, toDate)
+        );
     }
   }, [toDate, filteredUser, filteredProject]);
 
@@ -110,7 +111,7 @@ export default function ReportScreen() {
         lastName: track.user?.lastName,
         project: projectNames.current[track.projectId],
         hours: hours.toFixed(2),
-        hoursMinutes: getStringTimeFromSeconds(seconds),
+        hoursMinutes: formatSecondsToString(seconds, false),
       };
     });
   }, [tracks]);
@@ -154,7 +155,7 @@ export default function ReportScreen() {
           year: "numeric",
         }).format(new Date(date)),
         hours,
-        getStringTimeFromSeconds(total) + " h",
+        formatSecondsToString(total, false) + " h",
       ];
     });
 
@@ -273,8 +274,9 @@ export default function ReportScreen() {
             <div className="card">
               <div className="card-body">
                 <h2 className="card-title">
-                  {`${t("track.workedHours")}: ${getStringTimeFromSeconds(
-                    totalHours * 3600
+                  {`${t("track.workedHours")}: ${formatSecondsToString(
+                    totalHours * 3600,
+                    false
                   )} h (${totalHours})`}
                 </h2>
                 {groupedTracks.length > 0 ? (
