@@ -73,12 +73,12 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
 router.patch("/update", authenticateToken, async (req, res) => {
   try {
     const me = getUser(req, res);
-    let user = await User.findByPk(me.id);
+    const user = await User.findByPk(me.id);
 
     Object.keys(req.body).forEach((key) => {
       user[key] = req.body[key];
     });
-
+    console.log("user", user);
     await user.save();
 
     return res.json({ user });

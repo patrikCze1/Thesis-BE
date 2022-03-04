@@ -6,7 +6,7 @@ export default function PasswordRepeat({ onInputChange, data }) {
   return (
     <>
       <div className="form-group">
-        <label for="password">
+        <label htmlFor="password">
           <Trans>Password</Trans>
         </label>
         <input
@@ -21,7 +21,7 @@ export default function PasswordRepeat({ onInputChange, data }) {
         />
       </div>
       <div className="form-group">
-        <label for="passwordAgain">
+        <label htmlFor="passwordAgain">
           <Trans>Password again</Trans>
         </label>
         <input

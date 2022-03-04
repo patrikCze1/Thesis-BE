@@ -5,7 +5,10 @@ import { useHistory } from "react-router-dom";
 
 import axios from "./../../../utils/axios.config";
 import { ROUTE } from "../../../utils/enum";
-import { createRouteWithParams } from "../../service/router.service";
+import {
+  createRouteWithParams,
+  createTaskRoute,
+} from "../../service/router.service";
 
 const getSuggestionValue = (suggestion) => suggestion.text;
 
@@ -46,20 +49,20 @@ export default function SearchBar() {
       );
     } else if (sectionIndex === 1) {
       //task
-      if (suggestion.boardId)
-        history.push(
-          createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
-            ":id": suggestion.projectId,
-            ":boardId": suggestion.boardId,
-          }) + `?ukol=${suggestion.id}`
-        );
-      else
-        history.push(
-          createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
-            ":id": suggestion.projectId,
-          }) + `?ukol=${suggestion.id}`
-        );
-      //todo check if task is in archive
+      history.push(createTaskRoute(suggestion));
+      // if (suggestion.boardId)
+      //   history.push(
+      //     createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
+      //       ":id": suggestion.projectId,
+      //       ":boardId": suggestion.boardId,
+      //     }) + `?ukol=${suggestion.id}`
+      //   );
+      // else
+      //   history.push(
+      //     createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
+      //       ":id": suggestion.projectId,
+      //     }) + `?ukol=${suggestion.id}`
+      //   );
     }
     setValue("");
   };
@@ -81,7 +84,7 @@ export default function SearchBar() {
           text: task.name,
           projectId: task.projectId,
           boardId: task.boardId,
-          // archived: task.archived
+          archived: task.archived,
         }));
         const projectSuggestions = projects.map((project) => ({
           id: project.id,
@@ -98,7 +101,7 @@ export default function SearchBar() {
           },
         ]);
       } catch (error) {
-        console.log("search err", error);
+        console.error("search err", error);
       }
     }
   };
@@ -139,9 +142,9 @@ export default function SearchBar() {
           onSuggestionSelected={onSuggestionSelected}
         />
         <div className="input-group-append">
-          <a onClick={(e) => handleSearch(e)} className="input-group-text">
+          <button onClick={(e) => handleSearch(e)} className="input-group-text">
             <i className="mdi mdi-magnify"></i>
-          </a>
+          </button>
         </div>
       </div>
     </form>

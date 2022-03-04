@@ -5,7 +5,10 @@ import { useHistory } from "react-router-dom";
 import axios from "./../../../utils/axios.config";
 import SearchResultItem from "./SearchResultItem";
 import { ROUTE } from "../../../utils/enum";
-import { createRouteWithParams } from "../../service/router.service";
+import {
+  createRouteWithParams,
+  createTaskRoute,
+} from "../../service/router.service";
 import { useInitShowTask } from "../../hooks/task";
 
 export default function SearchResults() {
@@ -42,7 +45,8 @@ export default function SearchResults() {
 
   const handleClickTask = (e, task) => {
     e.preventDefault();
-    click(task);
+    // click(task);
+    history.push(createTaskRoute(task));
   };
 
   const handleClickProject = (e, project) => {

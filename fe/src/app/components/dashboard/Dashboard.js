@@ -40,7 +40,7 @@ export default function Dashboard() {
   const now = new Date();
 
   useEffect(() => {
-    dispatch(loadNotificationsAction(0, 10));
+    dispatch(loadNotificationsAction(0, 5));
     dispatch(loadTasksAction(-1, `?solverId=${user.id}&completedAt=null`));
 
     const firstDayOfWeek = getFirstDayOfWeek(new Date());

@@ -51,7 +51,8 @@ export default function currentUserReducer(state = initialState, action) {
       return { ...state, actionProcessing: false };
 
     case "user/update":
-      const storageData = window.localStorage.getItem("app-user");
+      let storageData = window.localStorage.getItem("app-user");
+      storageData = JSON.parse(storageData);
       const updatedUser = { ...state.user, ...action.payload };
       storageData.value = encrypt(JSON.stringify(updatedUser));
       window.localStorage.setItem("app-user", JSON.stringify(storageData));

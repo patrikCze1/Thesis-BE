@@ -44,3 +44,18 @@
     }
   }
 }
+
+.task-table-item-backlog {
+  .task-number {
+    width: 50px;
+  }
+  .task-estimation {
+    width: 100px;
+  }
+  .task-priority {
+    width: 120px;
+  }
+  .task-deadline {
+    width: 170px;
+  }
+}

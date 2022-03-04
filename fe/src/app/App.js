@@ -81,7 +81,7 @@ export default function App() {
   //https://socket.io/docs/v4/
   const initWebsocket = () => {
     const socket = initIo();
-    console.log("initWebsocket");
+    console.log("initWebsocket", socket);
     if (socket) {
       socket.on(SOCKET.NOTIFICATION_NEW, (data) => {
         console.log("SOCKET.NOTIFICATION_NEW", data);

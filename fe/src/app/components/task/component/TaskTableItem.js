@@ -83,20 +83,24 @@ export default function TaskTableItem({ task, view }) {
     );
 
   return (
-    <tr>
-      <td> {task.number} </td>
+    <tr className="task-table-item-backlog">
+      <td className="task-number">{task.number} </td>
       <td>
         <a href={`/upravit=${task.id}`} onClick={handleClick}>
           {task.name}
         </a>
       </td>
-      <td>
+      <td className="task-priority">
         <span className={`badge badge-prio-${task.priority}`}>
           <Trans>{TASK_PRIORITY[task.priority]}</Trans>
         </span>
       </td>
-      <td> {task.estimation ? `${task.estimation} h` : ""} </td>
-      <td> {task.deadline && getMonthDayTime(new Date(task.deadline))} </td>
+      <td className="task-estimation">
+        {task.estimation ? `${task.estimation} h` : ""}
+      </td>
+      <td className="task-deadline">
+        {task.deadline && getMonthDayTime(new Date(task.deadline))}
+      </td>
     </tr>
   );
 }
