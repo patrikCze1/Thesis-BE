@@ -75,7 +75,7 @@ export default function taskReducer(state = initialState, action) {
           ...state,
           actionSuccess: true,
           actionProcessing: false,
-          task: {},
+          // task: {},
           taskLoaded: true,
           tasks: [...state.tasks, action.payload.task],
         };
@@ -84,7 +84,7 @@ export default function taskReducer(state = initialState, action) {
           ...state,
           actionSuccess: true,
           actionProcessing: false,
-          task: {},
+          // task: {},
           taskLoaded: true,
           backlogTasks: [...state.backlogTasks, action.payload.task],
         };

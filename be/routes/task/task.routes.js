@@ -39,28 +39,19 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   try {
     const where = {};
     const { projectId } = req.params;
-    const skipParams = ["offset", "archived", "limit", "orderBy", "sort"];
+    const skipParams = ["offset", "limit", "orderBy", "sort"];
 
     if (projectId && projectId != "-1") where.ProjectId = projectId;
-    if (req.query.archived) {
-      if (req.query.archived === "true") where.archived = 1;
-      // where.completedAt = { [Op.lt]: addTimeToDate(new Date(), -86400 * 7) };
-      else where.archived = 0;
-      // where.completedAt = {
-      //   [Op.or]: [
-      //     { [Op.gt]: addTimeToDate(new Date(), -86400 * 7) },
-      //     { [Op.is]: null },
-      //   ],
-      // };
-    }
 
     for (const key in req.query) {
       if (!skipParams.includes(key) && req.query[key]) {
-        if (req.query[key] === "null") where[key] = { [Op.is]: null };
+        if (req.query[key] === "null" || req.query[key] === "=null")
+          where[key] = { [Op.is]: null };
+        else if (req.query[key] === "!=null") where[key] = { [Op.ne]: null };
         else where[key] = req.query[key];
       }
     }
-
+    console.log("where", where);
     const tasks = await Task.findAndCountAll({
       subQuery: false,
       attributes: {

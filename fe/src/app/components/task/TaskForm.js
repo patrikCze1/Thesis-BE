@@ -49,6 +49,7 @@ import { useSwalAlert } from "../../hooks/common";
 import ReactSelect from "../form/ReactSelect";
 import { useCreateTask } from "../../hooks/task";
 import { createTaskRoute } from "../../service/router.service";
+import { useHistory } from "react-router-dom";
 
 export default function TaskForm({
   task,
@@ -82,6 +83,7 @@ export default function TaskForm({
     task.id
   );
 
+  const history = useHistory();
   const disableEdit = false;
   const { Option } = Mentions;
   const { MySwal } = useSwalAlert();
@@ -262,15 +264,19 @@ export default function TaskForm({
       <div className="row">
         <div className="col-md-10 order-md-1 order-2">
           {task.parentId && (
-            <a
-              href={`${createTaskRoute(task.parent)}`}
-              // onClick={(e) => {
-              //   e.preventDefault();
-              //   createTaskRoute(task.parent);
-              // }}
-            >
-              {task.parent.name}
-            </a>
+            <span className="p-2 d-inline-block text-white badge badge-info mb-2 fs-small">
+              {i18n.t("task.superiorTask")}{" "}
+              <a
+                href={`${createTaskRoute(task.parent)}`}
+                className="text-white text-"
+                onClick={(e) => {
+                  e.preventDefault();
+                  history.push(createTaskRoute(task.parent));
+                }}
+              >
+                {task.parent.name}
+              </a>
+            </span>
           )}
           <Form.Group>
             <h4>
@@ -336,6 +342,27 @@ export default function TaskForm({
             )}
           </div>
 
+          {task?.subtasks?.length > 0 && (
+            <>
+              <hr />
+              <div className="row mb-3">
+                <div className="col-md-12">
+                  <h5 className="card-title">{i18n.t("task.subtasks")}</h5>
+
+                  {task.subtasks.map((task) => (
+                    <a
+                      href="#"
+                      onClick={(e) => history.push(createTaskRoute(task))}
+                      className="mr-2"
+                    >
+                      {task.name}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
           <hr />
           <div className="row mb-3">
             <div className="col-md-12">
@@ -391,8 +418,6 @@ export default function TaskForm({
             </div>
           </div>
           <hr />
-
-          {JSON.stringify(task.subtasks)}
 
           <h5 className="card-title">
             <Trans>Comments</Trans>

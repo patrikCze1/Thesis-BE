@@ -234,6 +234,8 @@ i18n
             moveTo: "Přesunout do",
             board: "Nástěnka",
             createSubtask: "Vytvořit podúkol",
+            subtasks: "Podúkoly",
+            superiorTask: "Nadřazený úkol",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",
