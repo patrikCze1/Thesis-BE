@@ -57,9 +57,12 @@ module.exports = (sequelize) => {
   });
 
   TimeTrack.associate = (models) => {
-    TimeTrack.belongsTo(models.User, { as: "user" });
-    TimeTrack.belongsTo(models.Task, { as: "task" });
-    TimeTrack.belongsTo(models.Project, { as: "project" });
+    TimeTrack.belongsTo(models.User, { as: "user", foreignKey: "userId" });
+    TimeTrack.belongsTo(models.Task, { as: "task", foreignKey: "taskId" });
+    TimeTrack.belongsTo(models.Project, {
+      as: "project",
+      foreignKey: "projectId",
+    });
   };
 
   return TimeTrack;

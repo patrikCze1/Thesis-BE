@@ -43,11 +43,11 @@ module.exports = (sequelize) => {
     Board.belongsTo(models.Project, {
       foreignKey: { name: "projectId", as: "project" },
     });
-    Board.hasMany(models.Task, { onDelete: "CASCADE", foreignKey: "taskId" });
+    Board.hasMany(models.Task, { onDelete: "CASCADE", foreignKey: "boardId" });
     Board.hasMany(models.Stage, {
       onDelete: "CASCADE",
-      foreignKey: "boardId",
       as: "stages",
+      foreignKey: "boardId",
     });
     Board.belongsTo(models.User, {
       foreignKey: "createdById",

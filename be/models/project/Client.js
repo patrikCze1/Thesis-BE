@@ -39,8 +39,8 @@ module.exports = (sequelize) => {
   Client.associate = function (models) {
     Client.hasMany(models.Project, {
       onDelete: "SET NULL",
-      foreignKey: "clientId",
       as: "projects",
+      foreignKey: "clientId",
     });
   };
 

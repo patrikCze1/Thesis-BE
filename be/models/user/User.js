@@ -110,17 +110,20 @@ module.exports = (sequelize) => {
   );
 
   User.associate = function (models) {
-    User.hasMany(models.Task, { foreignKey: "createdById", as: "creator" });
-    User.hasMany(models.Project, { foreignKey: "createdById" });
-    User.hasMany(models.Task, { foreignKey: "solverId" });
-    User.hasMany(models.TaskCheck, { foreignKey: "solverId" });
+    User.hasMany(models.Task, { as: "creator", foreignKey: "creatorId" });
+    User.hasMany(models.Task, { as: "tasks", foreignKey: "solverId" });
+    User.hasMany(models.Project, { as: "projects", foreignKey: "userId" });
+    User.hasMany(models.TaskCheck, { as: "taskChecks", foreignKey: "userId" });
     User.hasMany(models.TaskComment, {
-      foreignKey: "userId",
       as: "taskCommentUser",
+      foreignKey: "userId",
     });
-    User.hasMany(models.TaskChangeLog, { foreignKey: "userId" });
-    User.hasMany(models.TimeTrack, { foreignKey: "userId" });
-    User.hasMany(models.Todo, { foreignKey: "userId" });
+    User.hasMany(models.TaskChangeLog, {
+      as: "taskChangeLogs",
+      foreignKey: "userId",
+    });
+    User.hasMany(models.TimeTrack, { as: "timeTracks", foreignKey: "userId" });
+    User.hasMany(models.Todo, { as: "todos", foreignKey: "userId" });
     User.hasMany(models.Notification, { foreignKey: "userId" });
     User.hasMany(models.Notification, { foreignKey: "createdById" });
     User.belongsToMany(models.Group, {

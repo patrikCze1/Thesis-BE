@@ -81,8 +81,8 @@ export default function ProjectForm({ projectId = false, closeForm }) {
       const data = {
         ...formData,
         clientId: formData.clientId?.length ? formData.clientId[0].value : null,
-        users: formData.users.map((user) => user.value),
-        groups: formData.groups.map((group) => group.value),
+        users: formData.users?.map((user) => user.value) || [],
+        groups: formData.groups?.map((group) => group.value) || [],
       };
       console.log("data", data);
       if (projectId || project.id) {

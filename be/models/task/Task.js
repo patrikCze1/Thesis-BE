@@ -136,16 +136,16 @@ module.exports = (sequelize) => {
       foreignKey: "taskId",
       as: "changeLogs",
     });
-    Task.hasMany(models.TaskCheck, { foreignKey: "taskId", as: "checks" });
-    Task.hasMany(models.TimeTrack, { foreignKey: "taskId", as: "timeTracks" });
+    Task.hasMany(models.TaskCheck, { as: "checks", foreignKey: "taskId" });
+    Task.hasMany(models.TimeTrack, { as: "timeTracks", foreignKey: "taskId" });
     Task.hasMany(models.TaskNotification, {
-      foreignKey: "taskId",
       as: "notifications",
+      foreignKey: "taskId",
     });
-    // Task.hasMany(Task, {
-    //   foreignKey: "parentId",
-    //   as: "subTasks",
-    // });
+    Task.hasMany(Task, {
+      as: "subTasks",
+      foreignKey: "parentId",
+    });
   };
 
   return Task;

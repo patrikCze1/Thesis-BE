@@ -8,7 +8,7 @@ export default function Quill({ onChange, prop, value }) {
         if (source === "user") onChange(prop, value);
       }}
       theme="snow"
-      value={value}
+      value={value || ""}
     />
   );
 }

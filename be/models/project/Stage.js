@@ -54,7 +54,7 @@ module.exports = (sequelize) => {
     Stage.hasMany(models.Task, {
       as: "tasks",
       foreignKey: "stageId",
-      onDelete: "set null",
+      onDelete: "SET NULL",
     });
   };
   return Stage;
