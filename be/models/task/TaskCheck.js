@@ -11,7 +11,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        len: [0, 255],
+        len: {
+          args: [0, 255],
+          msg: "error.validation.stringTooLong",
+        },
       },
     },
     completed: {

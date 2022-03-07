@@ -11,6 +11,7 @@ const { validator } = require("../../service");
 const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
 const { getIo } = require("../../service/io");
 const { findUsersByProject } = require("../../repo/userRepo");
+const { responseError } = require("../../service/utils");
 
 const io = getIo();
 
@@ -49,7 +50,7 @@ router.post(
         io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      responseError(req, res, error);
     }
   }
 );
@@ -80,7 +81,7 @@ router.patch(
         });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      responseError(req, res, error);
     }
   }
 );

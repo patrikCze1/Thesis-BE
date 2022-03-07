@@ -11,7 +11,10 @@ module.exports = (sequelize) => {
       type: DataTypes.STRING(100),
       allowNull: false,
       validate: {
-        len: [0, 100],
+        len: {
+          args: [0, 100],
+          msg: "error.validation.stringTooLong",
+        },
       },
     },
     emails: {
@@ -23,7 +26,10 @@ module.exports = (sequelize) => {
     webpage: {
       type: DataTypes.STRING(100),
       validate: {
-        len: [0, 100],
+        len: {
+          args: [0, 100],
+          msg: "error.validation.stringTooLong",
+        },
       },
     },
     createdAt: {

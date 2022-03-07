@@ -4,6 +4,7 @@ const router = express.Router();
 const { Todo } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
 const { authenticateToken } = require("../../auth/auth");
+const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -37,7 +38,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const todo = await Todo.create(data);
     res.send({ todo });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -51,7 +52,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ todo });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 

@@ -7,6 +7,7 @@ const { Op } = require("sequelize");
 const { validator } = require("../../service");
 const { SOCKET_EMIT } = require("../../enum/enum");
 const { getIo } = require("../../service/io");
+const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -134,7 +135,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const track = await TimeTrack.create(data);
     res.send({ track });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -169,7 +170,7 @@ router.post("/start/", authenticateToken, async (req, res) => {
     const track = await TimeTrack.create(data);
     res.send({ track });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -198,7 +199,7 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
 
     res.send({ track });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -229,7 +230,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ track });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 

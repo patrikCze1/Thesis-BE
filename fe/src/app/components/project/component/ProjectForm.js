@@ -33,7 +33,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
   );
   const [isEdit, setIsEdit] = useState(projectId ? true : false);
   const [formData, setFormData] = useState({ ...project });
-
+  console.log("users", users);
   useEffect(() => {
     console.log("ProjectForm effect projectId project", projectId, project);
     dispatch(loadClietntsAction());
@@ -111,13 +111,12 @@ export default function ProjectForm({ projectId = false, closeForm }) {
   });
 
   const usersArr = users.map((user) => {
-    console.log("users", users);
     return {
       value: user.id,
       label: getFullName(user),
     };
   });
-
+  console.log("users", users);
   if (!projectLoaded) {
     return <Loader />;
   }
@@ -158,7 +157,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
-                    maxLength={10}
+                    // maxLength={10}
                   />
                 </Form.Group>
 
@@ -246,6 +245,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                     id="projectGroups"
                     multiple={true}
                     options={groupsArr}
+                    labelKey={(option) => option.label}
                     name="groups"
                     selected={formData.groups}
                     onChange={(val) => handleChange("groups", val)}

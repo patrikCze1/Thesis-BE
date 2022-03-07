@@ -38,7 +38,7 @@ const {
   sendEmailNotification,
   createTaskNotification,
 } = require("../../service/notification/notification.service");
-const { getFeUrl } = require("../../service/utils");
+const { getFeUrl, responseError } = require("../../service/utils");
 const io = getIo();
 
 router.post(
@@ -153,7 +153,7 @@ router.post(
 
       res.json({ comment: newComment });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      responseError(req, res, error);
     }
   }
 );
@@ -177,7 +177,7 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 
     res.json({ comment: taskComment });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 

@@ -4,6 +4,7 @@ const router = express.Router();
 const { Task, TaskCheck } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
+const { responseError } = require("../../service/utils");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -28,7 +29,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const newRecord = await TaskCheck.create(data);
     res.send({ success: true, check: newRecord });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -49,7 +50,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ success: true, check: updated });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -60,13 +61,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const user = getUser(req, res);
 
     if (!task.createdById !== user.id && !user.roles.includes(ROLE.ADMIN)) {
-      res
-        .status(403)
-        .json({
-          message: req.json({
-            message: req.t("error.missingPermissionForAction"),
-          }),
-        });
+      res.status(403).json({
+        message: req.json({
+          message: req.t("error.missingPermissionForAction"),
+        }),
+      });
       return;
     }
 

@@ -3,6 +3,7 @@ const router = express.Router();
 const { Group, User, UserGroup } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const { ROLE } = require("../../enum/enum");
+const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
   const where = {};
@@ -53,13 +54,11 @@ router.post("/", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 
@@ -80,7 +79,7 @@ router.post("/", authenticateToken, async (req, res) => {
     newGroup.setDataValue("createdAt", new Date());
     res.json({ group: newGroup });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -91,13 +90,11 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 
@@ -117,11 +114,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ group: updated });
   } catch (e) {
-    if (e.errors.length > 0) {
-      res.status(500).json({ message: e.errors[0].message });
-    } else {
-      res.status(500).json({ message: e.message });
-    }
+    responseError(req, res, error);
   }
 });
 
@@ -132,13 +125,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     !currentUser.roles.includes(ROLE.ADMIN) &&
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 

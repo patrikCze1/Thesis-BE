@@ -13,59 +13,79 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(50),
         unique: {
           args: true,
-          msg: "This username is already taken.",
+          msg: "error.validation.usernameAlreadyExists",
         },
         allowNull: false,
-
         validate: {
-          len: [0, 50],
+          len: {
+            args: [0, 50],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       password: {
         type: DataTypes.STRING(100),
         allowNull: false,
         validate: {
-          len: [0, 100],
+          len: {
+            args: [0, 100],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       email: {
         type: DataTypes.STRING(100),
+        allowNull: false,
         unique: {
           args: true,
-          msg: "This email is already taken.",
+          msg: "error.validation.emailAlreadyExists",
         },
-        allowNull: false,
         validate: {
           isEmail: {
-            msg: "Email is not valid",
+            msg: "error.validation.emailNotValid",
           },
-          len: [0, 100],
+          len: {
+            args: [0, 100],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       phone: {
         type: DataTypes.STRING(16),
         validate: {
-          len: [0, 16],
+          len: {
+            args: [0, 16],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       firstName: {
         type: DataTypes.STRING(50),
         allowNull: false,
         validate: {
-          len: [0, 50],
+          len: {
+            args: [0, 50],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       lastName: {
         type: DataTypes.STRING(50),
         allowNull: false,
         validate: {
-          len: [0, 50],
+          len: {
+            args: [0, 50],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       position: {
         type: DataTypes.STRING(50),
         validate: {
-          len: [0, 50],
+          len: {
+            args: [0, 50],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       sex: {
@@ -82,7 +102,10 @@ module.exports = (sequelize) => {
       passwordResetHash: {
         type: DataTypes.STRING,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       allowEmailNotification: {

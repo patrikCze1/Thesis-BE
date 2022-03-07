@@ -32,7 +32,11 @@ const {
 const { findOneById } = require("../../repo/user/user.repository");
 const { stageRepo } = require("../../repo");
 const { addTimeToDate } = require("../../service/date");
-const { getFeTaskUrl, trimString } = require("../../service/utils");
+const {
+  getFeTaskUrl,
+  trimString,
+  responseError,
+} = require("../../service/utils");
 const ResponseError = require("../../models/common/ResponseError");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
@@ -254,7 +258,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     }
     res.json({ task: newTask });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -685,9 +689,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       }
     }
   } catch (error) {
-    if (error instanceof ResponseError)
-      return res.status(error.status).json({ message: error.message });
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 

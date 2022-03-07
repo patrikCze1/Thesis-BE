@@ -6,6 +6,7 @@ const { Client, Project } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { ROLE } = require("../../enum/enum");
+const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -69,13 +70,11 @@ router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 
@@ -94,7 +93,7 @@ router.post("/", authenticateToken, async (req, res) => {
     const newRecord = await Client.create(data);
     res.send({ success: true, client: newRecord });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -102,13 +101,11 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 
@@ -123,7 +120,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ success: true, client: updated });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -131,13 +128,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   if (!user.roles.includes(ROLE.ADMIN)) {
-    res
-      .status(403)
-      .json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
-      });
+    res.status(403).json({
+      message: req.json({
+        message: req.t("error.missingPermissionForAction"),
+      }),
+    });
     return;
   }
 

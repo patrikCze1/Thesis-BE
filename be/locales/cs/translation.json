@@ -6,7 +6,13 @@
     "missingPermissionForAction": "Pro tuto akci nemáte dostatečné oprávnění",
     "accessDenied": "Přístup zamítnut",
     "thisFieldsAreRequired": "Tyto pole jsou povinná",
-    "cantAssignToStage": "Nelze přiřadit do této fáze"
+    "cantAssignToStage": "Nelze přiřadit do této fáze",
+    "validation": {
+      "stringTooLong": "Text pro {{field}} je příliš dlouhý",
+      "emailNotValid": "E-mail není validní",
+      "emailAlreadyExists": "E-mail je již používán",
+      "usernameAlreadyExists": "Uživatelské jméno již existuje"
+    }
   },
   "project": {
     "error": {
@@ -30,7 +36,14 @@
   },
   "field": {
     "title": "Název",
+    "name": "Název",
     "description": "Popis",
+    "key": "Zkratka",
+    "originalName": "Název",
+    "message": "Zpráva",
+    "colorCode": "Barva",
+    "lastName": "Příjmení",
+    "firstName": "Jméno",
     "task": {
       "name": "Název",
       "description": "Popis",

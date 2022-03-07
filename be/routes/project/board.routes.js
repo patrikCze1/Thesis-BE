@@ -10,6 +10,7 @@ const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
+const { responseError } = require("../../service/utils");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   try {
@@ -105,7 +106,7 @@ router.post(
         socket.to(u.id).emit(SOCKET_EMIT.PROJECT_BOARD_NEW, { board });
       }
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      responseError(req, res, error);
     }
   }
 );
@@ -122,7 +123,7 @@ router.patch(
 
       res.json({ board });
     } catch (error) {
-      res.status(500).json({ message: error.message });
+      responseError(req, res, error);
     }
   }
 );

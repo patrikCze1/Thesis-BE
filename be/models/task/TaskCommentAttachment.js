@@ -13,21 +13,30 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       file: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       path: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       commentId: {
@@ -43,7 +52,10 @@ module.exports = (sequelize) => {
       type: {
         type: DataTypes.STRING,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       createdAt: {

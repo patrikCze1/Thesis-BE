@@ -13,7 +13,10 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          len: [0, 255],
+          len: {
+            args: [0, 255],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       number: {
@@ -38,7 +41,6 @@ module.exports = (sequelize) => {
       },
       deadline: {
         type: DataTypes.DATE,
-
         validate: {
           isDate: true,
         },
@@ -47,7 +49,10 @@ module.exports = (sequelize) => {
         type: DataTypes.STRING(7),
         defaultValue: "#ffffff",
         validate: {
-          len: [0, 7],
+          len: {
+            args: [0, 7],
+            msg: "error.validation.stringTooLong",
+          },
         },
       },
       solverId: {
@@ -98,7 +103,6 @@ module.exports = (sequelize) => {
       },
       //begin
       //muted, favourites...
-      // todo proverit taskId
     },
     {
       paranoid: true,

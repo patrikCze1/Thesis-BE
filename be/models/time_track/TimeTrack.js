@@ -10,7 +10,10 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING(50),
       validate: {
-        len: [0, 255],
+        len: {
+          args: [0, 255],
+          msg: "error.validation.stringTooLong",
+        },
       },
     },
     beginAt: {

@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+
 const {
   Project,
   User,
@@ -15,6 +16,7 @@ const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
+const { responseError } = require("../../service/utils");
 
 const io = getIo();
 
@@ -173,7 +175,7 @@ router.post("/", authenticateToken, async (req, res) => {
       io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project });
     }
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
@@ -227,7 +229,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     res.json({ project: updated });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    responseError(req, res, error);
   }
 });
 
