@@ -38,9 +38,19 @@ const {
   responseError,
 } = require("../../service/utils");
 const ResponseError = require("../../models/common/ResponseError");
+const { isUserInProject } = require("../../repo/project/project.repository");
 
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
   try {
+    const allowEntry = await isUserInProject(req.params.projectId, user.id);
+    if (!allowEntry) {
+      res.status(403).json({
+        message: req.t("project.error.userHasNotAccessToThisProject"),
+      });
+      return;
+    }
+
     const where = {};
     const { projectId } = req.params;
     const skipParams = ["offset", "limit", "orderBy", "sort"];
@@ -128,6 +138,14 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // }
 
   try {
+    const allowEntry = await isUserInProject(req.params.projectId, user.id);
+    if (!allowEntry) {
+      res.status(403).json({
+        message: req.t("project.error.userHasNotAccessToThisProject"),
+      });
+      return;
+    }
+
     const task = await Task.findOne({
       where: {
         id: req.params.id,

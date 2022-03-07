@@ -17,6 +17,7 @@ const { projectRepo } = require("./../../repo");
 const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
 const { responseError } = require("../../service/utils");
+const { isUserInProject } = require("../../repo/project/project.repository");
 
 const io = getIo();
 
@@ -60,10 +61,7 @@ router.get("/:id", authenticateToken, async (req, res) => {
   try {
     if (!user.roles.includes(ROLE.ADMIN)) {
       // only admin can see all projects
-      const userProjects = await projectRepo.findByUser(user, {});
-      const result = userProjects.rows.find(
-        (project) => project.id == req.params.id
-      );
+      const result = await isUserInProject(req.params.id, user.id);
 
       if (!result) {
         res.status(403).json({

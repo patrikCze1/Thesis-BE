@@ -60,8 +60,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
           ? project.users.map((user) => {
               return {
                 value: user.id,
-                firstName: user.firstName,
-                lastName: user.lastName,
+                label: getFullName(user),
               };
             })
           : [],
@@ -121,6 +120,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
     return <Loader />;
   }
   console.log("formData", formData);
+  console.log("usersArr", usersArr);
   return (
     <div className="row">
       <div className="col-md-12 grid-margin">
@@ -157,7 +157,7 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                     onChange={(e) =>
                       handleChange(e.target.name, e.target.value)
                     }
-                    // maxLength={10}
+                    maxLength={10}
                   />
                 </Form.Group>
 

@@ -101,3 +101,48 @@ exports.findBySearch = async (user, query, filter) => {
     ],
   });
 };
+
+/**
+ *
+ * @param {number} projectId
+ * @param {number} userId
+ * @returns {boolean}
+ */
+exports.isUserInProject = async (projectId, userId) => {
+  try {
+    const project = await Project.findOne({
+      subQuery: false,
+      where: {
+        [Op.or]: [
+          { "$groups->groupUsers->UserGroup.userId$": userId },
+          { "$users.ProjectUser.userId$": userId },
+          { createdById: userId },
+        ],
+        id: projectId,
+      },
+      include: [
+        {
+          model: Group,
+          as: "groups",
+          attributes: [],
+          include: {
+            model: User,
+            as: "groupUsers",
+            attributes: [],
+          },
+        },
+        {
+          model: User,
+          as: "users",
+          attributes: [],
+        },
+      ],
+    });
+
+    if (project) return true;
+    else return false;
+  } catch (error) {
+    console.error("isUserInProject error", error);
+    return false;
+  }
+};

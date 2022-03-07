@@ -11,9 +11,20 @@ const { getIo } = require("../../service/io");
 const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
+const { isUserInProject } = require("../../repo/project/project.repository");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
+  const user = getUser(req, res);
+
   try {
+    const allowEntry = await isUserInProject(req.params.projectId, user.id);
+    if (!allowEntry) {
+      res.status(403).json({
+        message: req.t("project.error.userHasNotAccessToThisProject"),
+      });
+      return;
+    }
+
     const boards = await Board.findAll({
       where: { projectId: req.params.projectId },
       order: [
@@ -33,7 +44,17 @@ router.get(
   "/:projectId/boards/:boardId",
   authenticateToken,
   async (req, res) => {
+    const user = getUser(req, res);
+
     try {
+      const allowEntry = await isUserInProject(req.params.projectId, user.id);
+      if (!allowEntry) {
+        res.status(403).json({
+          message: req.t("project.error.userHasNotAccessToThisProject"),
+        });
+        return;
+      }
+
       const board = await Board.findByPk(req.params.boardId);
       const stages = await Stage.findAll({
         where: { boardId: req.params.boardId },
