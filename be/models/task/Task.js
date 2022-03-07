@@ -12,10 +12,17 @@ module.exports = (sequelize) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [0, 255],
+        },
       },
       number: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        validate: {
+          isInt: true,
+          min: 0,
+        },
       },
       description: {
         type: DataTypes.TEXT,
@@ -24,13 +31,24 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1,
+        validate: {
+          isInt: true,
+          min: 0,
+        },
       },
       deadline: {
         type: DataTypes.DATE,
+
+        validate: {
+          isDate: true,
+        },
       },
       colorCode: {
         type: DataTypes.STRING(7),
         defaultValue: "#ffffff",
+        validate: {
+          len: [0, 7],
+        },
       },
       solverId: {
         type: DataTypes.INTEGER,
@@ -45,6 +63,10 @@ module.exports = (sequelize) => {
       },
       parentId: {
         type: DataTypes.INTEGER,
+        references: {
+          model: "Tasks",
+          key: "id",
+        },
       },
       stageId: {
         type: DataTypes.INTEGER,
@@ -54,6 +76,9 @@ module.exports = (sequelize) => {
       },
       estimation: {
         type: DataTypes.FLOAT,
+        validate: {
+          isFloat: true,
+        },
       },
       archived: {
         type: DataTypes.BOOLEAN,
@@ -89,7 +114,7 @@ module.exports = (sequelize) => {
       as: "board",
       onDelete: "SET NULL",
     });
-    Task.belongsTo(models.Task, {
+    Task.belongsTo(Task, {
       foreignKey: "parentId",
       as: "parent",
       onDelete: "SET NULL",
@@ -107,10 +132,20 @@ module.exports = (sequelize) => {
       foreignKey: "taskId",
       as: "taskComments",
     });
-    Task.hasMany(models.TaskChangeLog, { foreignKey: "taskId" });
+    Task.hasMany(models.TaskChangeLog, {
+      foreignKey: "taskId",
+      as: "changeLogs",
+    });
     Task.hasMany(models.TaskCheck, { foreignKey: "taskId", as: "checks" });
-    Task.hasMany(models.TimeTrack, { foreignKey: "taskId" });
-    Task.hasMany(models.TaskNotification, { foreignKey: "taskId" });
+    Task.hasMany(models.TimeTrack, { foreignKey: "taskId", as: "timeTracks" });
+    Task.hasMany(models.TaskNotification, {
+      foreignKey: "taskId",
+      as: "notifications",
+    });
+    // Task.hasMany(Task, {
+    //   foreignKey: "parentId",
+    //   as: "subTasks",
+    // });
   };
 
   return Task;

@@ -10,6 +10,9 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [0, 255],
+      },
     },
     completed: {
       type: DataTypes.BOOLEAN,

@@ -12,14 +12,23 @@ module.exports = (sequelize) => {
       originalName: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [0, 255],
+        },
       },
       file: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [0, 255],
+        },
       },
       path: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [0, 255],
+        },
       },
       commentId: {
         type: DataTypes.INTEGER,
@@ -27,9 +36,15 @@ module.exports = (sequelize) => {
       },
       size: {
         type: DataTypes.INTEGER,
+        validate: {
+          isInt: true,
+        },
       },
       type: {
         type: DataTypes.STRING,
+        validate: {
+          len: [0, 255],
+        },
       },
       createdAt: {
         type: DataTypes.DATE,
@@ -45,7 +60,7 @@ module.exports = (sequelize) => {
     TaskCommentAttachment.belongsTo(models.TaskComment, {
       onDelete: "CASCADE",
       foreignKey: "commentId",
-      as: 'comment',
+      as: "comment",
     });
   };
 

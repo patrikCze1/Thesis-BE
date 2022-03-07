@@ -9,13 +9,27 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING(50),
+      validate: {
+        len: [0, 255],
+      },
     },
     beginAt: {
       type: DataTypes.DATE,
       allowNull: false,
+      validate: {
+        isDate: true,
+      },
     },
     endAt: {
       type: DataTypes.DATE,
+      validate: {
+        isDate: true,
+        isGreaterThanStart(value) {
+          if (new Date(value) < new Date(this.beginAt)) {
+            throw new Error("Začátek musí být menší než konec");
+          }
+        },
+      },
     },
     userId: {
       type: DataTypes.INTEGER,

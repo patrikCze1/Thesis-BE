@@ -13,9 +13,15 @@ module.exports = (sequelize) => {
       name: {
         type: DataTypes.STRING,
         allowNull: false,
+        validate: {
+          len: [0, 255],
+        },
       },
       key: {
         type: DataTypes.STRING(10),
+        validate: {
+          len: [0, 10],
+        },
       },
       description: {
         type: DataTypes.TEXT,
@@ -42,12 +48,24 @@ module.exports = (sequelize) => {
       timeBudget: {
         // hours
         type: DataTypes.FLOAT,
+
+        validate: {
+          isFloat: true,
+        },
       },
       priceBudget: {
         type: DataTypes.FLOAT,
+
+        validate: {
+          isFloat: true,
+        },
       },
       deadline: {
         type: DataTypes.DATE,
+
+        validate: {
+          isDate: true,
+        },
       },
     },
     {

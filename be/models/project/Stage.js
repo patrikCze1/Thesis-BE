@@ -12,10 +12,17 @@ module.exports = (sequelize) => {
       name: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        validate: {
+          len: [0, 100],
+        },
       },
       order: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        validate: {
+          isInt: true,
+          min: 0,
+        },
       },
       boardId: {
         type: DataTypes.INTEGER,
@@ -23,9 +30,15 @@ module.exports = (sequelize) => {
       },
       type: {
         type: DataTypes.TINYINT,
+        alidate: {
+          isInt: true,
+        },
       },
       limit: {
         type: DataTypes.INTEGER,
+        alidate: {
+          isInt: true,
+        },
       },
     },
     {

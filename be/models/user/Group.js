@@ -10,18 +10,21 @@ module.exports = (sequelize) => {
     name: {
       type: DataTypes.STRING(100),
       allowNull: false,
+      validate: {
+        len: [0, 100],
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
-      defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
     updatedAt: {
-        type: DataTypes.DATE,
-        defaultValue: sequelize.literal('CURRENT_TIMESTAMP'),
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
     },
   });
 
-  Group.associate = function(models) {
+  Group.associate = function (models) {
     Group.belongsToMany(models.User, {
       through: {
         model: models.UserGroup,
@@ -32,10 +35,13 @@ module.exports = (sequelize) => {
       },
       foreignKey: "groupId",
       constraints: false,
-      as: 'groupUsers',
+      as: "groupUsers",
     });
-    Group.belongsToMany(models.Project, { through: models.ProjectGroup, foreignKey: "groupId", });
-  }
+    Group.belongsToMany(models.Project, {
+      through: models.ProjectGroup,
+      foreignKey: "groupId",
+    });
+  };
 
   return Group;
 };

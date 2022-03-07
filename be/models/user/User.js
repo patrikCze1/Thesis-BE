@@ -10,19 +10,26 @@ module.exports = (sequelize) => {
         autoIncrement: true,
       },
       username: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.STRING(50),
         unique: {
           args: true,
           msg: "This username is already taken.",
         },
         allowNull: false,
+
+        validate: {
+          len: [0, 50],
+        },
       },
       password: {
         type: DataTypes.STRING(100),
         allowNull: false,
+        validate: {
+          len: [0, 100],
+        },
       },
       email: {
-        type: DataTypes.STRING(50),
+        type: DataTypes.STRING(100),
         unique: {
           args: true,
           msg: "This email is already taken.",
@@ -32,24 +39,40 @@ module.exports = (sequelize) => {
           isEmail: {
             msg: "Email is not valid",
           },
+          len: [0, 100],
         },
       },
       phone: {
         type: DataTypes.STRING(16),
+        validate: {
+          len: [0, 16],
+        },
       },
       firstName: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.STRING(50),
         allowNull: false,
+        validate: {
+          len: [0, 50],
+        },
       },
       lastName: {
-        type: DataTypes.STRING(20),
+        type: DataTypes.STRING(50),
         allowNull: false,
+        validate: {
+          len: [0, 50],
+        },
       },
       position: {
         type: DataTypes.STRING(50),
+        validate: {
+          len: [0, 50],
+        },
       },
       sex: {
         type: DataTypes.STRING(1),
+        validate: {
+          isIn: ["M", "F"],
+        },
       },
       roles: {
         type: DataTypes.JSON,
@@ -57,7 +80,10 @@ module.exports = (sequelize) => {
         defaultValue: '["user"]',
       },
       passwordResetHash: {
-        type: DataTypes.STRING(255),
+        type: DataTypes.STRING,
+        validate: {
+          len: [0, 255],
+        },
       },
       allowEmailNotification: {
         type: DataTypes.BOOLEAN,
@@ -72,11 +98,11 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),
       },
-      // deactivated: {
-      //   type: DataTypes.BOOLEAN,
-      //   allowNull: false,
-      //   defaultValue: false,
-      // }
+      deactivated: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
     },
     {
       paranoid: true,

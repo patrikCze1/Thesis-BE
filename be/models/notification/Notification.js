@@ -10,10 +10,16 @@ module.exports = (sequelize) => {
     message: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [0, 255],
+      },
     },
     type: {
       type: DataTypes.INTEGER,
       allowNull: false,
+      validate: {
+        isInt: true,
+      },
     },
     seen: {
       type: DataTypes.BOOLEAN,
