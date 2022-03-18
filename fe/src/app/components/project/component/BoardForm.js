@@ -1,16 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
-import ReactQuill from "react-quill";
 import { useDispatch, useSelector } from "react-redux";
+
 import {
   createBoardAction,
   editBoardAction,
 } from "../../../reducers/project/board.reducer";
 import LoaderTransparent from "../../common/LoaderTransparent";
+import { DatePicker, Quill } from "../../form";
 
 export default function BoardForm({ projectId, isEdit, closeForm }) {
   const dispatch = useDispatch();
   const [formData, setFormData] = useState({ name: "", description: "" });
+  const [showDates, setShowDates] = useState(false);
   const { working, board } = useSelector((state) => state.boardReducer);
 
   useEffect(() => {
@@ -62,13 +64,45 @@ export default function BoardForm({ projectId, isEdit, closeForm }) {
                     <Trans>Description</Trans>
                   </label>
 
-                  <ReactQuill
+                  <Quill
                     value={formData.description}
-                    onChange={(value) => handleChange("description", value)}
-                    theme="snow"
+                    onChange={handleChange}
+                    prop="description"
                   />
                 </div>
               </div>
+
+              <div className="form-group mb-2">
+                <div className="form-check">
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      onClick={() => setShowDates(!showDates)}
+                      value={showDates}
+                    />
+                    <i className="input-helper"></i>
+                    <Trans>track.showFilters</Trans>
+                  </label>
+                </div>
+              </div>
+
+              {showDates && (
+                <div className="form-row">
+                  <div className="form-group col-md-6">
+                    <DatePicker
+                      value={formData.beginAt}
+                      onChange={(val) => handleChange("beginAt", val)}
+                    />
+                  </div>
+                  <div className="form-group col-md-6">
+                    <DatePicker
+                      value={formData.endAt}
+                      onChange={(val) => handleChange("endAt", val)}
+                    />
+                  </div>
+                </div>
+              )}
 
               <button className="btn btn-primary" type="submit">
                 <Trans>{isEdit ? "Edit" : "Create"}</Trans>

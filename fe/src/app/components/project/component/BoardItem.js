@@ -70,6 +70,22 @@ export default function BoardItem({ board, user }) {
             )}
           </div>
 
+          <p className="text-white">
+            {board.beginAt &&
+              new Intl.DateTimeFormat("cs-CZ", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date(board.beginAt))}{" "}
+            -{" "}
+            {board.endAt &&
+              new Intl.DateTimeFormat("cs-CZ", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+              }).format(new Date(board.endAt))}
+          </p>
+
           <p
             className=" mt-3 mb-0 text-white"
             dangerouslySetInnerHTML={{ __html: board.description }}

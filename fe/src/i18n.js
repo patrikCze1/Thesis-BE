@@ -339,6 +339,7 @@ i18n
             goToMainPage: "Jít na hlavní stránku",
             recordRemoved: "Záznam odstraněn",
             boardCreated: "Nástěnka vytvořena",
+            boardUpdated: "Nástěnka upravena",
             boardDeleted: "Nástěnka ostraněna",
             stageCreated: "Fáze přidána",
             stageDeleted: "Fáze odstraněna",

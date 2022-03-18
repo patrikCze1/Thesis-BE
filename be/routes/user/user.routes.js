@@ -18,10 +18,7 @@ const { responseError } = require("../../service/utils");
 router.get("/", authenticateToken, async (req, res) => {
   try {
     const where = {};
-    console.log(
-      '!req.query.withDeactivated === "true"',
-      req.query.withDeactivated !== "true"
-    );
+
     if (req.query.withDeactivated !== "true") where.deactivated = false;
     const users = await User.findAll({
       where,

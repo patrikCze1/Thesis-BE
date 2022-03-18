@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Chart } from "react-google-charts";
 import Select from "react-select";
-import ReactDatePicker from "react-datepicker";
+import DatePicker from "react-datepicker";
 import { CSVLink } from "react-csv";
 
 import Loader from "./../common/Loader";
@@ -223,7 +223,7 @@ export default function ReportScreen() {
             </div>
             <div className="row track-report-filter-form">
               <div className="form-group col-sm-4">
-                <ReactDatePicker
+                <DatePicker
                   selected={fromDate}
                   onChange={handleDateChange}
                   startDate={fromDate}
