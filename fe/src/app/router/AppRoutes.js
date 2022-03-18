@@ -22,6 +22,7 @@ import Login from "../components/auth/Login";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
 import ResetPassword from "../components/auth/ResetPassword";
 
+//https://reactnavigation.org/docs/auth-flow/
 export default function AppRoutes() {
   return (
     <Switch>

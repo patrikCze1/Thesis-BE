@@ -9,11 +9,6 @@ const { responseError } = require("../../service/utils");
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
-  // if (!permission.granted) {
-  //   res.status(403).json();
-  //   return;
-  // }
-
   const requiredAttr = ["title"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
   if (!result.valid) {

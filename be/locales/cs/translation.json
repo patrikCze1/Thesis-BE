@@ -11,7 +11,11 @@
       "stringTooLong": "Text pro {{field}} je příliš dlouhý",
       "emailNotValid": "E-mail není validní",
       "emailAlreadyExists": "E-mail je již používán",
-      "usernameAlreadyExists": "Uživatelské jméno již existuje"
+      "usernameAlreadyExists": "Uživatelské jméno již existuje",
+      "emailDoesntExist": "E-mail neexistuje",
+      "invalidLink": "Neplatný odkaz",
+      "passwordDontMatch": "Hesla se neshodují",
+      "emptyPassword": "Heslo nemůže být prázné"
     }
   },
   "project": {
@@ -68,5 +72,10 @@
     "message": {
       "deleted": "Nástěnka odstraněna"
     }
+  },
+  "message": {
+    "emailSent": "E-mail odeslán",
+    "forgottenPassword": "Zapomenuté heslo",
+    "passwordChanged": "Heslo změněno"
   }
 }

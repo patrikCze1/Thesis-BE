@@ -43,19 +43,20 @@ const { isUserInProject } = require("../../repo/project/project.repository");
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   try {
-    const allowEntry = await isUserInProject(req.params.projectId, user.id);
-    if (!allowEntry) {
-      res.status(403).json({
-        message: req.t("project.error.userHasNotAccessToThisProject"),
-      });
-      return;
-    }
-
     const where = {};
     const { projectId } = req.params;
     const skipParams = ["offset", "limit", "orderBy", "sort"];
 
-    if (projectId && projectId != "-1") where.ProjectId = projectId;
+    if (projectId && projectId != "-1") {
+      where.ProjectId = projectId;
+      const allowEntry = await isUserInProject(req.params.projectId, user.id);
+      if (!allowEntry) {
+        res.status(403).json({
+          message: req.t("project.error.userHasNotAccessToThisProject"),
+        });
+        return;
+      }
+    }
 
     for (const key in req.query) {
       if (!skipParams.includes(key) && req.query[key]) {

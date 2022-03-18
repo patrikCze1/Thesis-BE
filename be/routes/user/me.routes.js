@@ -43,13 +43,13 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
     if (!password || !passwordAgain) {
       res.status(400).send({
         success: false,
-        message: "Heslo nemůže být prázné",
+        message: req.t("error.validation.emptyPassword"),
       });
       return;
     } else if (password !== passwordAgain) {
       res.status(400).send({
         success: false,
-        message: "Hesla se neshodují",
+        message: req.t("error.validation.passwordDontMatch"),
       });
       return;
     }
@@ -93,7 +93,7 @@ router.post("/forgotten-password", async (req, res) => {
   try {
     const user = await User.findOne({ where: { email } });
 
-    if (!user) throw new Error("Email does not exist");
+    if (!user) throw new Error(req.t("error.validation.emailDoesntExist"));
     else {
       const token = jwt.sign({ email }, process.env.PASSWORD_SECRET, {
         expiresIn: parseInt(process.env.PASSWORD_SECRET_EXPIRATION),
@@ -105,7 +105,7 @@ router.post("/forgotten-password", async (req, res) => {
       try {
         await sendMail(
           user.email,
-          "Forgotten password",
+          req.t("message.forgottenPassword"),
           "email/user/",
           "reset_password",
           { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}` }
@@ -115,7 +115,7 @@ router.post("/forgotten-password", async (req, res) => {
       }
 
       res.json({
-        message: "Email successfully sent.",
+        message: req.t("message.forgottenPassword"),
         success: true,
       });
     }
@@ -129,13 +129,13 @@ router.post("/reset-password", async (req, res) => {
 
   try {
     const { email } = jwt.verify(token, process.env.PASSWORD_SECRET);
-    if (!email) throw new Error("Invalid token");
+    if (!email) throw new Error(req.t("error.validation.invalidLink"));
 
     const user = await User.findOne({
       where: { email, passwordResetHash: token },
     });
 
-    if (!user) throw new Error("Invalid token");
+    if (!user) throw new Error(req.t("error.validation.invalidLink"));
     else {
       const hashedPassword = await bcrypt.hash(password, 10);
       const data = {
@@ -145,7 +145,7 @@ router.post("/reset-password", async (req, res) => {
       await user.update(data);
 
       res.json({
-        message: "Password changed.",
+        message: req.t("message.passwordChanged"),
         success: true,
       });
     }
