@@ -205,6 +205,8 @@ i18n
             yourComment: "Váš komentář",
             choose: "Vyberte",
             noResults: "Žádné výsledky",
+            deactivate: "Deaktivovat",
+            activate: "Ativovat",
           },
           task: {
             myTasks: "Moje úkoly",

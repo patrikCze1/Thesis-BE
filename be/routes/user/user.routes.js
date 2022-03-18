@@ -10,8 +10,6 @@ const {
   TimeTrack,
   UserGroup,
   ProjectUser,
-  Group,
-  Project,
 } = require("../../models/modelHelper");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { ROLE } = require("../../enum/enum");
@@ -19,10 +17,18 @@ const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    const where = {};
+    console.log(
+      '!req.query.withDeactivated === "true"',
+      req.query.withDeactivated !== "true"
+    );
+    if (req.query.withDeactivated !== "true") where.deactivated = false;
     const users = await User.findAll({
+      where,
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.page ? parseInt(req.query.page) : 0,
       order: [
+        ["deactivated", "ASC"],
         [
           req.query.orderBy ? req.query.orderBy : "lastName",
           req.query.sort ? req.query.sort : "ASC",

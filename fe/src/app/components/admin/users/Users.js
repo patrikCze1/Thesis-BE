@@ -12,6 +12,7 @@ import {
   loadUserDetailAction,
   clearUserDetailAction,
   deleteUserAction,
+  editUserAction,
 } from "./../../../reducers/user/userReducer";
 import UserForm from "./UserForm";
 import Loader from "./../../common/Loader";
@@ -79,6 +80,15 @@ export default function Users() {
               <Dropdown.Item onClick={() => handleUserDetail(user.id)}>
                 <Trans>Edit</Trans>
               </Dropdown.Item>
+              <Dropdown.Item
+                onClick={() => handleDeactivate(user.id, !user.deactivated)}
+              >
+                {user.deactivated ? (
+                  <Trans>label.activate</Trans>
+                ) : (
+                  <Trans>label.deactivate</Trans>
+                )}
+              </Dropdown.Item>
               <Dropdown.Item onClick={() => handleDelete(user.id)}>
                 <Trans>Delete</Trans>
               </Dropdown.Item>
@@ -93,7 +103,7 @@ export default function Users() {
   const [showUserForm, setShowUserForm] = useState(false);
 
   useEffect(() => {
-    dispatch(loadUsersAction());
+    dispatch(loadUsersAction("?withDeactivated=true"));
   }, []);
 
   const handleCreateNewUser = () => {
@@ -104,6 +114,10 @@ export default function Users() {
   const handleUserDetail = (id) => {
     setShowUserForm(true);
     dispatch(loadUserDetailAction(id));
+  };
+
+  const handleDeactivate = (id, deactivated) => {
+    dispatch(editUserAction(id, { deactivated }));
   };
 
   const handleDelete = (id) => {
@@ -179,6 +193,9 @@ export default function Users() {
                             {...props.baseProps}
                             wrapperClasses="table-responsive"
                             noDataIndication={i18n.t("label.noRecords")}
+                            rowClasses={(user, i) => {
+                              if (user.deactivated) return "table-warning";
+                            }}
                           />
                         </div>
                       )}

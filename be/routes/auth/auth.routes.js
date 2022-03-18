@@ -28,6 +28,7 @@ router.post("/login", async (req, res) => {
     });
 
     if (user) {
+      if (user.deactivated) throw new Error(req.t("error.accountDeactivated"));
       const match = await bcrypt.compare(password, user.password);
 
       if (match) {

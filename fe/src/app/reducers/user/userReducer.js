@@ -50,15 +50,17 @@ export default function userReducer(state = initialState, action) {
   }
 }
 
-export const loadUsersAction = () => async (dispatch) => {
-  dispatch({ type: "users/loadStart", payload: null });
-  try {
-    const response = await axios.get(`/api/users`);
-    dispatch({ type: "users/loaded", payload: response.data });
-  } catch (error) {
-    toast.error(error.response?.data?.message);
-  }
-};
+export const loadUsersAction =
+  (params = "") =>
+  async (dispatch) => {
+    dispatch({ type: "users/loadStart", payload: null });
+    try {
+      const response = await axios.get(`/api/users${params}`);
+      dispatch({ type: "users/loaded", payload: response.data });
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+    }
+  };
 
 /**
  *
