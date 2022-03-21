@@ -209,6 +209,7 @@ i18n
             activate: "Ativovat",
             beginAt: "Začátek",
             endAt: "Konec",
+            finished: "Dokončeno",
           },
           task: {
             myTasks: "Moje úkoly",

@@ -84,6 +84,9 @@ export default function BoardItem({ board, user }) {
                   month: "2-digit",
                   day: "2-digit",
                 }).format(new Date(board.endAt))}
+              {new Date() > new Date(board.endAt) && (
+                <small className="ml-1">({i18n.t("label.finished")})</small>
+              )}
             </p>
           )}
           <p
