@@ -3,8 +3,9 @@ require("dotenv/config");
 const app = express();
 const server = require("http").createServer(app);
 const cors = require("cors");
-// const csrf = require("csurf"); // todo csrf??
 const cookieParser = require("cookie-parser");
+
+const csrf = require("csurf");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");
 const path = require("path");
@@ -45,23 +46,36 @@ i18next
     fallbackLng: "en",
   });
 
-if (process.env.NODE_ENV !== "production") {
-  app.use(
-    cors({
-      origin: process.env.FE_URI,
-      credentials: true,
-      optionsSuccessStatus: 200,
-    })
-  );
-}
+// if (process.env.NODE_ENV !== "production") {
+app.use(
+  cors({
+    origin: process.env.FE_URI,
+    credentials: true,
+    optionsSuccessStatus: 200,
+  })
+);
+// }
+
+// app.options("*", cors()); // enable preflight
 
 app.use(i18Middleware.handle(i18next)); // todo include locales json
-app.use(express.json()); // todo post routes
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-// app.use(csrf({ cookie: true }));
+// mount csrf ingnored routes before csrf is appended to the app stack
+app.use("/api/auth", authRoutes);
+
+app.use(csrf({ cookie: true }));
+
+// error handler
+app.use(function (err, req, res, next) {
+  if (err.code !== "EBADCSRFTOKEN") return next(err);
+
+  // handle CSRF token errors here
+  res.status(403).json({ message: "Bad csrf token" });
+});
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
@@ -76,13 +90,10 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("Client disconnected");
     disconnect(socket.id);
-    // socket.leave(1);
   });
 });
 
-/**
- * List of routes
- */
+// List of routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/projects", boardRoutes);
 app.use("/api/boards", stageRoutes);
@@ -91,7 +102,6 @@ app.use("/api/projects", taskRoutes);
 app.use("/api/tasks", taskCommentRoutes);
 app.use("/api/tasks", taskAttachmentRoutes);
 app.use("/api/tasks/checks", taskCheckRoutes);
-app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/todos", todoRoutes);
@@ -105,4 +115,4 @@ server.listen(port, () => {
   console.log(`Listening on port ${port}...`);
 });
 
-// nastaveni notifikaci, xss, cors, save date as utc
+// save date as utc

@@ -21,7 +21,7 @@ export default function ForgottenPassword() {
     setError(false);
 
     try {
-      await axios.post("/api/me/forgotten-password", {
+      await axios.post("/api/auth/forgotten-password", {
         email,
       });
       toast.success(t("auth.emailSent"));

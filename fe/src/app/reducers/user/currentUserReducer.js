@@ -94,6 +94,8 @@ export const loginAction = (email, password, history) => async (dispatch) => {
       }
     );
 
+    await axios.get(`/api/me/csrf`);
+
     dispatch({ type: "user/login", payload: response.data });
     history.push(ROUTE.HOME);
   } catch (e) {
