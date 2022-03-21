@@ -207,6 +207,8 @@ i18n
             noResults: "Žádné výsledky",
             deactivate: "Deaktivovat",
             activate: "Ativovat",
+            beginAt: "Začátek",
+            endAt: "Konec",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -356,6 +358,7 @@ i18n
             boardWillBeDeleted:
               "Nástěnka {{board}} bude ostraněna a nebude možné tuto akci vrátit zpět.",
             editStages: "Upravit sloupce",
+            setDeadlines: "Nastavit termíny",
           },
         },
       },

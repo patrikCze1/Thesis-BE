@@ -4,16 +4,22 @@ import Swal2 from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import i18n from "../../i18n";
 
-export function useModuleInfoModal() {
+//todo render fn refresh parent compoennt
+export function useModuleInfoModal(item) {
   const [show, setShow] = useState(false);
-
+  console.log("item", item);
   const handleShowInfoModal = () => {
     console.log("handleShowInfoModal");
     setShow(!show);
   };
 
+  /**
+   *
+   * @param {string} title
+   * @param {string} content
+   * @returns JSX Element | ''
+   */
   const renderInfoModal = (title, content) => {
-    console.log("renderInfoModal", show);
     if (show)
       return (
         <Modal

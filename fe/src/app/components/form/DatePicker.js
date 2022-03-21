@@ -1,7 +1,13 @@
 import React from "react";
 import ReactDatePicker from "react-datepicker";
 
-export default function DatePicker({ value, onChange, placeholderText }) {
+export default function DatePicker({
+  value,
+  onChange,
+  placeholder,
+  required = false,
+}) {
+  if (typeof value === "string") value = new Date(value);
   return (
     <ReactDatePicker
       selected={value}
@@ -10,7 +16,7 @@ export default function DatePicker({ value, onChange, placeholderText }) {
       //   endDate={toDate}
       //   selectsRange
       className="form-control"
-      placeholderText={placeholderText}
+      placeholderText={placeholder}
       locale="cs"
       //   timeFormat="p"
       //   timeIntervals={15}
@@ -18,6 +24,7 @@ export default function DatePicker({ value, onChange, placeholderText }) {
       //   showTimeSelect
       withPortal
       isClearable
+      required={required}
     />
   );
 }

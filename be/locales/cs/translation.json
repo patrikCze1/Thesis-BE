@@ -16,7 +16,8 @@
       "emailDoesntExist": "E-mail neexistuje",
       "invalidLink": "Neplatný odkaz",
       "passwordDontMatch": "Hesla se neshodují",
-      "emptyPassword": "Heslo nemůže být prázné"
+      "emptyPassword": "Heslo nemůže být prázné",
+      "fillBothDates": "Prosím vyplňte obě data"
     }
   },
   "project": {

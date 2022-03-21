@@ -46,7 +46,10 @@ export default function boardReducer(state = initialState, action) {
       };
 
     case "board/socketNew":
-      if (!state.working) {
+      if (
+        !state.working &&
+        !state.boards.some((board) => board.id == action.payload.id)
+      ) {
         return {
           ...state,
           boards: [action.payload, ...state.boards],

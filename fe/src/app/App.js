@@ -201,7 +201,7 @@ export default function App() {
         <div className="container-fluid page-body-wrapper full-page-wrapper">
           <div className="main-panel">
             <div className="content-wrapper">
-              <AnonymRoutes />
+              {/* <AnonymRoutes /> */}
               <AppRoutes />
             </div>
             <Footer />

@@ -58,7 +58,6 @@ export default function KanbanTable() {
     boardId
   );
   const { project, projectLoaded } = useProjectDetail(projectId);
-  const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal();
 
   const { tasks } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
@@ -66,6 +65,7 @@ export default function KanbanTable() {
     (state) => state.currentUserReducer
   );
   const { board, stages } = useSelector((state) => state.boardReducer);
+  const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal(board);
 
   const stageZero = {
     id: null,
@@ -450,7 +450,7 @@ export default function KanbanTable() {
         </Modal>
       )}
 
-      {renderInfoModal(i18n.t("label.boardDescription", board.description))}
+      {renderInfoModal(i18n.t("label.boardDescription"), board.description)}
     </div>
   );
 }

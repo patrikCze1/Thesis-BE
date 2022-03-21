@@ -28,10 +28,8 @@ router.get("/:projectId/boards", authenticateToken, async (req, res) => {
     const boards = await Board.findAll({
       where: { projectId: req.params.projectId },
       order: [
-        [
-          req.query.orderBy ? req.query.orderBy : "createdAt",
-          req.query.sort ? req.query.sort : "DESC",
-        ],
+        ["beginAt", "ASC"],
+        ["createdAt", "DESC"],
       ],
     });
     res.json({ boards });
@@ -74,6 +72,12 @@ router.post(
     const currentUser = getUser(req, res);
     const { projectId } = req.params;
 
+    const data = {
+      ...req.body,
+      createdById: currentUser.id,
+      projectId,
+    };
+
     const requiredAttr = ["name"];
     const result = validator.validateRequiredFields(requiredAttr, req.body);
     if (!result.valid) {
@@ -85,13 +89,12 @@ router.post(
             .join(", "),
       });
       return;
+    } else if ((data.beginAt && !data.endAt) || (!data.beginAt && data.endAt)) {
+      res.status(400).json({
+        message: req.t("error.validation.fillBothDates"),
+      });
+      return;
     }
-
-    const data = {
-      ...req.body,
-      createdById: currentUser.id,
-      projectId,
-    };
 
     try {
       const socket = getIo();
@@ -136,8 +139,15 @@ router.patch(
   "/:projectId/boards/:boardId",
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
+    const data = req.body;
+    if ((data.beginAt && !data.endAt) || (!data.beginAt && data.endAt)) {
+      res.status(400).json({
+        message: req.t("error.validation.fillBothDates"),
+      });
+      return;
+    }
+
     try {
-      const data = req.body;
       const b = await Board.findByPk(req.params.boardId);
 
       const board = await b.update(data);

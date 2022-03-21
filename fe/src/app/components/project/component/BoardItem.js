@@ -69,25 +69,26 @@ export default function BoardItem({ board, user }) {
               </Dropdown>
             )}
           </div>
-
-          <p className="text-white">
-            {board.beginAt &&
-              new Intl.DateTimeFormat("cs-CZ", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(new Date(board.beginAt))}{" "}
-            -{" "}
-            {board.endAt &&
-              new Intl.DateTimeFormat("cs-CZ", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-              }).format(new Date(board.endAt))}
-          </p>
-
+          {board.beginAt && board.endAt && (
+            <p className="text-white">
+              {board.beginAt &&
+                new Intl.DateTimeFormat("cs-CZ", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                }).format(new Date(board.beginAt))}{" "}
+              -{" "}
+              {board.endAt &&
+                new Intl.DateTimeFormat("cs-CZ", {
+                  year: "numeric",
+                  month: "2-digit",
+                  day: "2-digit",
+                }).format(new Date(board.endAt))}
+            </p>
+          )}
           <p
-            className=" mt-3 mb-0 text-white"
+            className=" mt-3 mb-0 text-white overflow-hidden"
+            style={{ maxHeight: 100 }}
             dangerouslySetInnerHTML={{ __html: board.description }}
           ></p>
         </div>
