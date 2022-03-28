@@ -194,7 +194,8 @@ export default function Users() {
                             wrapperClasses="table-responsive"
                             noDataIndication={i18n.t("label.noRecords")}
                             rowClasses={(user, i) => {
-                              if (user.deactivated) return "table-warning";
+                              if (user.deactivated)
+                                return "table-warning line-through";
                             }}
                           />
                         </div>

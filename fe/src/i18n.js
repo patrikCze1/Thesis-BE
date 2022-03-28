@@ -281,6 +281,9 @@ i18n
             position: "Pozice",
             email: "E-mail",
             notifications: "Notifikace",
+            message: {
+              deleted: "Uživatel odstraněn",
+            },
           },
           stage: {
             waiting: "Co udělat",

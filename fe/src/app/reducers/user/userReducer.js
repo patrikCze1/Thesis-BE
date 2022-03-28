@@ -43,7 +43,11 @@ export default function userReducer(state = initialState, action) {
       };
 
     case "user/delete":
-      return { ...state, error: null };
+      return {
+        ...state,
+        error: null,
+        users: state.users.filter((user) => user.id !== action.payload),
+      };
 
     default:
       return state;
@@ -130,9 +134,9 @@ export const editUserAction = (id, user) => async (dispatch) => {
 
 export const deleteUserAction = (id) => async (dispatch) => {
   try {
-    const response = await axios.delete(`/api/users/${id}`);
-    toast.success(i18next.t("User deleted"));
-    dispatch({ type: "user/delete", payload: response.data });
+    await axios.delete(`/api/users/${id}`);
+    toast.success(i18next.t("user.message.deleted"));
+    dispatch({ type: "user/delete", payload: id });
   } catch (error) {
     toast.error(error.response?.data?.message);
   }

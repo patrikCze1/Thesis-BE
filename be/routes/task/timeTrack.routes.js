@@ -195,6 +195,13 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     track.endAt = new Date();
     (track.projectId = projectId), (track.name = name), await track.save();
 
+    if (projectId) {
+      track.setDataValue(
+        "project",
+        await Project.findByPk(projectId, { attributes: ["id", "name"] })
+      );
+    }
+
     io.to(user.id).emit(SOCKET_EMIT.TIME_TRACK_STOP, { id: req.params.id });
 
     res.send({ track });
