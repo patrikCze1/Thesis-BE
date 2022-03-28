@@ -232,6 +232,7 @@ export default function ReportScreen() {
                   className="form-control"
                   placeholderText={t("track.selectDate")}
                   locale="cs"
+                  dateFormat="P"
                 />
               </div>
               {showFilters && (

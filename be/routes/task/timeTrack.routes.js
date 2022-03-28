@@ -33,7 +33,14 @@ router.get("/", authenticateToken, async (req, res) => {
   try {
     const tracks = await TimeTrack.findAll({
       where: where,
-      include: [{ model: User, as: "user" }],
+      include: [
+        { model: User, as: "user" },
+        {
+          model: Project,
+          as: "project",
+          attributes: ["name", "id"],
+        },
+      ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [

@@ -5,6 +5,7 @@ import DatePicker from "react-datepicker";
 
 import {
   formatSecondsToString,
+  getMonthDayTime,
   getSecondsDiff,
 } from "../../service/date/date.service";
 import { getFullName, getShortName } from "../../service/user/user.service";
@@ -99,6 +100,7 @@ export default function TimeTrackListItem({
           }}
           name="name"
           disabled={!isEditable}
+          title={formData.name}
         />
       </div>
 
@@ -109,6 +111,7 @@ export default function TimeTrackListItem({
           value={formData.projectId}
           onChange={(e) => handleChange("projectId", e.target.value, true)}
           disabled={!isEditable}
+          title={track?.project?.name}
         >
           <option value="null">{t("track.selectProject")}</option>
           {projects &&
@@ -133,6 +136,7 @@ export default function TimeTrackListItem({
           showTimeSelect
           disabled={!isEditable}
           withPortal
+          title={getMonthDayTime(startVal)}
         />
         <DatePicker
           className="form-control"
@@ -145,6 +149,7 @@ export default function TimeTrackListItem({
           showTimeSelect
           disabled={!isEditable}
           withPortal
+          title={getMonthDayTime(endVal)}
         />
       </div>
       {/* {isEditable && (

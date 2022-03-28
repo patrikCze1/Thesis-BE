@@ -18,13 +18,14 @@ export default function Starter({ activeTrack, projects }) {
 
   const [isTracking, setIsTracking] = useState(false);
   const [isModeTracking, setIsModeTracking] = useState(true);
-  const [trackData, setTrackData] = useState({ name: null, projectId: null });
+  const [trackData, setTrackData] = useState({ name: "", projectId: "" });
   const [manualStart, setManualStart] = useState(new Date());
   const [manualEnd, setManualEnd] = useState(new Date());
   const valChangedRef = useRef(false);
 
   useEffect(() => {
     if (activeTrack) {
+      console.log("effect activeTrack", activeTrack);
       setIsTracking(true);
       setTrackData({
         name: activeTrack.name,
@@ -61,15 +62,46 @@ export default function Starter({ activeTrack, projects }) {
     if (!activeTrack) setIsModeTracking(mode);
   };
 
-  const handleInputChange = (e) => {
+  const handleSave = (data = null) => {
+    console.log(
+      "activeTrack && valChangedRef.current",
+      activeTrack && valChangedRef.current
+    );
+    console.log("trackData", trackData);
+    console.log("data", data);
+    console.log("activeTrack", activeTrack);
+    if (activeTrack && valChangedRef.current) {
+      if (data) {
+        dispatch(
+          editTimeTrackAction({
+            ...activeTrack,
+            ...data,
+          })
+        );
+      } else {
+        dispatch(
+          editTimeTrackAction({
+            ...activeTrack,
+            ...trackData,
+          })
+        );
+      }
+      valChangedRef.current = false;
+    }
+  };
+
+  const handleInputChange = (e, save = false) => {
     const { name, value } = e.target;
-    valChangedRef.current = true;
-    setTrackData({ ...trackData, [name]: value });
+    const data = { ...trackData, [name]: value };
+    setTrackData(data);
+    console.log("data save", data, save);
     if (
       (name === "name" && value !== trackData.name) ||
       (name === "projectId" && value != trackData.projectId)
     )
       valChangedRef.current = true;
+
+    if (save) handleSave(data);
   };
 
   const handleDateChange = (val, isStart = true) => {
@@ -77,18 +109,6 @@ export default function Starter({ activeTrack, projects }) {
       setManualStart(val);
     } else {
       setManualEnd(val);
-    }
-  };
-
-  const handleSave = () => {
-    if (activeTrack && valChangedRef.current) {
-      dispatch(
-        editTimeTrackAction({
-          ...trackData,
-          ...activeTrack,
-        })
-      );
-      valChangedRef.current = false;
     }
   };
 
@@ -102,8 +122,8 @@ export default function Starter({ activeTrack, projects }) {
             id="exampleInputUsername1"
             placeholder={t("track.whatAreYouDoing")}
             value={trackData?.name}
-            onChange={handleInputChange}
-            onBlur={handleSave}
+            onChange={(e) => handleInputChange(e, false)}
+            onBlur={() => handleSave(null)}
           />
         </div>
         <div className="tracker-project tracker-item">
@@ -112,8 +132,7 @@ export default function Starter({ activeTrack, projects }) {
             name="projectId"
             value={trackData?.projectId}
             onChange={(e) => {
-              handleInputChange(e);
-              handleSave();
+              handleInputChange(e, true);
             }}
           >
             <option value="">{t("project.title")}</option>
