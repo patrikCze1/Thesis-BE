@@ -9,7 +9,7 @@ const initialState = {
   clientsError: false,
   clientsErrorMessage: "",
   client: {},
-  clientLoaded: false,
+  clientLoading: false,
   clientError: false,
   clientErrorMessage: "",
 };
@@ -38,22 +38,29 @@ export default function clientReducer(state = initialState, action) {
       };
 
     case "client/detail":
-      return { ...state, client: action.payload.client, clientLoaded: true };
+      return { ...state, client: action.payload.client, clientLoading: false };
 
     case "client/detailLoad":
-      return { ...state, clientLoaded: false, client: {} };
+      return { ...state, clientLoading: true, client: {} };
+
+    case "client/clearDetail":
+      return { ...state, client: {} };
 
     case "client/detailLoadError":
       return {
         ...state,
-        clientLoaded: true,
+        clientLoading: false,
         clientError: action.payload.status,
         clientErrorMessage: action.payload.message,
       };
 
     case "client/create":
       toast.success(i18next.t("Client created"));
-      return { ...state, clients: [action.payload.client, ...state.clients] };
+      return {
+        ...state,
+        clients: [action.payload.client, ...state.clients],
+        client: action.payload.client,
+      };
 
     case "client/edit":
       toast.success(i18next.t("Client updated"));
@@ -99,6 +106,10 @@ export const clientDetailAction = (id) => async (dispatch) => {
   } catch (error) {
     dispatch({ type: "client/clientLoadError", payload: error });
   }
+};
+
+export const clearClientAction = () => async (dispatch) => {
+  dispatch({ type: "client/clearDetail", payload: null });
 };
 
 export const createClientAction = (client) => async (dispatch) => {

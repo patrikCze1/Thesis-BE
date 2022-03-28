@@ -17,18 +17,11 @@ export default function ClientTableRow({ client }) {
   const MySwal = withReactContent(Swal);
 
   const [editClient, setEditClient] = useState(null);
-  const [showDetail, setShowDetail] = useState(null);
 
   const handleClientEdit = (e) => {
     e.preventDefault();
     dispatch(clientDetailAction(client.id));
     setEditClient(client.id);
-  };
-
-  const handleClientDetail = (e, id) => {
-    e.preventDefault();
-    dispatch(clientDetailAction(id));
-    setShowDetail(id);
   };
 
   const handleDeleteClick = (e) => {

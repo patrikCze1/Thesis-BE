@@ -6,7 +6,10 @@ import { Trans } from "react-i18next";
 import ClientForm from "./ClientForm";
 import ClientTableRow from "./ClientTableRow";
 import Loader from "./../../common/Loader";
-import { loadClietntsAction } from "./../../../reducers/common/clientReducer";
+import {
+  clearClientAction,
+  loadClietntsAction,
+} from "./../../../reducers/common/clientReducer";
 import { usePagination } from "../../../hooks/usePagination";
 import i18n from "../../../../i18n";
 
@@ -29,6 +32,7 @@ export default function Clients() {
   }, [paginationOffset]);
 
   const handleShowClientForm = () => {
+    dispatch(clearClientAction());
     setShowClientForm(!showClientForm);
   };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
+import { Loader } from "react-bootstrap-typeahead";
 import { Trans, useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -20,7 +21,7 @@ export default function ClientForm({ clientId }) {
   });
   const [loaded, setLoaded] = useState(false);
 
-  const { client } = useSelector((state) => state.clientReducer);
+  const { client, clientLoading } = useSelector((state) => state.clientReducer);
 
   useEffect(() => {
     if (clientId) {
@@ -40,8 +41,8 @@ export default function ClientForm({ clientId }) {
     e.preventDefault();
     console.log(formData);
 
-    if (clientId) {
-      dispatch(editClientAction(clientId, formData));
+    if (clientId || client?.id) {
+      dispatch(editClientAction(clientId || client?.id, formData));
     } else {
       dispatch(createClientAction(formData));
     }
@@ -140,7 +141,7 @@ export default function ClientForm({ clientId }) {
 
   return (
     <div className="row">
-      {loaded && (
+      {!clientLoading ? (
         <div className="col-md-12 grid-margin">
           <div className="card-body">
             <form onSubmit={handleFormSubmit} method="post">
@@ -210,11 +211,13 @@ export default function ClientForm({ clientId }) {
               </div>
 
               <Button type="submit">
-                {clientId ? <Trans>Edit</Trans> : <Trans>label.create</Trans>}
+                {client?.id ? <Trans>Edit</Trans> : <Trans>label.create</Trans>}
               </Button>
             </form>
           </div>
         </div>
+      ) : (
+        <Loader />
       )}
     </div>
   );
