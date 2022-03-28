@@ -20,6 +20,7 @@ import NotificationListItem from "./../notification/NotificationListItem";
 import { ROUTE } from "./../../../utils/enum";
 import { loadMyTimeTracksAction } from "../../reducers/timeTrack/timeTrack.reducer";
 import TaskTableItem from "../task/component/TaskTableItem";
+import { createTaskRoute } from "../../service/router.service";
 
 export default function Dashboard() {
   const dispatch = useDispatch();
@@ -70,9 +71,10 @@ export default function Dashboard() {
 
   const handleClickNotification = (e, notification) => {
     e.preventDefault();
+    if (!notification.seen)
+      dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
-      const { projectId, id } = notification.TaskNotification.task;
-      history.push(`${ROUTE.PROJECTS}/${projectId}?ukol=${id}`);
+      history.push(createTaskRoute(notification.TaskNotification.task));
     }
   };
 

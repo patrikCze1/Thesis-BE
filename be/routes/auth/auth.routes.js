@@ -12,7 +12,7 @@ const {
 } = require("../../auth/auth");
 const { sendMail } = require("../../email/config");
 
-const router = new express.Router();
+const router = express.Router();
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;

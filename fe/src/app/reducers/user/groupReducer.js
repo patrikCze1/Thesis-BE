@@ -48,7 +48,7 @@ export default function groupReducer(state = initialState, action) {
       return {
         ...state,
         group: action.payload.group,
-        groups: state.groups.filter((group) => group.id !== action.payload.id),
+        groups: state.groups.filter((group) => group.id !== action.payload),
         error: null,
         actionProcessing: false,
       };

@@ -134,7 +134,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    await Group.remove({ id: req.params.id });
+    await Group.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
