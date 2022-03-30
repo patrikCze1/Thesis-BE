@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "react-bootstrap";
-import { Loader } from "react-bootstrap-typeahead";
 import { Trans, useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -8,6 +7,8 @@ import {
   createClientAction,
   editClientAction,
 } from "../../../reducers/common/clientReducer";
+import Loader from "../../common/Loader";
+import LoaderTransparent from "../../common/LoaderTransparent";
 
 export default function ClientForm({ clientId }) {
   const dispatch = useDispatch();
@@ -19,22 +20,22 @@ export default function ClientForm({ clientId }) {
     phones: [""],
     emails: [""],
   });
-  const [loaded, setLoaded] = useState(false);
 
-  const { client, clientLoading } = useSelector((state) => state.clientReducer);
-
+  const { client, clientLoading, processing } = useSelector(
+    (state) => state.clientReducer
+  );
+  console.log("client, clientLoading", client, clientLoading);
   useEffect(() => {
-    if (clientId) {
+    if (clientId && !clientLoading) {
       setFormData((prevState) => ({
         ...prevState,
         name: client.name,
         webpage: client.webpage,
-        phones: client.phones ? client.phones : [],
-        emails: client.emails ? client.emails : [],
+        phones: client?.phones || [],
+        emails: client?.emails || [],
       }));
-      console.log(formData);
+      console.log("formData", formData);
     }
-    setLoaded(true);
   }, [client]);
 
   const handleFormSubmit = (e) => {
@@ -141,10 +142,14 @@ export default function ClientForm({ clientId }) {
 
   return (
     <div className="row">
-      {!clientLoading ? (
-        <div className="col-md-12 grid-margin">
+      {clientLoading === false ? (
+        <div className="col-md-12">
           <div className="card-body">
-            <form onSubmit={handleFormSubmit} method="post">
+            <form
+              onSubmit={handleFormSubmit}
+              method="post"
+              className="position-relative"
+            >
               <div className="form-row">
                 <div className="form-group col-md-12">
                   <label className="form-label" htmlFor="clientName">
@@ -215,6 +220,7 @@ export default function ClientForm({ clientId }) {
               </Button>
             </form>
           </div>
+          {processing && <LoaderTransparent />}
         </div>
       ) : (
         <Loader />

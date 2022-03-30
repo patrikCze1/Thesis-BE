@@ -2,19 +2,18 @@ import React, { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Modal, Dropdown } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
-import Swal from "sweetalert2";
-import withReactContent from "sweetalert2-react-content";
 
 import {
   clientDetailAction,
   deleteClientAction,
 } from "../../../reducers/common/clientReducer";
 import ClientForm from "./ClientForm";
+import { useSwalAlert } from "../../../hooks/common";
 
 export default function ClientTableRow({ client }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
-  const MySwal = withReactContent(Swal);
+  const { Swal } = useSwalAlert();
 
   const [editClient, setEditClient] = useState(null);
 
@@ -26,7 +25,7 @@ export default function ClientTableRow({ client }) {
 
   const handleDeleteClick = (e) => {
     e.preventDefault();
-    MySwal.fire({
+    Swal.fire({
       icon: "warning",
       title: t("Delete client") + "?",
       text: t("Client will be deleted", { client: client.name }),
@@ -40,15 +39,7 @@ export default function ClientTableRow({ client }) {
 
   return (
     <tr>
-      <td>
-        {/* <a
-          href="#"
-          onClick={(e) => handleClientDetail(e, client.id)}
-          className="project-title"
-        > */}
-        {client.name}
-        {/* </a> */}
-      </td>
+      <td>{client.name}</td>
       <td>
         {client.emails &&
           client.emails.map((email, i) => {

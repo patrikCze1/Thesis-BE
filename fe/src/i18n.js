@@ -349,6 +349,7 @@ i18n
             boardDeleted: "Nástěnka ostraněna",
             stageCreated: "Fáze přidána",
             stageDeleted: "Fáze odstraněna",
+            removingClient: "Odstraňuji klienta",
           },
           alert: {
             changesSaved: "Změny uloženy",

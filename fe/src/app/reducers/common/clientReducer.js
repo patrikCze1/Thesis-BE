@@ -1,6 +1,7 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
 import i18next from "i18next";
+import i18n from "../../../i18n";
 
 const initialState = {
   clients: [],
@@ -12,13 +13,17 @@ const initialState = {
   clientLoading: false,
   clientError: false,
   clientErrorMessage: "",
+  processing: false,
 };
 
 export default function clientReducer(state = initialState, action) {
   let clients;
 
   switch (action.type) {
-    case "client/load":
+    case "clients/loadStart":
+      return { ...state, clientsLoaded: false };
+
+    case "clients/load":
       return {
         ...state,
         clients: action.payload.clients.rows,
@@ -26,10 +31,7 @@ export default function clientReducer(state = initialState, action) {
         clientsLoaded: true,
       };
 
-    case "client/loadClients":
-      return { ...state, clientsLoaded: false };
-
-    case "client/clientsLoadError":
+    case "clients/loadError":
       return {
         ...state,
         clientsLoaded: true,
@@ -60,6 +62,7 @@ export default function clientReducer(state = initialState, action) {
         ...state,
         clients: [action.payload.client, ...state.clients],
         client: action.payload.client,
+        processing: false,
       };
 
     case "client/edit":
@@ -68,12 +71,22 @@ export default function clientReducer(state = initialState, action) {
         if (client.id == action.payload.client.id) return action.payload.client;
         else return client;
       });
-      return { ...state, client: action.payload.client, clients };
+      return {
+        ...state,
+        client: action.payload.client,
+        clients,
+        processing: false,
+      };
 
     case "client/delete":
-      toast.success(i18next.t("Client deleted"));
       clients = state.clients.filter((client) => client.id != action.payload);
-      return { ...state, clients };
+      return { ...state, clients, processing: false };
+
+    case "client/actionStart":
+      return { ...state, processing: true };
+
+    case "client/actionStop":
+      return { ...state, processing: false };
 
     default:
       return state;
@@ -83,17 +96,17 @@ export default function clientReducer(state = initialState, action) {
 export const loadClietntsAction =
   (offset = 0, limit = 100000) =>
   async (dispatch) => {
-    dispatch({ type: "client/loadClients", payload: null });
+    dispatch({ type: "clients/loadStart", payload: null });
 
     try {
       const response = await axios.get(
         `/api/clients?offset=${offset}&limit=${limit}`
       );
 
-      dispatch({ type: "client/load", payload: response.data });
+      dispatch({ type: "clients/load", payload: response.data });
     } catch (error) {
       console.log(error);
-      // dispatch({ type: "client/clientsLoadError", payload: error.response });
+      // dispatch({ type: "clients/loadError", payload: error.response });
     }
   };
 
@@ -113,28 +126,46 @@ export const clearClientAction = () => async (dispatch) => {
 };
 
 export const createClientAction = (client) => async (dispatch) => {
+  dispatch({ type: "client/actionStart", payload: null });
   try {
     const response = await axios.post(`/api/clients`, client);
     dispatch({ type: "client/create", payload: response.data });
   } catch (error) {
     toast.error(error.response?.data?.message);
+    dispatch({ type: "client/actionStop", payload: null });
   }
 };
 
 export const editClientAction = (id, data) => async (dispatch) => {
+  dispatch({ type: "client/actionStart", payload: null });
   try {
     const response = await axios.patch(`/api/clients/${id}`, data);
     dispatch({ type: "client/edit", payload: response.data });
   } catch (error) {
     toast.error(error.response?.data?.message);
+    dispatch({ type: "client/actionStop", payload: null });
   }
 };
 
 export const deleteClientAction = (id) => async (dispatch) => {
+  const toastId = toast(i18n.t("message.removingClient"), {
+    autoClose: false,
+    closeButton: false,
+  });
+
   try {
     await axios.delete(`/api/clients/${id}`);
     dispatch({ type: "client/delete", payload: id });
+    toast.update(toastId, {
+      render: i18next.t("Client deleted"),
+      type: "success",
+      autoClose: true,
+    });
   } catch (error) {
-    toast.error(error.response?.data?.message);
+    toast.update(toastId, {
+      render: error.response?.data?.message,
+      type: "error",
+      autoClose: true,
+    });
   }
 };
