@@ -283,6 +283,8 @@ i18n
             notifications: "Notifikace",
             message: {
               deleted: "Uživatel odstraněn",
+              deactivated: "Uživatel deaktivován",
+              activated: "Uživatel aktivován",
             },
           },
           stage: {
@@ -350,6 +352,9 @@ i18n
             stageCreated: "Fáze přidána",
             stageDeleted: "Fáze odstraněna",
             removingClient: "Odstraňuji klienta",
+            removingUser: "Odstraňuji uživatele",
+            deactivatingUser: "Deaktivuji uživatele",
+            activatingUser: "Aktivuji uživatele",
           },
           alert: {
             changesSaved: "Změny uloženy",
