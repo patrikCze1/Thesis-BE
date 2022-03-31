@@ -4,7 +4,8 @@ import { toast } from "react-toastify";
 const initialState = {
   checks: [],
   actionSuccess: false,
-  actionProcessing: false,
+  processing: false,
+  creating: false,
 };
 
 export default function taskCheckReducer(state = initialState, action) {
@@ -14,16 +15,25 @@ export default function taskCheckReducer(state = initialState, action) {
       return { ...state, checks: action.payload };
 
     case "check/actionStart":
-      return { ...state, actionSuccess: false, actionProcessing: true };
+      return { ...state, actionSuccess: false, processing: true };
+
+    case "check/creteStart":
+      return { ...state, creating: true };
 
     case "check/actionFail":
-      return { ...state, actionSuccess: false, actionProcessing: false };
+      return {
+        ...state,
+        actionSuccess: false,
+        processing: false,
+        creating: false,
+      };
 
     case "check/create":
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
+        creating: false,
         checks: [...checks, action.payload.check],
       };
 
@@ -31,7 +41,7 @@ export default function taskCheckReducer(state = initialState, action) {
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
         checks: state.checks.map((check) => {
           if (check.id === action.payload.check.id) return action.payload.check;
           else return check;
@@ -42,7 +52,7 @@ export default function taskCheckReducer(state = initialState, action) {
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
         checks: state.checks.filter((check) => check.id != action.payload),
       };
 
@@ -52,11 +62,12 @@ export default function taskCheckReducer(state = initialState, action) {
 }
 
 export const loadChecks = (checks) => async (dispatch) => {
+  console.log("loadChecks", checks);
   dispatch({ type: "check/load", payload: checks });
 };
 
 export const createAction = (data) => async (dispatch) => {
-  dispatch({ type: "check/actionStart", payload: null });
+  dispatch({ type: "check/creteStart", payload: null });
 
   try {
     const response = await axios.post(`/api/tasks/checks`, data);
@@ -81,14 +92,11 @@ export const editAction = (id, data) => async (dispatch) => {
 };
 
 export const deleteAction = (id) => async (dispatch) => {
-  dispatch({ type: "check/actionStart", payload: null });
-
   try {
-    const response = await axios.delete(`/api/tasks/checks/${id}`);
-    console.log(response.data);
+    await axios.delete(`/api/tasks/checks/${id}`);
+
     dispatch({ type: "check/delete", payload: id });
   } catch (error) {
     toast.error(error.response?.data?.message);
-    dispatch({ type: "check/actionFail", payload: null });
   }
 };

@@ -362,6 +362,8 @@ i18n
             deactivatingUser: "Deaktivuji uživatele",
             activatingUser: "Aktivuji uživatele",
             removingGroup: "Odstraňuji skupinu",
+            removingRecord: "Odstraňuji záznam",
+            removingComment: "Odstraňuji komentář",
           },
           alert: {
             changesSaved: "Změny uloženy",

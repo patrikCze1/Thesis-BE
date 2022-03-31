@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from "react-redux";
 import Quill from "./Quill";
 
 import { createAction } from "../../reducers/task/taskCommentReducer";
-import Loader from "../common/Loader";
+import { LoaderTransparent } from "../common";
 
 export default function TaskCommentForm({ taskId, onHide }) {
   const dispatch = useDispatch();
-  const { actionProcessing } = useSelector((state) => state.taskCommentReducer);
+  const { creating } = useSelector((state) => state.taskCommentReducer);
   const [formData, setFormData] = useState({ text: "", files: [] });
 
   const handleSubmit = (e) => {
@@ -43,13 +43,14 @@ export default function TaskCommentForm({ taskId, onHide }) {
     }
   };
 
-  const handleRemoveAttachment = (index) => {
+  const handleRemoveAttachment = (e, index) => {
+    e.preventDefault();
     setFormData({
-      ...setFormData,
-      files: setFormData?.files.filter((val, i) => i !== index),
+      ...formData,
+      files: setFormData?.files?.filter((val, i) => i !== index) || [],
     });
   };
-
+  console.log("formData", formData);
   const getUploadedFiles = () => {
     if (formData?.files.length) {
       return (
@@ -65,8 +66,8 @@ export default function TaskCommentForm({ taskId, onHide }) {
                   <i className="mdi mdi-check-all mr-1"></i>
                   {file.name}
                   <button
-                    className="btn btn-link p-0 d-inline-block text-right ml-auto"
-                    onClick={() => handleRemoveAttachment(i)}
+                    className="btn btn-link p-0 d-inline-block text-right ml-1"
+                    onClick={(e) => handleRemoveAttachment(e, i)}
                   >
                     <i className="mdi mdi-close-circle-outline text-danger "></i>
                   </button>
@@ -80,7 +81,7 @@ export default function TaskCommentForm({ taskId, onHide }) {
   };
 
   return (
-    <form className="" onSubmit={handleSubmit}>
+    <form className="position-relative" onSubmit={handleSubmit}>
       <div className="form-group mb-1">
         {
           //todo fix options
@@ -128,7 +129,7 @@ export default function TaskCommentForm({ taskId, onHide }) {
         </button>
       </div>
 
-      {actionProcessing && <Loader />}
+      {creating && <LoaderTransparent />}
     </form>
   );
 }

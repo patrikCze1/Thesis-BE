@@ -1,12 +1,13 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
-import i18next from "i18next";
+import i18n from "../../../i18n";
 
 const initialState = {
   comments: [],
   actionSuccess: false,
-  actionProcessing: false,
+  processing: false,
   loading: false,
+  creating: false,
 };
 
 export default function taskCommentReducer(state = initialState, action) {
@@ -18,32 +19,39 @@ export default function taskCommentReducer(state = initialState, action) {
       return {
         ...state,
         actionSuccess: false,
-        actionProcessing: true,
+        processing: true,
         loading: true,
+      };
+
+    case "comment/startCreating":
+      return {
+        ...state,
+        creating: true,
       };
 
     case "comment/actionFail":
       return {
         ...state,
         actionSuccess: false,
-        actionProcessing: false,
+        processing: false,
+        creating: false,
         loading: false,
       };
 
     case "comment/create":
       if (state.comments.some((comm) => comm.id === action.payload.comment.id))
-        return state;
+        return { ...state, actionSuccess: true, creating: false };
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        creating: false,
         comments: [action.payload.comment, ...state.comments],
       };
 
     case "comment/socketNew":
       if (
         state.comments.some((comm) => comm.id === action.payload.id) ||
-        state.actionProcessing
+        state.processing
       )
         return state;
       return {
@@ -55,7 +63,7 @@ export default function taskCommentReducer(state = initialState, action) {
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
         comments: state.comments.map((comment) => {
           if (comment.id == action.payload.comment.id) return action.payload;
           else return comment;
@@ -66,7 +74,7 @@ export default function taskCommentReducer(state = initialState, action) {
       return {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
         comments: state.comments.filter(
           (comment) => comment.id !== action.payload
         ),
@@ -90,7 +98,7 @@ export const loadComments = (comments) => async (dispatch) => {
 };
 
 export const createAction = (taskId, data) => async (dispatch) => {
-  dispatch({ type: "comment/actionStart", payload: null });
+  dispatch({ type: "comment/startCreating", payload: null });
   try {
     const response = await axios.post(`/api/tasks/${taskId}/comments`, data, {
       headers: { "Content-Type": "multipart/form-data" },
@@ -128,20 +136,30 @@ export const editAction = (taskId, comment) => async (dispatch) => {
 
 export const deleteTaskCommentAction =
   (taskId, commentId) => async (dispatch) => {
-    dispatch({ type: "comment/actionStart", payload: null });
+    const toastId = toast(i18n.t("message.removingComment"), {
+      autoClose: false,
+      closeButton: false,
+    });
 
     try {
       await axios.delete(`/api/tasks/${taskId}/comments/${commentId}`);
-      toast.success(i18next.t("comment.commentDeleted"));
+
+      toast.update(toastId, {
+        render: i18n.t("comment.commentDeleted"),
+        type: "success",
+        autoClose: true,
+      });
       dispatch({ type: "comment/delete", payload: commentId });
       dispatch({
         type: "task/changeCommentsCount",
         payload: { taskId, value: -1 },
       });
     } catch (error) {
-      console.error("error", error);
-      toast.error(error.response?.data?.message);
-      dispatch({ type: "comment/actionFail", payload: null });
+      toast.update(toastId, {
+        render: error.response?.data?.message,
+        type: "error",
+        autoClose: true,
+      });
     }
   };
 

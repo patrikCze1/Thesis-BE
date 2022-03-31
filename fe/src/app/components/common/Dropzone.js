@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { Trans } from "react-i18next";
+import LoaderTransparent from "./LoaderTransparent";
 
-export default function Dropzone({ onSubmit }) {
+export default function Dropzone({ onSubmit, uploading = false }) {
   const [files, setFiles] = useState([]);
 
   const { getRootProps, getInputProps, open, acceptedFiles } = useDropzone({
@@ -23,7 +24,7 @@ export default function Dropzone({ onSubmit }) {
   };
 
   return (
-    <div>
+    <div className="position-relative">
       <div
         {...getRootProps({ className: "dropzone" })}
         style={{
@@ -76,6 +77,8 @@ export default function Dropzone({ onSubmit }) {
       >
         <Trans>label.upload</Trans>
       </button>
+
+      {uploading && <LoaderTransparent />}
     </div>
   );
 }

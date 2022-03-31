@@ -159,6 +159,7 @@ export default function Starter({ activeTrack, projects }) {
               timeIntervals={1}
               dateFormat="p"
               showTimeSelect
+              withPortal
             />
             <DatePicker
               className="form-control"
@@ -169,6 +170,7 @@ export default function Starter({ activeTrack, projects }) {
               timeIntervals={1}
               dateFormat="p"
               showTimeSelect
+              withPortal
             />
           </div>
         )}

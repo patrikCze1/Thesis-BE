@@ -18,7 +18,7 @@ const initialState = {
   taskError: false,
   taskErrorMessage: "",
   actionSuccess: false,
-  actionProcessing: false,
+  processing: false,
 };
 
 export default function taskReducer(state = initialState, action) {
@@ -74,7 +74,7 @@ export default function taskReducer(state = initialState, action) {
         return {
           ...state,
           actionSuccess: true,
-          actionProcessing: false,
+          processing: false,
           // task: {},
           taskLoaded: true,
           tasks: [...state.tasks, action.payload.task],
@@ -83,7 +83,7 @@ export default function taskReducer(state = initialState, action) {
         return {
           ...state,
           actionSuccess: true,
-          actionProcessing: false,
+          processing: false,
           // task: {},
           taskLoaded: true,
           backlogTasks: [...state.backlogTasks, action.payload.task],
@@ -92,7 +92,7 @@ export default function taskReducer(state = initialState, action) {
     case "task/socketNew":
       if (
         !state.tasks.some((task) => task.id == action.payload.id) &&
-        !state.actionProcessing
+        !state.processing
       ) {
         return {
           ...state,
@@ -105,7 +105,7 @@ export default function taskReducer(state = initialState, action) {
       const editedState = {
         ...state,
         actionSuccess: true,
-        actionProcessing: false,
+        processing: false,
       };
 
       if (action.payload.type === TASK_ACTION_TYPE.NORMAL) {
@@ -178,7 +178,7 @@ export default function taskReducer(state = initialState, action) {
           ...state,
           task: {},
           actionSuccess: true,
-          actionProcessing: false,
+          processing: false,
           tasks: state.tasks.filter(
             (task) => task.id !== action.payload.taskId
           ),
@@ -188,7 +188,7 @@ export default function taskReducer(state = initialState, action) {
           ...state,
           task: {},
           actionSuccess: true,
-          actionProcessing: false,
+          processing: false,
           backlogTasks: state.tasks.filter(
             (task) => task.id !== action.payload.taskId
           ),
@@ -199,7 +199,7 @@ export default function taskReducer(state = initialState, action) {
           ...state,
           task: {},
           actionSuccess: true,
-          actionProcessing: false,
+          processing: false,
           archiveTasks: state.tasks.filter(
             (task) => task.id !== action.payload.taskId
           ),
@@ -213,10 +213,10 @@ export default function taskReducer(state = initialState, action) {
       };
 
     case "task/actionStart":
-      return { ...state, actionSuccess: false, actionProcessing: true };
+      return { ...state, actionSuccess: false, processing: true };
 
     case "task/actionFail":
-      return { ...state, actionSuccess: false, actionProcessing: false };
+      return { ...state, actionSuccess: false, processing: false };
 
     case "task/changeCommentsCount":
       return {
@@ -285,6 +285,15 @@ export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
       `/api/projects/${projectId}/tasks/${taskId}`
     );
     dispatch({ type: "task/loaded", payload: response.data });
+    dispatch({ type: "check/load", payload: response.data.task?.checks });
+    dispatch({
+      type: "comment/load",
+      payload: response.data.task?.taskComments,
+    });
+    dispatch({
+      type: "taskAttachment/set",
+      payload: response.data.task?.attachments,
+    });
   } catch (error) {
     toast.error(error.response?.data?.message);
     dispatch({ type: "task/loadFail", payload: null });
@@ -375,13 +384,25 @@ export const socketEditTask = (task) => (dispatch) => {
 export const deleteTaskAction =
   (type = TASK_ACTION_TYPE.NORMAL, projectId, taskId) =>
   async (dispatch) => {
-    dispatch({ type: "task/actionStart", payload: null });
+    const toastId = toast(i18n.t("message.removingTask"), {
+      autoClose: false,
+      closeButton: false,
+    });
+
     try {
       await axios.delete(`/api/projects/${projectId}/tasks/${taskId}`);
       dispatch({ type: "task/delete", payload: { taskId, type } });
-      toast.success(i18next.t("task.taskDeleted"));
+      toast.update(toastId, {
+        render: i18n.t("task.taskDeleted"),
+        type: "success",
+        autoClose: true,
+      });
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.update(toastId, {
+        render: error.response?.data?.message,
+        type: "error",
+        autoClose: true,
+      });
       dispatch({ type: "task/actionFail", payload: null });
     }
   };

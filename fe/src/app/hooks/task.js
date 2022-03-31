@@ -23,14 +23,17 @@ export function useTaskDetail(projectId, taskType) {
 
   useEffect(() => {
     console.log("useTaskDetail useEffect", selectedTask);
-    if (selectedTask) dispatch(loadTaskDetailAction(projectId, selectedTask));
-  }, [selectedTask]);
-
-  useEffect(() => {
-    if (taskLoaded && selectedTask) {
+    if (selectedTask) {
+      dispatch(loadTaskDetailAction(projectId, selectedTask));
       setShowTaskDetail(true);
     }
-  }, [taskLoaded]);
+  }, [selectedTask]);
+
+  // useEffect(() => {
+  //   if (taskLoaded && selectedTask) {
+  //     setShowTaskDetail(true);
+  //   }
+  // }, [taskLoaded]);
 
   const handleHideTaskDetail = () => {
     setShowTaskDetail(false);

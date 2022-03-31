@@ -19,23 +19,24 @@ export const createRouteWithParams = (route, params) => {
  * @returns {string} url
  */
 export const createTaskRoute = (task) => {
-  if (task.archived)
+  if (task.archived) {
     return (
       createRouteWithParams(ROUTE.PROJECTS_DETAIL_ARCHIVE, {
         ":id": task.projectId,
       }) + `?ukol=${task.id}`
     );
-  else if (!task.stageId)
+  } else if (!task.stageId) {
     return (
       createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
         ":id": task.projectId,
       }) + `?ukol=${task.id}`
     );
-  else
+  } else {
     return (
       createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
         ":id": task.projectId,
         ":boardId": task.boardId,
       }) + `?ukol=${task.id}`
     );
+  }
 };

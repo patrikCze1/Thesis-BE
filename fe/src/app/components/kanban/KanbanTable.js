@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { DragDropContext } from "react-beautiful-dnd";
 import { useParams, NavLink } from "react-router-dom";
-import i18next from "i18next";
 import { Trans, useTranslation } from "react-i18next";
 import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 
@@ -59,7 +58,7 @@ export default function KanbanTable() {
   );
   const { project, projectLoaded } = useProjectDetail(projectId);
 
-  const { tasks } = useSelector((state) => state.taskReducer);
+  const { tasks, tasksLoaded } = useSelector((state) => state.taskReducer);
   const { users: projectUsers } = useSelector((state) => state.userReducer);
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
@@ -382,7 +381,7 @@ export default function KanbanTable() {
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <div className="kanban-wrapper h-100">
-          {projectLoaded &&
+          {tasksLoaded ? (
             tableState.columnOrder.length &&
             tableState.columnOrder.map((columnOrder) => {
               const column =
@@ -421,7 +420,10 @@ export default function KanbanTable() {
                   tasks={columnTasks}
                 />
               );
-            })}
+            })
+          ) : (
+            <Loader />
+          )}
         </div>
       </DragDropContext>
 

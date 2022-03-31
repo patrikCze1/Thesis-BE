@@ -11,7 +11,6 @@ import {
 import Loader from "../common/Loader";
 import Pagination from "../common/Pagination";
 import NotificationListItem from "./NotificationListItem";
-import { ROUTE } from "../../../utils/enum";
 import { createTaskRoute } from "../../service/router.service";
 
 export default function NotificationScreen() {

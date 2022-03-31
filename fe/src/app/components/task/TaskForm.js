@@ -14,17 +14,14 @@ import {
   createAction,
   editAction as editCheckAction,
   deleteAction,
-  loadChecks,
 } from "./../../reducers/task/taskCheckReducer";
 import {
   createAction as createCommentAction,
-  loadComments,
   socketDeleteComment,
   socketNewComment,
 } from "./../../reducers/task/taskCommentReducer";
 import {
   deleteTaskAttachmentAction,
-  setAttachmentsAction,
   uploadAction,
 } from "../../reducers/task/taskAttachmentReducer";
 import Editable from "../form/Editable";
@@ -40,7 +37,6 @@ import { getFullName } from "../../service/user/user.service";
 import { hasRole } from "../../service/role.service";
 import TaskCommentItem from "./component/TaskCommentItem";
 import Dropzone from "../common/Dropzone";
-import Loader from "../common/Loader";
 import AttachmentItem from "../common/AttachmentItem";
 import i18n from "../../../i18n";
 import TaskCommentForm from "../form/TaskCommentForm";
@@ -50,6 +46,7 @@ import ReactSelect from "../form/ReactSelect";
 import { useCreateTask } from "../../hooks/task";
 import { createTaskRoute } from "../../service/router.service";
 import { useHistory } from "react-router-dom";
+import { LoaderTransparent } from "../common";
 
 export default function TaskForm({
   task,
@@ -67,7 +64,9 @@ export default function TaskForm({
   const [showCheckForm, setShowCheckForm] = useState(false);
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showCommentForm, setShowCommentForm] = useState(false);
-  const { checks } = useSelector((state) => state.taskCheckReducer);
+  const { checks, creating: creatingCheck } = useSelector(
+    (state) => state.taskCheckReducer
+  );
   const { comments } = useSelector((state) => state.taskCommentReducer);
   const { stages, boards } = useSelector((state) => state.boardReducer);
   const { users } = useSelector((state) => state.userReducer);
@@ -86,7 +85,7 @@ export default function TaskForm({
   const history = useHistory();
   const disableEdit = false;
   const { Option } = Mentions;
-  const { MySwal } = useSwalAlert();
+  const { Swal } = useSwalAlert();
   console.log("task attachments", task, attachments);
   const handleWebsockets = () => {
     try {
@@ -116,9 +115,6 @@ export default function TaskForm({
   useEffect(() => {
     setFormData({ ...formData, ...task });
     console.log("set form data", task);
-    dispatch(loadChecks(task.checks));
-    dispatch(loadComments(task.taskComments));
-    dispatch(setAttachmentsAction(task.attachments));
     setProjectUsers(users);
     handleWebsockets();
   }, [task]);
@@ -153,7 +149,7 @@ export default function TaskForm({
     if (!value) updatedTask[name] = null;
     console.log("updatedTask", updatedTask);
     setFormData(updatedTask);
-    if (save) handleSave(updatedTask);
+    if (save) handleSave({ [name]: value });
   };
 
   const handleDeadlineChange = (value) => {
@@ -184,7 +180,7 @@ export default function TaskForm({
   };
 
   // const handleCompleteClick = () => {
-  //   MySwal.fire({
+  //   Swal.fire({
   //     icon: task.completedAt ? "warning" : "info",
   //     title: task.completedAt
   //       ? t("task.unCompleteTask") + "?"
@@ -200,7 +196,7 @@ export default function TaskForm({
   // };
 
   const handleRemoveClick = () => {
-    MySwal.fire({
+    Swal.fire({
       icon: "warning",
       title: t("task.deleteTask") + "?",
       text: t("task.taskWillBeDeleted"),
@@ -321,7 +317,6 @@ export default function TaskForm({
                 <i className="mdi mdi-upload"></i>
               </span>
             </h6>
-            {uploading && <Loader />}
 
             <ul className="comment-attachment-list">
               {attachments?.length > 0 &&
@@ -335,9 +330,15 @@ export default function TaskForm({
                   );
                 })}
             </ul>
+
             {canEdit && (
               <>
-                {showFileForm && <Dropzone onSubmit={handleUploadTaskFiles} />}
+                {showFileForm && (
+                  <Dropzone
+                    onSubmit={handleUploadTaskFiles}
+                    uploading={uploading}
+                  />
+                )}
               </>
             )}
           </div>
@@ -363,60 +364,66 @@ export default function TaskForm({
             </>
           )}
 
-          <hr />
-          <div className="row mb-3">
-            <div className="col-md-12">
-              <h5 className="card-title">
-                <span
-                  className={canEdit && "editable-text"}
-                  onClick={() => setShowCheckForm(!showCheckForm)}
-                >
-                  <Trans>Checklist</Trans>
-                  <i className="mdi mdi-checkbox-multiple-marked-outline ml-1"></i>
-                </span>
-              </h5>
-              {checks?.length > 0 && (
-                <div className="mb-2">
-                  <ProgressBar
-                    striped
-                    variant={checklistProgress === 100 ? "success" : `info`}
-                    now={checklistProgress}
-                  />
+          {(checks?.length > 0 || canEdit) && (
+            <>
+              <hr />
+              <div className="row mb-3">
+                <div className="col-md-12">
+                  <h5 className="card-title">
+                    <span
+                      className={canEdit && "editable-text"}
+                      onClick={() => setShowCheckForm(!showCheckForm)}
+                    >
+                      <Trans>Checklist</Trans>
+                      <i className="mdi mdi-checkbox-multiple-marked-outline ml-1"></i>
+                    </span>
+                  </h5>
+                  {checks?.length > 0 && (
+                    <div className="mb-2">
+                      <ProgressBar
+                        striped
+                        variant={checklistProgress === 100 ? "success" : `info`}
+                        now={checklistProgress}
+                      />
+                    </div>
+                  )}
+                  {canEdit && showCheckForm && (
+                    <form
+                      className="add-items d-sm-flex mb-2 position-relative"
+                      onSubmit={handleCreateCheck}
+                    >
+                      <input
+                        type="text"
+                        name="check"
+                        className="form-control h-auto"
+                        placeholder={t("Set checklist")}
+                        value={checkInput || ""}
+                        onChange={handleCheckFormInput}
+                        required
+                        maxLength="255"
+                      />
+                      <button
+                        type="submit"
+                        className="btn btn-primary font-weight-bold ml-0 ml-sm-2 mt-2 mt-sm-0"
+                      >
+                        <Trans>Add</Trans>
+                      </button>
+
+                      {creatingCheck && <LoaderTransparent />}
+                    </form>
+                  )}
+                  <div className="list-wrapper">
+                    <ul className="d-flex flex-column todo-list">
+                      {checks &&
+                        checks.map((check) => {
+                          return <CheckItem key={check.id} check={check} />;
+                        })}
+                    </ul>
+                  </div>
                 </div>
-              )}
-              {canEdit && showCheckForm && (
-                <form
-                  className="add-items d-sm-flex mb-2"
-                  onSubmit={handleCreateCheck}
-                >
-                  <input
-                    type="text"
-                    name="check"
-                    className="form-control h-auto"
-                    placeholder={t("Set checklist")}
-                    value={checkInput || ""}
-                    onChange={handleCheckFormInput}
-                    required
-                    maxLength="255"
-                  />
-                  <button
-                    type="submit"
-                    className="btn btn-primary font-weight-bold ml-0 ml-sm-2 mt-2 mt-sm-0"
-                  >
-                    <Trans>Add</Trans>
-                  </button>
-                </form>
-              )}
-              <div className="list-wrapper">
-                <ul className="d-flex flex-column todo-list">
-                  {checks &&
-                    checks.map((check) => {
-                      return <CheckItem key={check.id} check={check} />;
-                    })}
-                </ul>
               </div>
-            </div>
-          </div>
+            </>
+          )}
           <hr />
 
           <h5 className="card-title">
@@ -659,7 +666,7 @@ export default function TaskForm({
               placeholder={i18n.t("task.hoursCount")}
               onBlur={() => {
                 if (formData.estimation != task.estimation)
-                  handleSave(formData);
+                  handleSave({ estimation: formData.estimation });
               }}
             />
           </Form.Group>

@@ -112,6 +112,11 @@
     top: 0;
     left: 0;
   }
+
+  &.loader-mini {
+    width: 25px;
+    height: 20px;
+  }
 }
 
 .dropdown-menu-static-demo {

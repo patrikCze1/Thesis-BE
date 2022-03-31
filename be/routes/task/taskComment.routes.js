@@ -182,7 +182,6 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
-  //todo remove all task comment attach
   try {
     const comment = await TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);

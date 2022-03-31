@@ -1,13 +1,13 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
-import i18next from "i18next";
+import i18n from "../../../i18n";
 
 const initialState = {
   todos: [],
   loaded: false,
 };
 
-export default (state = initialState, action) => {
+export default function myTodoReducer(state = initialState, action) {
   switch (action.type) {
     case "todos/load":
       return { ...state, loaded: false };
@@ -36,7 +36,7 @@ export default (state = initialState, action) => {
     default:
       return state;
   }
-};
+}
 
 export const loadTodosAction = () => async (dispatch) => {
   dispatch({ type: "todos/load", payload: null });
@@ -74,11 +74,24 @@ export const editTodoAction = (id, todo) => async (dispatch) => {
 };
 
 export const deleteTodoAction = (id) => async (dispatch) => {
+  const toastId = toast(i18n.t("message.removingRecord"), {
+    autoClose: false,
+    closeButton: false,
+  });
+
   try {
     await axios.delete(`/api/todos/${id}`);
     dispatch({ type: "todos/delete", payload: id });
-    toast.success(i18next.t("message.recordRemoved"));
+    toast.update(toastId, {
+      render: i18n.t("message.recordRemoved"),
+      type: "success",
+      autoClose: true,
+    });
   } catch (error) {
-    toast.error(error.response?.data?.message);
+    toast.update(toastId, {
+      render: error.response?.data?.message,
+      type: "error",
+      autoClose: true,
+    });
   }
 };

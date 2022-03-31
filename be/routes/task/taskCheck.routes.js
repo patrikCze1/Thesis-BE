@@ -5,6 +5,7 @@ const { Task, TaskCheck } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { responseError } = require("../../service/utils");
+const { ROLE } = require("../../enum/enum");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -55,7 +56,11 @@ router.delete("/:id", authenticateToken, async (req, res) => {
     const task = await Task.findByPk(check.taskId);
     const user = getUser(req, res);
 
-    if (!task.createdById !== user.id && !user.roles.includes(ROLE.ADMIN)) {
+    if (
+      !task.createdById !== user.id &&
+      !user.roles.includes(ROLE.ADMIN) &&
+      !user.roles.includes(ROLE.MANAGEMENT)
+    ) {
       res.status(403).json({
         message: req.json({
           message: req.t("error.missingPermissionForAction"),

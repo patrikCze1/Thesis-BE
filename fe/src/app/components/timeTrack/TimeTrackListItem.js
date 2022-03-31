@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Dropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import DatePicker from "react-datepicker";
@@ -77,7 +77,9 @@ export default function TimeTrackListItem({
   };
 
   return (
-    <div className={`track-item ${!isEditable && "disabled"}`}>
+    <div
+      className={`track-item position-relative ${!isEditable && "disabled"}`}
+    >
       {showUser && (
         <div className="track-info mr-2">
           <OverlayTrigger

@@ -1,6 +1,5 @@
 import axios from "./../../../utils/axios.config";
 import { toast } from "react-toastify";
-import i18next from "i18next";
 import i18n from "../../../i18n";
 
 const initialState = {
@@ -38,7 +37,7 @@ export default function timeTrackReducer(state = initialState, action) {
       return { ...state, activeTrack: action.payload.track };
 
     case "tracks/stop":
-      toast.success(i18next.t("track.created"));
+      toast.success(i18n.t("track.created"));
       return {
         ...state,
         activeTrack: null,
@@ -133,7 +132,6 @@ export const socketStopTimeTrackAction = (id) => async (dispatch) => {
 export const createTimeTrackAction = (data) => async (dispatch) => {
   try {
     const response = await axios.post(`/api/tracks/`, data);
-    toast.success(i18next.t("track.created"));
     dispatch({ type: "tracks/stop", payload: response.data });
   } catch (error) {
     toast.error(error.response?.data?.message);
@@ -141,10 +139,9 @@ export const createTimeTrackAction = (data) => async (dispatch) => {
 };
 
 export const editTimeTrackAction = (track) => async (dispatch) => {
-  console.log("track", track);
   try {
     const response = await axios.patch(`/api/tracks/${track.id}`, track);
-    toast.success(i18next.t("track.edited"));
+    toast.success(i18n.t("track.edited"));
     dispatch({ type: "tracks/edit", payload: response.data });
   } catch (error) {
     toast.error(error.response?.data?.message);
@@ -152,11 +149,24 @@ export const editTimeTrackAction = (track) => async (dispatch) => {
 };
 
 export const deleteTimeTrackAction = (id) => async (dispatch) => {
+  const toastId = toast(i18n.t("message.removingRecord"), {
+    autoClose: false,
+    closeButton: false,
+  });
+
   try {
     await axios.delete(`/api/tracks/${id}`);
-    toast.success(i18next.t("track.removed"));
+    toast.update(toastId, {
+      render: i18n.t("track.removed"),
+      type: "success",
+      autoClose: true,
+    });
     dispatch({ type: "tracks/delete", payload: id });
   } catch (error) {
-    toast.error(error.response?.data?.message);
+    toast.update(toastId, {
+      render: error.response?.data?.message,
+      type: "error",
+      autoClose: true,
+    });
   }
 };
