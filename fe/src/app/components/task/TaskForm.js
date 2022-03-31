@@ -655,7 +655,7 @@ export default function TaskForm({
 
           <Form.Group className="mb-3">
             <label>
-              <Trans>task.estimation</Trans>
+              <Trans>task.estimation</Trans> (H)
             </label>
             <input
               className="form-control form-control-sm"

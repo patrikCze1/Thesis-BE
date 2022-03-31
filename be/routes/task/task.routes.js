@@ -31,7 +31,6 @@ const {
 } = require("../../service/notification/notification.service");
 const { findOneById } = require("../../repo/user/user.repository");
 const { stageRepo } = require("../../repo");
-const { addTimeToDate } = require("../../service/date");
 const {
   getFeTaskUrl,
   trimString,
@@ -63,20 +62,23 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         if (req.query[key] === "null" || req.query[key] === "=null")
           where[key] = { [Op.is]: null };
         else if (req.query[key] === "!=null") where[key] = { [Op.ne]: null };
+        else if (req.query[key] === "true") where[key] = true;
+        else if (req.query[key] === "false") where[key] = false;
         else where[key] = req.query[key];
       }
     }
+
     console.log("where", where);
     const tasks = await Task.findAndCountAll({
       subQuery: false,
       attributes: {
         include: [
           [
-            sequelize.fn("COUNT", sequelize.col("attachments.id")),
+            sequelize.literal("COUNT(DISTINCT attachments.id)"),
             "attachmentsCount",
           ],
           [
-            sequelize.fn("COUNT", sequelize.col("taskComments.id")),
+            sequelize.literal("COUNT(DISTINCT taskComments.id)"),
             "commentsCount",
           ],
         ],
@@ -89,16 +91,18 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
         },
         { model: User, as: "solver" },
         { model: Project, as: "project" },
-        { model: TaskAttachment, as: "attachments", attributes: [] },
+        {
+          model: TaskAttachment,
+          as: "attachments",
+          attributes: [],
+        },
         { model: TaskComment, as: "taskComments", attributes: [] },
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
       order: [
-        [
-          req.query.orderBy ? req.query.orderBy : "createdAt",
-          req.query.sort ? req.query.sort : "DESC",
-        ],
+        ["priority", "DESC"],
+        ["estimation", "desc"],
       ],
       group: ["Task.id"],
     });
@@ -351,7 +355,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             if (newSolver?.allowEmailNotification)
               sendEmailNotification(
                 newSolver.email,
-                req.t("task.newAssignment"),
+                req.t("task.message.newAssignment"),
                 "email/task",
                 "new_assignment",
                 {
@@ -383,7 +387,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             if (oldSolver?.allowEmailNotification)
               sendEmailNotification(
                 oldSolver.email,
-                req.t("task.newAssignment"),
+                req.t("task.message.newAssignment"),
                 "email/task",
                 "removed_assignment",
                 {

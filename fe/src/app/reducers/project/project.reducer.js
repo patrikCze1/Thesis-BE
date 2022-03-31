@@ -9,7 +9,6 @@ const initialState = {
   project: {},
   projectLoaded: false,
   errorMessage: null,
-  // stages: [],
   savingProject: false,
 };
 
@@ -35,14 +34,13 @@ export default function projectReducer(state = initialState, action) {
       };
 
     case "project/loadDetail":
-      return { ...state, projectLoaded: false };
+      return { ...state, projectLoaded: false, project: {} };
 
     case "project/detail":
       return {
         ...state,
         projectLoaded: true,
         project: action.payload.project,
-        // stages: [...action.payload.project.stages],
       };
 
     case "project/saving":
@@ -118,6 +116,12 @@ export default function projectReducer(state = initialState, action) {
         ),
       };
 
+    case "project/notFound":
+      return {
+        ...state,
+        project: null,
+      };
+
     default:
       return state;
   }
@@ -143,7 +147,10 @@ export const loadProjectAction = (id) => async (dispatch) => {
     const response = await axios.get(`/api/projects/${id}`);
     dispatch({ type: "project/detail", payload: response.data });
   } catch (error) {
+    console.log("error.response", error.response);
     toast.error(error.response?.data?.message);
+    if (error.response?.status === 404)
+      dispatch({ type: "project/notFound", payload: null });
   }
 };
 

@@ -8,13 +8,10 @@ import { Modal, OverlayTrigger, Tooltip } from "react-bootstrap";
 import KanbanCol from "./KanbanCol";
 import Loader from "./../common/Loader";
 
-import {} from "./../../reducers/project/project.reducer";
 import {
   loadTasksAction,
   editTaskAction,
-  createTaskAction,
 } from "../../reducers/task/task.reducer";
-import { loadUsersByProject } from "./../../reducers/user/userReducer";
 import { getFullName, getShortName } from "../../service/user/user.service";
 import {
   socketDeleteTask,
@@ -37,6 +34,7 @@ import {
 import BoardStagesForm from "../board/component/BoardStagesForm";
 import { hasRole } from "../../service/role.service";
 import { useModuleInfoModal } from "../../hooks/common";
+import { NotFound } from "../error";
 
 // const initialFilter = {
 //   query: "",
@@ -246,6 +244,13 @@ export default function KanbanTable() {
 
   if (!projectLoaded) {
     return <Loader />;
+  }
+  console.log(
+    "board === null || project === null",
+    board === null || project === null
+  );
+  if (board === null || project === null) {
+    return <NotFound />;
   }
 
   return (

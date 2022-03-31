@@ -3,6 +3,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Trans } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "react-bootstrap";
+
 import {
   createStageAction,
   deleteStageAction,
@@ -11,6 +12,7 @@ import {
 import i18n from "../../../../i18n";
 import { STAGE_TYPE } from "../../../../utils/enum";
 import { useSwalAlert } from "../../../hooks/common";
+import { LoaderTransparent } from "../../common";
 
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
@@ -23,7 +25,9 @@ const reorder = (list, startIndex, endIndex) => {
 export default function BoardStagesForm({ boardId }) {
   const dispatch = useDispatch();
   const { Swal } = useSwalAlert();
-  const { stages: projectStages } = useSelector((state) => state.boardReducer);
+  const { stages: projectStages, working } = useSelector(
+    (state) => state.boardReducer
+  );
   const [stages, setStages] = useState([...projectStages]);
   const [showNewStageForm, setShowNewStageForm] = useState(false);
   const [newPhaseTitle, setNewPhaseTitle] = useState("");
@@ -119,7 +123,7 @@ export default function BoardStagesForm({ boardId }) {
   };
 
   return (
-    <div className="row mt-5 bg-white">
+    <div className="row mt-5 bg-white position-relative">
       <div className="col-md-12">
         <h3 className="d-flex">
           <Trans>Stage settings</Trans>
@@ -256,6 +260,7 @@ export default function BoardStagesForm({ boardId }) {
           {i18n.t("label.saveChanges")}
         </Button>
       </div>
+      {working && <LoaderTransparent />}
     </div>
   );
 }

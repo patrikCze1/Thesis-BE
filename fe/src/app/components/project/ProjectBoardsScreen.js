@@ -16,6 +16,7 @@ import {
 import { loadProjectAction } from "../../reducers/project/project.reducer";
 import { hasRole } from "../../service/role.service";
 import Loader from "../common/Loader";
+import { NotFound } from "../error";
 import BoardForm from "./component/BoardForm";
 import BoardItem from "./component/BoardItem";
 
@@ -86,6 +87,10 @@ export default function ProjectBoardsScreen() {
       });
     }
   };
+
+  if (project === null) {
+    return <NotFound />;
+  }
 
   return (
     <>

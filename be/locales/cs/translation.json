@@ -32,7 +32,8 @@
   "task": {
     "message": {
       "created": "Vytvoření úkolu",
-      "stageChangedTo": "Změna stavu úkolu na {{stage}}"
+      "stageChangedTo": "Změna stavu úkolu na {{stage}}",
+      "newAssignment": "Přiřazení k úkolu"
     }
   },
   "stage": {

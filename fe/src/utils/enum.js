@@ -47,6 +47,7 @@ export const ROUTE = Object.freeze({
   TIME_TRACKS: "/zaznam-casu",
   TIME_TRACKS_REPORT: "/zaznam-casu/report",
   TODO: "/moje-todo",
+  NOT_FOUND: "/nenalezeno",
   ADMIN_CLIENT: "/administrace/klienti",
   ADMIN_GROUP: "/administrace/skupiny",
   ADMIN_USER: "/administrace/uzivatele",

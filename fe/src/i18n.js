@@ -348,6 +348,9 @@ i18n
           },
           error: {
             errorAppeared: "Nastala chyba",
+            pageNotFound: "Strana nenalezena",
+            pageNotFoundText:
+              "Hledaná stránka neexistuje, nejspíše byla odstraněna.",
           },
           message: {
             goToMainPage: "Jít na hlavní stránku",

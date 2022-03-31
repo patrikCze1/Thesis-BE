@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Trans } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import i18n from "../../../../i18n";
 
+import i18n from "../../../../i18n";
 import {
   createBoardAction,
   editBoardAction,
 } from "../../../reducers/project/board.reducer";
-import LoaderTransparent from "../../common/LoaderTransparent";
+import { LoaderTransparent } from "../../common";
 import { DatePicker, Quill } from "../../form";
 
 export default function BoardForm({ projectId, isEdit, closeForm }) {
