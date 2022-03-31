@@ -133,10 +133,13 @@ module.exports = (sequelize) => {
   );
 
   User.associate = function (models) {
-    User.hasMany(models.Task, { as: "creator", foreignKey: "creatorId" });
+    User.hasMany(models.Task, { as: "creator", foreignKey: "createdById" });
     User.hasMany(models.Task, { as: "tasks", foreignKey: "solverId" });
-    User.hasMany(models.Project, { as: "projects", foreignKey: "userId" });
-    User.hasMany(models.TaskCheck, { as: "taskChecks", foreignKey: "userId" });
+    User.hasMany(models.Project, { as: "projects", foreignKey: "createdById" });
+    User.hasMany(models.TaskCheck, {
+      as: "taskChecks",
+      foreignKey: "solverId",
+    });
     User.hasMany(models.TaskComment, {
       as: "taskCommentUser",
       foreignKey: "userId",

@@ -66,9 +66,14 @@ module.exports = (sequelize) => {
           isFloat: true,
         },
       },
+      beginAt: {
+        type: DataTypes.DATE,
+        validate: {
+          isDate: true,
+        },
+      },
       deadline: {
         type: DataTypes.DATE,
-
         validate: {
           isDate: true,
         },
