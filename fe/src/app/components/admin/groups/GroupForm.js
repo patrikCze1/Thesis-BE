@@ -10,13 +10,16 @@ import {
 } from "./../../../reducers/user/groupReducer";
 import { loadUsersAction } from "./../../../reducers/user/userReducer";
 import { getFullName } from "../../../service/user/user.service";
+import { LoaderTransparent, Loader } from "../../common";
 
 export default function GroupForm({ closeModal }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const [formData, setFormData] = useState({});
   const [isEdit, setIsEdit] = useState(false);
-  const { group, error } = useSelector((state) => state.groupReducer);
+  const { group, error, processing, groupLoading } = useSelector(
+    (state) => state.groupReducer
+  );
   const { users, usersLoaded } = useSelector((state) => state.userReducer);
   const [dragState, setDragState] = useState({
     users: {},
@@ -136,73 +139,81 @@ export default function GroupForm({ closeModal }) {
 
   return (
     <div className="row">
-      <div className="col-md-12">
-        <div className="card-body">
-          <form className="forms-sample" onSubmit={handleSubmitForm}>
-            {error && (
-              <div role="alert" className="fade alert alert-danger show">
-                {error}
-              </div>
-            )}
-            <div className="row">
-              <div className="col-md-12">
-                <Form.Group>
-                  <label htmlFor="name">
-                    <Trans>Name</Trans>
-                  </label>
-                  <Form.Control
-                    type="text"
-                    id="name"
-                    name="name"
-                    placeholder={t("Name")}
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </Form.Group>
-              </div>
-            </div>
-
-            {isEdit && (
+      {!groupLoading ? (
+        <div className="col-md-12">
+          <div className="card-body">
+            <form
+              className="forms-sample position-relative"
+              onSubmit={handleSubmitForm}
+            >
+              {error && (
+                <div role="alert" className="fade alert alert-danger show">
+                  {error}
+                </div>
+              )}
               <div className="row">
                 <div className="col-md-12">
-                  <DragDropContext onDragEnd={handleDragEnd}>
-                    <div className="row mb-2">
-                      {usersLoaded &&
-                        Object.keys(dragState.columns).map((key, i) => {
-                          console.log(dragState);
-                          const users = dragState.columns[key].users.map(
-                            (userId) => dragState.users[userId]
-                          );
-                          //return column.tittle;
-                          return (
-                            <Column
-                              key={i}
-                              column={dragState.columns[key]}
-                              users={users}
-                              index={key}
-                            />
-                          );
-                        })}
-                    </div>
-                  </DragDropContext>
+                  <Form.Group>
+                    <label htmlFor="name">
+                      <Trans>Name</Trans>
+                    </label>
+                    <Form.Control
+                      type="text"
+                      id="name"
+                      name="name"
+                      placeholder={t("Name")}
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      required
+                    />
+                  </Form.Group>
                 </div>
               </div>
-            )}
 
-            <button type="submit" className="btn btn-primary mr-2">
-              <Trans>Save</Trans>
-            </button>
-            <button
-              className="btn btn-light"
-              type="button"
-              onClick={closeModal}
-            >
-              <Trans>Cancel</Trans>
-            </button>
-          </form>
+              {isEdit && (
+                <div className="row">
+                  <div className="col-md-12">
+                    <DragDropContext onDragEnd={handleDragEnd}>
+                      <div className="row mb-2">
+                        {usersLoaded &&
+                          Object.keys(dragState.columns).map((key, i) => {
+                            console.log(dragState);
+                            const users = dragState.columns[key].users.map(
+                              (userId) => dragState.users[userId]
+                            );
+                            //return column.tittle;
+                            return (
+                              <Column
+                                key={i}
+                                column={dragState.columns[key]}
+                                users={users}
+                                index={key}
+                              />
+                            );
+                          })}
+                      </div>
+                    </DragDropContext>
+                  </div>
+                </div>
+              )}
+
+              <button type="submit" className="btn btn-primary mr-2">
+                <Trans>Save</Trans>
+              </button>
+              <button
+                className="btn btn-light"
+                type="button"
+                onClick={closeModal}
+              >
+                <Trans>Cancel</Trans>
+              </button>
+            </form>
+          </div>
+          {processing && <LoaderTransparent />}
         </div>
-      </div>
+      ) : (
+        <Loader />
+      )}
     </div>
   );
 }

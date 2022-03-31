@@ -286,6 +286,12 @@ i18n
               deactivated: "Uživatel deaktivován",
               activated: "Uživatel aktivován",
             },
+            infoText: `<p>V této sekci je možné spravovat uživatele pro celou aplikaci</p>
+<p><span class='bg-warning line-through'>Přeškrtnutí uživatelé</span> jsou deaktivováni a nemají přístup do aplikace</p>
+<p><strong>Role</strong></p>
+<p><strong>Uživatel</strong> - nemá přístup do administrace a nemůže vytvářet projekty, vidí jen záznamy, které se ho týkají.</p>
+<p><strong>Manažer</strong> - oproti uživateli má přípstup do administrace a může spravovat projekty. </p>
+<p><strong>Administrátor</strong> - má přístup ke všem sekcím aplikace a všem záznamům (úkoly, projekty), může mazat i cizí záznamy.</p>`,
           },
           stage: {
             waiting: "Co udělat",
@@ -355,6 +361,7 @@ i18n
             removingUser: "Odstraňuji uživatele",
             deactivatingUser: "Deaktivuji uživatele",
             activatingUser: "Aktivuji uživatele",
+            removingGroup: "Odstraňuji skupinu",
           },
           alert: {
             changesSaved: "Změny uloženy",

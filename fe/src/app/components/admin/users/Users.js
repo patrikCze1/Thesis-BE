@@ -17,7 +17,7 @@ import {
 import UserForm from "./UserForm";
 import Loader from "./../../common/Loader";
 import i18n from "../../../../i18n";
-import { useSwalAlert } from "../../../hooks/common";
+import { useModuleInfoModal, useSwalAlert } from "../../../hooks/common";
 
 const { SearchBar } = Search;
 
@@ -26,6 +26,7 @@ export default function Users() {
   const history = useHistory();
   const { t } = useTranslation();
   const { Swal } = useSwalAlert();
+  const { renderInfoModal, handleShowInfoModal } = useModuleInfoModal();
 
   const columns = [
     {
@@ -151,6 +152,13 @@ export default function Users() {
       <div className="page-header">
         <h1 className="page-title">
           <Trans>Users</Trans>
+
+          <button
+            onClick={handleShowInfoModal}
+            className="ml-1 p-0 btn btn-link"
+          >
+            <i className="mdi mdi-information-outline"></i>
+          </button>
         </h1>
         <div className="d-lg-flex flex-column flex-md-row ml-md-0 ml-md-auto my-2 wrapper">
           <div className="d-flex mt-4 mt-md-0">
@@ -233,6 +241,8 @@ export default function Users() {
           </Modal.Body>
         </Modal>
       )}
+
+      {renderInfoModal(i18n.t("Users"), i18n.t("user.infoText"))}
     </>
   );
 }
