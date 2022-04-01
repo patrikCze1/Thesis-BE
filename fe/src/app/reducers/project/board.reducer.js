@@ -69,7 +69,6 @@ export default function boardReducer(state = initialState, action) {
       };
 
     case "board/delete":
-      toast.success(i18n.t("message.boardDeleted"));
       return {
         ...state,
         working: false,
@@ -190,11 +189,24 @@ export const editBoardAction =
   };
 
 export const deleteBoardAction = (boardId) => async (dispatch) => {
+  const toastId = toast(i18n.t("message.removingBoard"), {
+    autoClose: false,
+    closeButton: false,
+  });
   try {
     await axios.delete(`/api/projects/boards/${boardId}`);
     dispatch({ type: "board/delete", payload: boardId });
+    toast.update(toastId, {
+      render: i18n.t("message.boardDeleted"),
+      type: "success",
+      autoClose: true,
+    });
   } catch (error) {
-    toast.error(error.response?.data?.message);
+    toast.update(toastId, {
+      render: error.response?.data?.message,
+      type: "error",
+      autoClose: true,
+    });
   }
 };
 

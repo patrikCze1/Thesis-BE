@@ -69,7 +69,6 @@ export default function taskReducer(state = initialState, action) {
       };
 
     case "task/create":
-      toast.success(i18n.t("task.taskCreated"));
       if (action.payload.task.stageId)
         return {
           ...state,
@@ -307,16 +306,33 @@ export const loadTaskDetailAction = (projectId, taskId) => async (dispatch) => {
  * @returns
  */
 export const createTaskAction = (projectId, data) => async (dispatch) => {
+  const toastId = toast(
+    i18n.t("message.creatingTask", {
+      closeButton: false,
+      autoClose: false,
+    })
+  );
+
   dispatch({ type: "task/actionStart", payload: null });
-  console.log("task", data);
+
   try {
     const response = await axios.post(
       `/api/projects/${projectId}/tasks/`,
       data
     );
+    toast.update(toastId, {
+      render: i18n.t("task.taskCreated"),
+      type: toast.TYPE.SUCCESS,
+      autoClose: true,
+    });
+
     dispatch({ type: "task/create", payload: response.data });
   } catch (error) {
-    toast.error(error.response?.data?.message);
+    toast.update(toastId, {
+      render: error.response?.data?.message,
+      type: toast.TYPE.ERROR,
+      autoClose: true,
+    });
     dispatch({ type: "task/actionFail", payload: null });
   }
 };

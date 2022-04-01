@@ -210,6 +210,7 @@ i18n
             beginAt: "Začátek",
             endAt: "Konec",
             finished: "Dokončeno",
+            deadline: "Termín",
           },
           task: {
             myTasks: "Moje úkoly",
@@ -342,7 +343,7 @@ i18n
             deadlineIn24Hours: "Během 24 hodin",
             members: "Členové",
             myTasks: "Moje úkoly",
-            tasksWithoutUser: "Nezařazené",
+            tasksWithoutUser: "Nepřiřazené",
             clearFilter: "Smazat filtr",
             taskQuery: "Vyhledejte dle názvu nebo čísla...",
           },
@@ -367,6 +368,8 @@ i18n
             removingGroup: "Odstraňuji skupinu",
             removingRecord: "Odstraňuji záznam",
             removingComment: "Odstraňuji komentář",
+            removingBoard: "Odstraňuji nástěnku",
+            creatingTask: "Vytvářím úkol",
           },
           alert: {
             changesSaved: "Změny uloženy",

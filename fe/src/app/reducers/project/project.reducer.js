@@ -163,9 +163,11 @@ export const createProjectAction = (project) => async (dispatch) => {
   try {
     const response = await axios.post(`/api/projects`, project);
     dispatch({ type: "project/create", payload: response.data });
+    return true;
   } catch (error) {
     toast.error(error.response?.data?.message);
     dispatch({ type: "project/stopSaving" });
+    return false;
   }
 };
 

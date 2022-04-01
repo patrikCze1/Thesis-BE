@@ -46,7 +46,7 @@ module.exports = (sequelize) => {
     Board.belongsTo(models.Project, {
       foreignKey: { name: "projectId", as: "project" },
     });
-    Board.hasMany(models.Task, { onDelete: "CASCADE", foreignKey: "boardId" });
+    Board.hasMany(models.Task, { onDelete: "SET NULL", foreignKey: "boardId" });
     Board.hasMany(models.Stage, {
       onDelete: "CASCADE",
       as: "stages",

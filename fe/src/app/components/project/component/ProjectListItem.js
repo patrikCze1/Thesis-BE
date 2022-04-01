@@ -12,6 +12,7 @@ import { PROJECT_STATE, ROLES, ROUTE } from "./../../../../utils/enum";
 import { hasRole } from "../../../service/role.service";
 import { getFullName } from "../../../service/user/user.service";
 import { createRouteWithParams } from "../../../service/router.service";
+import { getDayMonthShort } from "../../../service/date/date.service";
 
 export default function ProjectListItem({ project }) {
   const history = useHistory();
@@ -64,6 +65,7 @@ export default function ProjectListItem({ project }) {
           <Trans>{PROJECT_STATE[project.status]}</Trans>
         </label>
       </td>
+      <td>{project.deadline ? getDayMonthShort(project.deadline) : "-"}</td>
       <td className="text-center">
         <div>
           {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (

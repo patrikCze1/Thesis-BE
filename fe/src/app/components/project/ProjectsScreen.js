@@ -1,7 +1,6 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Trans } from "react-i18next";
-import { useHistory } from "react-router-dom";
 import { Modal } from "react-bootstrap";
 
 import Loader from "../common/Loader";
@@ -137,6 +136,9 @@ export default function Projects() {
                       <th>
                         <Trans>State</Trans>
                       </th>
+                      <th>
+                        <Trans>label.deadline</Trans>
+                      </th>
                       <th className="text-center w-100px">
                         <Trans>Action</Trans>
                       </th>
@@ -149,7 +151,7 @@ export default function Projects() {
                       ))
                     ) : (
                       <tr>
-                        <td colSpan={5} className="text-center">
+                        <td colSpan={6} className="text-center">
                           <Trans>label.noRecords</Trans>
                         </td>
                       </tr>

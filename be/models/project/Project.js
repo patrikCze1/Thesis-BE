@@ -70,12 +70,22 @@ module.exports = (sequelize) => {
         type: DataTypes.DATE,
         validate: {
           isDate: true,
+          isLowerThanDeadline(value) {
+            if (this.deadline && new Date(value) > new Date(this.deadline)) {
+              throw new Error("Začátek musí být menší než konec");
+            }
+          },
         },
       },
       deadline: {
         type: DataTypes.DATE,
         validate: {
           isDate: true,
+          isGreaterThanStart(value) {
+            if (this.beginAt && new Date(value) < new Date(this.beginAt)) {
+              throw new Error("Začátek musí být menší než konec");
+            }
+          },
         },
       },
     },

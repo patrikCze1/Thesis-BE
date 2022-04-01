@@ -18,10 +18,14 @@ import { getFullName } from "../../../service/user/user.service";
 import LoaderTransparent from "../../common/LoaderTransparent";
 import { PROJECT_STATE } from "../../../../utils/enum";
 import Quill from "../../form/Quill";
+import { DatePicker } from "../../form";
+import i18n from "../../../../i18n";
+import { Switch } from "../../common";
 
 export default function ProjectForm({ projectId = false, closeForm }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
+  const [showDates, setShowDates] = useState(false);
   const { clients } = useSelector((state) => state.clientReducer);
   const { groups } = useSelector((state) => state.groupReducer);
   const { users } = useSelector((state) => state.userReducer);
@@ -66,13 +70,18 @@ export default function ProjectForm({ projectId = false, closeForm }) {
           : [],
         createdById: project.createdById,
         status: project.status || 1,
+        beginAt: project.beginAt,
+        deadline: project.deadline,
       });
     }
 
-    if (projectId || Object.keys(project).length > 0) setIsEdit(true);
+    if (projectId || Object.keys(project).length > 0) {
+      setIsEdit(true);
+      if (project.beginAt || project.deadline) setShowDates(true);
+    }
   }, [project]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const form = e.currentTarget;
 
@@ -83,12 +92,16 @@ export default function ProjectForm({ projectId = false, closeForm }) {
         users: formData.users?.map((user) => user.value) || [],
         groups: formData.groups?.map((group) => group.value) || [],
       };
+      if (!showDates) {
+        data.beginAt = null;
+        data.deadline = null;
+      }
       console.log("data", data);
       if (projectId || project.id) {
         dispatch(editProjectAction(project.id, data));
       } else {
-        dispatch(createProjectAction(data));
-        closeForm();
+        const success = await dispatch(createProjectAction(data));
+        if (success) closeForm();
       }
     }
   };
@@ -221,6 +234,95 @@ export default function ProjectForm({ projectId = false, closeForm }) {
                   </select>
                 </Form.Group>
               </Form.Row>
+
+              <div className="form-group mb-2">
+                <div className="form-check">
+                  <label className="form-check-label">
+                    <input
+                      type="checkbox"
+                      className="form-check-input"
+                      onClick={() => setShowDates(!showDates)}
+                      value={showDates ? "checked" : ""}
+                    />
+                    <i className="input-helper"></i>
+                    <Trans>board.setDeadlines</Trans>
+                  </label>
+                </div>
+              </div>
+
+              {showDates && (
+                <div className="form-row">
+                  <div className="form-group col-md-6">
+                    <DatePicker
+                      value={formData.beginAt}
+                      onChange={(val) => handleChange("beginAt", val)}
+                      placeholder={i18n.t("label.beginAt")}
+                      required={showDates}
+                    />
+                  </div>
+                  <div className="form-group col-md-6">
+                    <DatePicker
+                      value={formData.deadline}
+                      onChange={(val) => handleChange("deadline", val)}
+                      placeholder={i18n.t("label.deadline")}
+                      // required={showDates}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* <Form.Row>
+                <div className="form-group col-md-6">
+                  <label className="form-label">
+                    <Trans>project.timeBudget</Trans>
+                  </label>
+
+                  <Form.Group>
+                    <div className="input-group">
+                      
+                      <Form.Control
+                        type="text"
+                        className="form-control"
+                        aria-label="Amount"
+                        placeholder=""
+                        name="timeBudget"
+                        value={formData.timeBudget}
+                        onChange={(e) =>
+                          handleChange(e.target.name, e.target.value)
+                        }
+                      />
+                      <div className="input-group-append">
+                        <span className="input-group-text">Hod</span>
+                      </div>
+                    </div>
+                  </Form.Group>
+                </div>
+
+                <div className="form-group col-md-6">
+                  <label className="form-label">
+                    <Trans>project.priceBudget</Trans>
+                  </label>
+
+                  <Form.Group>
+                    <div className="input-group">
+                      <Form.Control
+                        type="text"
+                        className="form-control"
+                        aria-label="Amount"
+                        placeholder=""
+                        name="priceBudget"
+                        value={formData.priceBudget}
+                        onChange={(e) =>
+                          handleChange(e.target.name, e.target.value)
+                        }
+                      />
+                      <div className="input-group-append">
+                        <span className="input-group-text">Kc</span>
+                      </div>
+                    </div>
+                  </Form.Group>
+                </div>
+              </Form.Row> */}
 
               <Form.Row>
                 <div className="form-group col-md-12">
