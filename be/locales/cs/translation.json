@@ -33,7 +33,8 @@
     "message": {
       "created": "Vytvoření úkolu",
       "stageChangedTo": "Změna stavu úkolu na {{stage}}",
-      "newAssignment": "Přiřazení k úkolu"
+      "newAssignment": "Přiřazení k úkolu",
+      "deadlineIn24Hours": "Úkol {{name}} má být brzy dokončen"
     }
   },
   "stage": {

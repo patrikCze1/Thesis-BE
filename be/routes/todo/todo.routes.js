@@ -22,9 +22,15 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
-  if (!req.body.name) {
-    res.status(400).send({
-      name: "name is required",
+  const requiredAttr = ["name"];
+  const result = validator.validateRequiredFields(requiredAttr, req.body);
+  if (!result.valid) {
+    res.status(400).json({
+      message:
+        req.t("error.theseFieldsAreRequired") +
+        result.requiredFields
+          .map((field) => req.t(`field.${field}`))
+          .join(", "),
     });
     return;
   }
@@ -36,7 +42,7 @@ router.post("/", authenticateToken, async (req, res) => {
 
   try {
     const todo = await Todo.create(data);
-    res.send({ todo });
+    res.json({ todo });
   } catch (error) {
     responseError(req, res, error);
   }

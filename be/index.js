@@ -30,6 +30,7 @@ const {
   notificationRoutes,
   meRoutes,
   searchRoutes,
+  cronRoutes,
 } = require("./routes");
 const { connect, disconnect } = require("./service/io");
 
@@ -109,6 +110,7 @@ app.use("/api/tracks", timeTrackRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/me", meRoutes);
 app.use("/api/search", searchRoutes);
+app.use("/api/cron", cronRoutes);
 
 const port = process.env.PORT || 8080;
 server.listen(port, () => {

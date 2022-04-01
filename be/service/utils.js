@@ -25,7 +25,7 @@ const getFeTaskUrl = (projectId, taskId) => {
  * @param {number} length
  * @returns {string}
  */
-const trimString = (string, length) => {
+const trimString = (string, length = 100) => {
   return string.length > length ? string.substring(0, length) + "..." : string;
 };
 
