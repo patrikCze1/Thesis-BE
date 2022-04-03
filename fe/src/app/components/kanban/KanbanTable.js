@@ -81,7 +81,7 @@ export default function KanbanTable() {
 
   const handleWebsockets = () => {
     const socket = getIo();
-    console.log("handleWebsockets");
+    console.log("handleWebsockets", socket);
     try {
       socket.on(SOCKET.TASK_NEW, (data) => {
         console.log("socket TASK_NEW", data);
@@ -120,11 +120,18 @@ export default function KanbanTable() {
       )
     );
     dispatch(loadBoardDetailAction(projectId, boardId));
-    const sockets = handleWebsockets();
+    const socket = handleWebsockets();
 
     return () => {
-      console.log("close sockets");
-      sockets?.close();
+      console.log("remove socket listeners");
+      if (socket) {
+        socket.off(SOCKET.TASK_NEW);
+        socket.off(SOCKET.TASK_EDIT);
+        socket.off(SOCKET.TASK_DELETE);
+        socket.off(SOCKET.BOARD_STAGE_NEW);
+        socket.off(SOCKET.BOARD_STAGE_EDIT);
+        socket.off(SOCKET.BOARD_STAGE_DELETE);
+      }
     };
   }, [projectId, boardId]);
 
@@ -189,12 +196,9 @@ export default function KanbanTable() {
           stageId: tableState.columns[destination.droppableId].id,
         };
         dispatch(
-          editTaskAction(
-            TASK_ACTION_TYPE.NORMAL,
-            projectId,
-            task.id,
-            updatedTask
-          )
+          editTaskAction(TASK_ACTION_TYPE.NORMAL, projectId, task.id, {
+            stageId: tableState.columns[destination.droppableId].id,
+          })
         );
         return updatedTask;
       }

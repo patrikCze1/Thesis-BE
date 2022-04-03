@@ -90,8 +90,14 @@ export default function App() {
       socket.on(SOCKET.TIME_TRACK_STOP, (data) => {
         dispatch(socketStopTimeTrackAction(data.id));
       });
-      return () => socket.disconnect();
+      socket.on("connect", () => {
+        console.log("initWebsocket socket connected");
+      });
+      socket.on("error", function (err) {
+        console.log("connect failed" + err);
+      });
     }
+    return socket;
   };
 
   useEffect(() => {
@@ -137,10 +143,12 @@ export default function App() {
   useEffect(() => {
     console.log("APP user", user);
     if (user && Object.keys(user).length > 0) {
-      initWebsocket();
+      const socket = initWebsocket();
       setShowMenu(true);
       if (location.pathname !== ROUTE.TIME_TRACKS)
         dispatch(loadMyTimeTracksAction(0, 0, false, true));
+
+      if (socket) return () => socket.disconnect();
     } else setShowMenu(false);
     setLoaded(true);
   }, [user]);

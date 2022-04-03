@@ -69,7 +69,7 @@
   },
   "notification": {
     "task": {
-      "taskCompleted": "Uživatel {{userName}} dokončil úkol {{taskName}}"
+      "taskCompleted": "Uživatel {{userName}} dokončil/a úkol {{taskName}}"
     }
   },
   "board": {

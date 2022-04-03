@@ -1,10 +1,10 @@
-import io from "socket.io-client";
+import { io } from "socket.io-client";
 import { parseUserFromStorage } from "../app/service/user/user.service";
 
 let instance = null;
 export const initIo = () => {
   try {
-    console.log("try to connect socket");
+    console.log("init socket");
     const user = parseUserFromStorage();
     if (!user) {
       throw new Error("User not loged in");
@@ -23,8 +23,14 @@ export const initIo = () => {
       // extraHeaders: {
       //   "my-custom-header": "abcd"
       // }
+      reconnection: true,
+      // reconnectionDelay: 1000,
+      // reconnectionDelayMax: 5000,
+      // reconnectionAttempts: Infinity,
+      forceNew: true,
+      // secure: true,
     });
-    instance.connect();
+
     return instance;
   } catch (error) {
     console.error("init io error", error);
@@ -32,4 +38,8 @@ export const initIo = () => {
   }
 };
 
-export const getIo = () => instance;
+export const getIo = () => {
+  console.log("getSocket");
+  // if (instance) instance.connect();
+  return instance;
+};

@@ -52,13 +52,15 @@ export default function NavigationNotifications() {
           <Trans>Notifications</Trans>
         </h6>
         {unreadNotifications &&
-          unreadNotifications.map((notification, i) => (
-            <NavNotificationListItem
-              key={i}
-              notification={notification}
-              onClick={(e) => handleNotificationClick(e, notification)}
-            />
-          ))}
+          unreadNotifications
+            .slice(0, 5)
+            .map((notification, i) => (
+              <NavNotificationListItem
+                key={i}
+                notification={notification}
+                onClick={(e) => handleNotificationClick(e, notification)}
+              />
+            ))}
         <Dropdown.Item
           className="dropdown-item preview-item d-flex align-items-center"
           href="!#"

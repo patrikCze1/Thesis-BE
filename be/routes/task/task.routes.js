@@ -338,7 +338,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           const oldSolver = await User.findByPk(taskSolverId);
           const newSolver = await User.findByPk(task.solverId);
 
-          TaskChangeLog.create({
+          await TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: `Změnil řešitele z ${
@@ -352,7 +352,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             user.id != task.solverId
           ) {
             const newSolver = await User.findByPk(task.solverId);
-            if (newSolver?.allowEmailNotification)
+            if (newSolver?.allowEmailNotification) {
               sendEmailNotification(
                 newSolver.email,
                 req.t("task.message.newAssignment"),
@@ -364,6 +364,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                   username: getFullName(user),
                 }
               );
+            }
 
             const newNotification = await createTaskNotification(
               task.id,
@@ -379,12 +380,13 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             io.to(parseInt(task.solverId)).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
               notification: newNotification,
             });
+            console.log("io to ", task.solverId);
           } else if (
             taskSolverId !== null &&
             taskSolverId !== task.solverId &&
             user.id != taskSolverId
           ) {
-            if (oldSolver?.allowEmailNotification)
+            if (oldSolver?.allowEmailNotification) {
               sendEmailNotification(
                 oldSolver.email,
                 req.t("task.message.newAssignment"),
@@ -396,6 +398,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                   username: getFullName(user),
                 }
               );
+            }
 
             const newNotification = await createTaskNotification(
               task.id,
@@ -414,7 +417,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             });
           }
         } else if (field === "priority") {
-          TaskChangeLog.create({
+          await TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: `Změnil prioritu na ${TASK_PRIORITY[task.priority]}`,
@@ -442,7 +445,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             const s = await stageRepo.findFirstByBoard(task.boardId);
             task.stageId = s.id;
 
-            TaskChangeLog.create({
+            await TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Změna nástěnky na ${s.name}`,
@@ -473,7 +476,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             throw new ResponseError(400, req.t("error.cantAssignToStage"));
           }
 
-          TaskChangeLog.create({
+          await TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: req.t(`task.message.stageChangedTo`, {
@@ -708,6 +711,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       }
     } else {
       for (const u of projectUsers) {
+        console.log("SOCKET_EMIT.TASK_EDIT ", u.id);
         io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
       }
     }

@@ -120,9 +120,9 @@ export default function KanbanTask({ task, index }) {
               <div className="d-flex justify-content-between w-100">
                 <h5 className="text-dark">{task.name}</h5>
 
-                <small className="d-inline-block ml-auto">{`${
-                  project.key !== null ? `${project.key}-` : ""
-                }${task.number}`}</small>
+                <small className="d-inline-block ml-auto">{`[${
+                  project.key ? `${project.key}-` : ""
+                }${task.number}]`}</small>
 
                 {/* <Dropdown variant="p-0" alignRight>
                   <Dropdown.Toggle variant="dropdown-toggle p-0">

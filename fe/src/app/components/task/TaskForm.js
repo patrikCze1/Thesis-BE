@@ -99,7 +99,11 @@ export default function TaskForm({
       //   dispatch(socketDeleteComment(data.id));
       // });
 
-      return () => socket?.close();
+      return () => {
+        if (socket) {
+          socket.off(SOCKET.TASK_COMMENT_NEW);
+        }
+      };
     } catch (error) {
       console.error(error);
     }

@@ -38,7 +38,7 @@ export default function ProjectBoardsScreen() {
 
   const handleWebsockets = () => {
     const socket = getIo();
-
+    console.log("socket", socket);
     try {
       socket.on(SOCKET.PROJECT_BOARD_NEW, (data) => {
         if (data.board.projectId === projectId)
@@ -57,9 +57,9 @@ export default function ProjectBoardsScreen() {
       dispatch(loadBoardsAction(projectId));
     }
 
-    const sockets = handleWebsockets();
+    const socket = handleWebsockets();
     return () => {
-      sockets?.close();
+      if (socket) socket.off(SOCKET.PROJECT_BOARD_NEW);
     };
   }, [projectId]);
 

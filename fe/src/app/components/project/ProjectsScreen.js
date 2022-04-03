@@ -60,11 +60,15 @@ export default function Projects() {
   };
 
   useEffect(() => {
-    const io = handleWebsockets();
+    const socket = handleWebsockets();
     // if (params.has("upravit")) showForm(params.get("upravit"));
 
     return () => {
-      io?.close();
+      if (socket) {
+        socket.off(SOCKET.PROJECT_NEW);
+        socket.off(SOCKET.PROJECT_EDIT);
+        socket.off(SOCKET.PROJECT_DELETE);
+      }
     };
   }, []);
 
