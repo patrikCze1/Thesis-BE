@@ -93,7 +93,7 @@ export default function KanbanTable() {
       });
       socket.on(SOCKET.TASK_DELETE, (data) => {
         console.log("socket.on(SOCKET.TASK_DELETE data", data);
-        dispatch(socketDeleteTask(data.id));
+        dispatch(socketDeleteTask(data.id, data.type));
       });
       socket.on(SOCKET.BOARD_STAGE_NEW, (data) => {
         if (data.stage.boardId == boardId) dispatch(socketNewStage(data.stage));

@@ -34,7 +34,8 @@
       "created": "Vytvoření úkolu",
       "stageChangedTo": "Změna stavu úkolu na {{stage}}",
       "newAssignment": "Přiřazení k úkolu",
-      "deadlineIn24Hours": "Úkol {{name}} má být brzy dokončen"
+      "deadlineIn24Hours": "Úkol {{name}} má být brzy dokončen",
+      "deleted": "Úkol odstraněn"
     }
   },
   "stage": {

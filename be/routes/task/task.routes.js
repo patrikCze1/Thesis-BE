@@ -270,15 +270,15 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       name: req.t("task.message.created"),
     });
 
-    if (newTask.boardId) {
-      const projectUsers = await findUsersByProject(projectId);
-      console.log("findUsersByProject", projectUsers);
+    // if (newTask.boardId) {
+    const projectUsers = await findUsersByProject(projectId);
+    console.log("findUsersByProject", projectUsers);
 
-      for (const u of projectUsers) {
-        console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-        io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
-      }
+    for (const u of projectUsers) {
+      console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
+      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
+    // }
     res.json({ task: newTask });
   } catch (error) {
     responseError(req, res, error);
@@ -289,11 +289,14 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // await User.findByIdAndUpdate(userId, update);
   const io = getIo();
   const { projectId } = req.params;
+  let prevBoardId = null;
+  let prevWasArchived = false;
 
   try {
     let task = await Task.findByPk(req.params.id);
     const taskSolverId = task.solverId;
     const user = getUser(req, res);
+    prevBoardId = task.boardId;
 
     Object.keys(req.body).forEach((key) => {
       task[key] = req.body[key];
@@ -334,6 +337,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
       for (const field of changedFields) {
         console.log("changedFields", changedFields);
+        console.log("task", task);
         if (field === "solverId") {
           const oldSolver = await User.findByPk(taskSolverId);
           const newSolver = await User.findByPk(task.solverId);
@@ -444,7 +448,6 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           try {
             const s = await stageRepo.findFirstByBoard(task.boardId);
             task.stageId = s.id;
-
             await TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
@@ -667,8 +670,8 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 )}`,
               });
             else if (field === "boardId") continue;
-          } else {
-            TaskChangeLog.create({
+          } else if (!["boardId", "stageId"].includes(field)) {
+            await TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Změnil ${transFields[field]} na ${trimString(
@@ -679,7 +682,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           }
         }
       }
-
+      prevWasArchived = task.previous("archived");
       await task.save();
     }
 
@@ -690,32 +693,67 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     console.log("task prev vals", task.previous("stageId"));
     const projectUsers = await findUsersByProject(projectId);
 
-    res.json({ task });
-
+    console.log("prevWasArchived", prevWasArchived);
     if (changedFields.includes("boardId")) {
       if (task.boardId) {
-        if (task.previous("boardId") === task.boardId) {
+        if (prevBoardId == task.boardId) {
+          console.log("prevBoardId === task.boardId", prevBoardId);
           for (const u of projectUsers) {
             io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
           }
-        } else {
+        } else if (task.archived !== prevWasArchived) {
+          // move from archive to kanban
           for (const u of projectUsers) {
+            io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+          }
+        } else {
+          // move from backlog to kanban
+          console.log("else");
+          for (const u of projectUsers) {
+            io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+              id: task.id,
+              type: "rmFromBacklog",
+            });
             io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
           }
         }
       } else {
-        // hide task in kanban
+        console.log("!task.boardId");
+        // hide task in kanban, move them to backlog
         for (const u of projectUsers) {
-          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, { id: task.id });
+          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+            id: task.id,
+            type: "rmFromKanban",
+          });
+          // todo io.backlog task new
+        }
+      }
+    } else if (changedFields.includes("archived")) {
+      if (prevWasArchived && task.boardId) {
+        // move from archive to kanban
+        for (const u of projectUsers) {
+          io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+        }
+        //  } else if (prevWasArchived && !task.boardId) {// move from archive to backlog
+      } else {
+        for (const u of projectUsers) {
+          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+            id: task.id,
+            type: "rmFromKanban",
+          });
         }
       }
     } else {
+      console.log("SOCKET_EMIT.TASK_EDIT");
       for (const u of projectUsers) {
         console.log("SOCKET_EMIT.TASK_EDIT ", u.id);
         io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
       }
     }
+
+    res.json({ task });
   } catch (error) {
+    console.error("path", error);
     responseError(req, res, error);
   }
 });
@@ -740,13 +778,14 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     }
 
     await task.destroy();
-    res.json({ message: "Úkol odstraněn" });
+    res.json({ message: req.t("task.message.deleted") });
 
     const projectUsers = await findUsersByProject(task.projectId);
     for (const u of projectUsers) {
-      console.log("SOCKET TASK_DELETE to", u.id);
-
-      io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, { id: task.id });
+      io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+        id: task.id,
+        type: "rmFromAll",
+      });
     }
   } catch (error) {
     res.status(500).json({ message: error.message });

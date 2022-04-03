@@ -4,13 +4,19 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
 import i18n from "../../../i18n";
-import { TASK_ACTION_TYPE } from "../../../utils/enum";
+import { SOCKET, TASK_ACTION_TYPE } from "../../../utils/enum";
+import { getIo } from "../../../utils/websocket.config";
 import { useProjectDetail } from "../../hooks/project";
 import { useCreateTask, useTaskDetail } from "../../hooks/task";
 import { usePagination } from "../../hooks/usePagination";
 import { loadBoardsAction } from "../../reducers/project/board.reducer";
 import { loadProjectAction } from "../../reducers/project/project.reducer";
-import { loadBacklogTasksAction } from "../../reducers/task/task.reducer";
+import {
+  loadBacklogTasksAction,
+  socketDeleteTask,
+  socketEditTask,
+  socketNewTask,
+} from "../../reducers/task/task.reducer";
 import { objectIsNotEmpty } from "../../service/utils";
 import TaskTable from "./component/TaskTable";
 
@@ -34,11 +40,45 @@ export default function TaskBacklogScreen() {
     backlogTasksCount
   );
 
+  const handleWebsockets = () => {
+    const socket = getIo();
+    console.log("handleWebsockets", socket);
+    try {
+      socket.on(SOCKET.TASK_NEW, (data) => {
+        console.log("socket TASK_NEW", data);
+        if (data.task.boardId == null) dispatch(socketNewTask(data.task));
+      });
+      socket.on(SOCKET.TASK_EDIT, (data) => {
+        console.log("socket TASK_EDIT", data);
+        if (data.task.boardId == null) dispatch(socketEditTask(data.task));
+      });
+      socket.on(SOCKET.TASK_DELETE, (data) => {
+        console.log("socket.on(SOCKET.TASK_DELETE data", data);
+        dispatch(socketDeleteTask(data.id, data.type));
+      });
+    } catch (error) {
+      console.error(error);
+    }
+
+    return socket;
+  };
+
   useEffect(() => {
     if (projectId) {
       dispatch(loadProjectAction(projectId));
       dispatch(loadBoardsAction(projectId));
     }
+
+    const socket = handleWebsockets();
+
+    return () => {
+      console.log("remove socket listeners");
+      if (socket) {
+        socket.off(SOCKET.TASK_NEW);
+        socket.off(SOCKET.TASK_EDIT);
+        socket.off(SOCKET.TASK_DELETE);
+      }
+    };
   }, [projectId]);
 
   useEffect(() => {

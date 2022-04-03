@@ -77,6 +77,7 @@ export default function taskReducer(state = initialState, action) {
           // task: {},
           taskLoaded: true,
           tasks: [...state.tasks, action.payload.task],
+          taskCount: state.taskCount + 1,
         };
       else
         return {
@@ -86,6 +87,7 @@ export default function taskReducer(state = initialState, action) {
           // task: {},
           taskLoaded: true,
           backlogTasks: [...state.backlogTasks, action.payload.task],
+          backlogTasksCount: state.backlogTasksCount + 1,
         };
 
     case "task/socketNew":
@@ -93,10 +95,18 @@ export default function taskReducer(state = initialState, action) {
         !state.tasks.some((task) => task.id == action.payload.id) &&
         !state.processing
       ) {
-        return {
-          ...state,
-          tasks: [...state.tasks, action.payload],
-        };
+        if (action.payload.stageId)
+          return {
+            ...state,
+            tasks: [...state.tasks, action.payload],
+            taskCount: state.taskCount + 1,
+          };
+        else
+          return {
+            ...state,
+            backlogTasks: [...state.backlogTasks, action.payload],
+            backlogTasksCount: state.backlogTasksCount + 1,
+          };
       } else return state;
 
     case "task/edit":
@@ -145,31 +155,45 @@ export default function taskReducer(state = initialState, action) {
       return editedState;
 
     case "task/socketEdit":
-      return {
-        ...state,
-        tasks: state.tasks.map((task) => {
-          if (task.id === action.payload.id) return action.payload;
-          else return task;
-        }),
-        task:
-          state.task.id === action.payload.id
-            ? { ...state.task, ...action.payload }
-            : state.task,
-      };
-
-    // case "task/complete":
-    //   return {
-    //     ...state,
-    //     tasks: state.tasks.map((task) => {
-    //       if (task.id === action.payload.id)
-    //         return { ...task, ...action.payload };
-    //       else return task;
-    //     }),
-    //     task:
-    //       state.task.id === action.payload.id
-    //         ? { ...state.task, ...action.payload }
-    //         : state.task,
-    //   };
+      if (state.tasks.some((task) => task.id === action.payload.id))
+        return {
+          ...state,
+          tasks: state.tasks.map((task) => {
+            if (task.id === action.payload.id) return action.payload;
+            else return task;
+          }),
+          task:
+            state.task.id === action.payload.id
+              ? { ...state.task, ...action.payload }
+              : state.task,
+        };
+      else if (
+        state.backlogTasks.some((task) => task.id === action.payload.id)
+      ) {
+        return {
+          ...state,
+          backlogTasks: state.backlogTasks.map((task) => {
+            if (task.id === action.payload.id) return action.payload;
+            else return task;
+          }),
+          task:
+            state.task.id === action.payload.id
+              ? { ...state.task, ...action.payload }
+              : state.task,
+        };
+      } else {
+        return {
+          ...state,
+          archiveTasks: state.archiveTasks.map((task) => {
+            if (task.id === action.payload.id) return action.payload;
+            else return task;
+          }),
+          task:
+            state.task.id === action.payload.id
+              ? { ...state.task, ...action.payload }
+              : state.task,
+        };
+      }
 
     case "task/delete":
       if (action.payload.type === TASK_ACTION_TYPE.NORMAL)
@@ -188,7 +212,7 @@ export default function taskReducer(state = initialState, action) {
           task: {},
           actionSuccess: true,
           processing: false,
-          backlogTasks: state.tasks.filter(
+          backlogTasks: state.backlogTasks.filter(
             (task) => task.id !== action.payload.taskId
           ),
           backlogTasksCount: state.backlogTasksCount - 1,
@@ -199,17 +223,43 @@ export default function taskReducer(state = initialState, action) {
           task: {},
           actionSuccess: true,
           processing: false,
-          archiveTasks: state.tasks.filter(
+          archiveTasks: state.archiveTasks.filter(
             (task) => task.id !== action.payload.taskId
           ),
           archiveTasksCount: state.archiveTasksCount - 1,
         };
 
     case "task/socketDelete":
-      return {
-        ...state,
-        tasks: state.tasks.filter((task) => task.id !== action.payload),
-      };
+      if (
+        (action.payload.type === "rmFromKanban" ||
+          action.payload.type === "rmFromAll") &&
+        state.tasks.some((task) => task.id === action.payload.id)
+      )
+        return {
+          ...state,
+          tasks: state.tasks.filter((task) => task.id !== action.payload.id),
+        };
+      else if (
+        (action.payload.type === "rmFromBacklog" ||
+          action.payload.type === "rmFromAll") &&
+        state.backlogTasks.some((task) => task.id === action.payload.id)
+      )
+        return {
+          ...state,
+          backlogTasks: state.backlogTasks.filter(
+            (task) => task.id !== action.payload.id
+          ),
+          backlogTasksCount: state.backlogTasksCount - 1,
+        };
+      else if (state.archiveTasks.some((task) => task.id === action.payload.id))
+        return {
+          ...state,
+          archiveTasks: state.archiveTasks.filter(
+            (task) => task.id !== action.payload.id
+          ),
+          archiveTasksCount: state.archiveTasksCount - 1,
+        };
+      else return { ...state };
 
     case "task/actionStart":
       return { ...state, actionSuccess: false, processing: true };
@@ -322,7 +372,7 @@ export const createTaskAction = (projectId, data) => async (dispatch) => {
     );
     toast.update(toastId, {
       render: i18n.t("task.taskCreated"),
-      type: toast.TYPE.SUCCESS,
+      type: "success",
       autoClose: true,
     });
 
@@ -330,7 +380,7 @@ export const createTaskAction = (projectId, data) => async (dispatch) => {
   } catch (error) {
     toast.update(toastId, {
       render: error.response?.data?.message,
-      type: toast.TYPE.ERROR,
+      type: "error",
       autoClose: true,
     });
     dispatch({ type: "task/actionFail", payload: null });
@@ -423,7 +473,7 @@ export const deleteTaskAction =
     }
   };
 
-export const socketDeleteTask = (id) => (dispatch) => {
+export const socketDeleteTask = (id, type) => (dispatch) => {
   console.log("socketDeleteTask action");
-  dispatch({ type: "task/socketDelete", payload: id });
+  dispatch({ type: "task/socketDelete", payload: { id, type } });
 };
