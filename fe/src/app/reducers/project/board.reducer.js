@@ -6,7 +6,7 @@ const initialState = {
   boards: [],
   boardsLoaded: false,
   board: {},
-  boardLoaded: false,
+  loadingBoard: false,
   working: false,
   stages: [],
 };
@@ -23,18 +23,18 @@ export default function boardReducer(state = initialState, action) {
       return { ...state, boardsLoaded: true, boards: action.payload.boards };
 
     case "board/loadDetail":
-      return { ...state, boardLoaded: false };
+      return { ...state, loadingBoard: true };
 
     case "board/detailLoaded":
       return {
         ...state,
-        boardLoaded: true,
+        loadingBoard: false,
         board: action.payload.board,
         stages: action.payload.stages,
       };
 
     case "board/loadDetailFail":
-      return { ...state, boardLoaded: true };
+      return { ...state, loadingBoard: false };
 
     case "board/create":
       toast.success(i18n.t("message.boardCreated"));
@@ -163,9 +163,11 @@ export const createBoardAction = (projectId, data) => async (dispatch) => {
       data
     );
     dispatch({ type: "board/create", payload: response.data });
+    return true;
   } catch (error) {
     dispatch({ type: "board/actionStop", payload: null });
     toast.error(error.response?.data?.message);
+    return false;
   }
 };
 

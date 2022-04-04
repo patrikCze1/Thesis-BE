@@ -23,7 +23,7 @@ export default function userReducer(state = initialState, action) {
       return { ...state, userLoading: true, user: {}, error: null };
 
     case "user/clear":
-      return { ...state, user: {}, error: null };
+      return { ...state, user: {}, error: null, processing: false };
 
     case "user/loaded":
       return { ...state, userLoading: false, user: action.payload.user };
@@ -185,7 +185,7 @@ export const editUserAction = (id, data) => async (dispatch) => {
 
 export const deleteUserAction = (id) => async (dispatch) => {
   const toastId = toast(i18n.t("message.removingUser"), {
-    autoClose: false,
+    // autoClose: false,
     closeButton: false,
   });
   try {

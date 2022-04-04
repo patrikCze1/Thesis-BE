@@ -149,7 +149,7 @@ export const editClientAction = (id, data) => async (dispatch) => {
 
 export const deleteClientAction = (id) => async (dispatch) => {
   const toastId = toast(i18n.t("message.removingClient"), {
-    autoClose: false,
+    // autoClose: false,
     closeButton: false,
   });
 

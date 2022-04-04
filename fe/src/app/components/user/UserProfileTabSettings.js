@@ -1,19 +1,19 @@
 import React from "react";
 import { Trans } from "react-i18next";
 import { useSelector } from "react-redux";
-import { useChangePassword } from "../../hooks/user";
 
 import PasswordRepeat from "../common/PasswordRepeat";
-import Loader from "./../common/Loader";
+import { useChangePassword } from "../../hooks/user";
+import { LoaderTransparent } from "../common";
 
 export default function UserProfileTabSettings() {
-  const { actionProcesing } = useSelector((state) => state.currentUserReducer);
+  const { actionProcessing } = useSelector((state) => state.currentUserReducer);
   const { error, handleInputChange, handleSubmitPassword, passwordFormData } =
     useChangePassword();
-
+  console.log("actionProcesing", actionProcessing);
   return (
     <div className="media">
-      <div className="media-body">
+      <div className="media-body position-relative">
         <h4 className="mt-0">
           <Trans>Change password</Trans>
         </h4>
@@ -32,9 +32,8 @@ export default function UserProfileTabSettings() {
           <button type="submit" className="btn btn-primary mr-2">
             <Trans>Change</Trans>
           </button>
-
-          {actionProcesing && <Loader />}
         </form>
+        {actionProcessing && <LoaderTransparent />}
       </div>
     </div>
   );

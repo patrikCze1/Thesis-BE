@@ -17,7 +17,7 @@ const initialState = {
 const now = new Date();
 export default function currentUserReducer(state = initialState, action) {
   switch (action.type) {
-    case "user/login":
+    case "currentuser/login":
       const data = {
         value: encrypt(JSON.stringify(action.payload.user)),
         expiry: now.getTime() + 1000 * 60 * 60 * 12,
@@ -27,9 +27,13 @@ export default function currentUserReducer(state = initialState, action) {
 
       initIo();
 
-      return { ...state, user: action.payload.user, actionProcessing: false };
+      return {
+        ...state,
+        user: action.payload.user,
+        actionProcessing: false,
+      };
 
-    case "user/loadFromStorage":
+    case "currentuser/loadFromStorage":
       const user = parseUserFromStorage();
 
       console.log("loadFromStorage", user);
@@ -41,16 +45,16 @@ export default function currentUserReducer(state = initialState, action) {
         };
       else return { ...state };
 
-    case "user/actionStart":
+    case "currentuser/actionStart":
       return { ...state, actionProcessing: true };
 
-    case "user/actionSuccess":
+    case "currentuser/actionSuccess":
       return { ...state, actionProcessing: false };
 
-    case "user/actionFail":
+    case "currentuser/actionFail":
       return { ...state, actionProcessing: false };
 
-    case "user/update":
+    case "currentuser/update":
       let storageData = window.localStorage.getItem("app-user");
       storageData = JSON.parse(storageData);
       const updatedUser = { ...state.user, ...action.payload };
@@ -63,7 +67,7 @@ export default function currentUserReducer(state = initialState, action) {
         user: updatedUser,
       };
 
-    case "user/logout":
+    case "currentuser/logout":
       Cookies.remove("Auth-Token");
       Cookies.remove("Refresh-Token");
       window.localStorage.removeItem("app-user");
@@ -81,7 +85,7 @@ export default function currentUserReducer(state = initialState, action) {
 }
 
 export const loginAction = (email, password, history) => async (dispatch) => {
-  dispatch({ type: "user/actionStart" });
+  dispatch({ type: "currentuser/actionStart" });
   try {
     const response = await axios.post(
       `/api/auth/login`,
@@ -96,47 +100,47 @@ export const loginAction = (email, password, history) => async (dispatch) => {
 
     await axios.get(`/api/me/csrf`);
 
-    dispatch({ type: "user/login", payload: response.data });
+    dispatch({ type: "currentuser/login", payload: response.data });
     history.push(ROUTE.HOME);
   } catch (e) {
-    dispatch({ type: "user/actionFail" });
+    dispatch({ type: "currentuser/actionFail" });
     toast.error(e.response?.data?.message);
   }
 };
 
 // export const loadCurrentUserAction = (data) => async (dispatch) => {
-//   dispatch({ type: "user/load", payload: data });
+//   dispatch({ type: "currentuser/load", payload: data });
 // };
 
 export const loadFromSessionAction = () => async (dispatch) => {
-  dispatch({ type: "user/loadFromStorage" });
+  dispatch({ type: "currentuser/loadFromStorage" });
 };
 
 export const logoutAction = (history) => async (dispatch) => {
-  dispatch({ type: "user/logout" });
+  dispatch({ type: "currentuser/logout" });
   history.push(ROUTE.LOGIN);
 };
 
 export const changePasswordAction = (data) => async (dispatch) => {
-  dispatch({ type: "user/actionStart" });
+  dispatch({ type: "currentuser/actionStart" });
   try {
     const response = await axios.patch(`/api/me/change-password`, data);
-    dispatch({ type: "user/actionSuccess", payload: response.data });
+    dispatch({ type: "currentuser/actionSuccess", payload: response.data });
     toast.success(i18next.t("Password changed"));
   } catch (e) {
-    dispatch({ type: "user/actionFail" });
+    dispatch({ type: "currentuser/actionFail" });
     toast.error(e.response?.data?.message);
   }
 };
 
 export const updateAction = (data) => async (dispatch) => {
-  dispatch({ type: "user/actionStart" });
+  dispatch({ type: "currentuser/actionStart" });
   try {
     const response = await axios.patch(`/api/me/update`, data);
-    dispatch({ type: "user/update", payload: response.data.user });
+    dispatch({ type: "currentuser/update", payload: response.data.user });
     toast.success(i18next.t("alert.changesSaved"));
   } catch (e) {
-    dispatch({ type: "user/actionFail" });
+    dispatch({ type: "currentuser/actionFail" });
     toast.error(e.response?.data?.message);
   }
 };
