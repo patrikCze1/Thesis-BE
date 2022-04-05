@@ -5,6 +5,7 @@ const { Todo } = require("../../models/modelHelper");
 const { getUser } = require("../../auth/auth");
 const { authenticateToken } = require("../../auth/auth");
 const { responseError } = require("../../service/utils");
+const { validator } = require("../../service");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

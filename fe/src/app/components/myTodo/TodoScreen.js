@@ -11,13 +11,14 @@ import {
 } from "../../reducers/myTodo/myTodo.reducer";
 import { useModuleInfoModal } from "../../hooks/common";
 import i18n from "../../../i18n";
+import { Loader } from "../common";
 
 export default function TodoScreen() {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { handleShowInfoModal, renderInfoModal } = useModuleInfoModal();
 
-  const { todos } = useSelector((state) => state.todoReducer);
+  const { todos, loaded } = useSelector((state) => state.todoReducer);
 
   const [todoName, setTodoName] = useState(null);
 
@@ -80,21 +81,25 @@ export default function TodoScreen() {
               </button>
             </form>
             <div className="list-wrapper todo-list">
-              {todos.length > 0 ? (
-                <ul className="d-flex flex-column todo-list">
-                  {todos.map((todo, i) => {
-                    return (
-                      <TodoListItem
-                        todo={todo}
-                        onComplete={handleComplete}
-                        onDelete={handleRemoveTodo}
-                        key={i}
-                      />
-                    );
-                  })}
-                </ul>
+              {loaded ? (
+                todos.length > 0 ? (
+                  <ul className="d-flex flex-column todo-list">
+                    {todos.map((todo, i) => {
+                      return (
+                        <TodoListItem
+                          todo={todo}
+                          onComplete={handleComplete}
+                          onDelete={handleRemoveTodo}
+                          key={i}
+                        />
+                      );
+                    })}
+                  </ul>
+                ) : (
+                  <p className="text-center">{i18n.t("label.noRecords")}</p>
+                )
               ) : (
-                <p className="text-center">{i18n.t("label.noRecords")}</p>
+                <Loader />
               )}
             </div>
           </div>

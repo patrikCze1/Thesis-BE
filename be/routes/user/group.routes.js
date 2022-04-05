@@ -113,7 +113,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     }
 
     res.json({ group: updated });
-  } catch (e) {
+  } catch (error) {
     responseError(req, res, error);
   }
 });

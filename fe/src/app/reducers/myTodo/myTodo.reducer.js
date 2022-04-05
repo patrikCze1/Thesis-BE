@@ -21,10 +21,10 @@ export default function myTodoReducer(state = initialState, action) {
     case "todos/edited":
       return {
         ...state,
-        // todos: state.todos.map((todo) => {
-        //   if (todo.id === action.payload.todo.id) return action.payload.todo;
-        //   else return todo;
-        // }),
+        todos: state.todos.map((todo) => {
+          if (todo.id === action.payload.todo.id) return action.payload.todo;
+          else return todo;
+        }),
       };
 
     case "todos/delete":
