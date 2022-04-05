@@ -28,7 +28,7 @@ export default function KanbanTask({ task, index }) {
               </Tooltip>
             }
           >
-            <div className="badge badge-pill badge-success">
+            <div className="badge badge-pill badge-prio-1">
               <i className="mdi mdi-14px mdi-chevron-down"></i>
             </div>
           </OverlayTrigger>

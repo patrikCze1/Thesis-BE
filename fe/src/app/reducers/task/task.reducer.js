@@ -19,6 +19,7 @@ const initialState = {
   taskErrorMessage: "",
   actionSuccess: false,
   processing: false,
+  taskSubtasks: [],
 };
 
 export default function taskReducer(state = initialState, action) {
@@ -55,6 +56,7 @@ export default function taskReducer(state = initialState, action) {
         taskLoaded: false,
         taskError: true,
         actionSuccess: false,
+        taskSubtasks: [],
       };
 
     case "task/loadFail":
@@ -66,28 +68,34 @@ export default function taskReducer(state = initialState, action) {
         task: action.payload.task,
         taskLoaded: true,
         actionSuccess: true,
+        taskSubtasks: action.payload.task?.subtasks || [],
       };
 
     case "task/create":
+      const isSubtask = action.payload.task.parentId === state.task.id;
       if (action.payload.task.stageId)
         return {
           ...state,
           actionSuccess: true,
           processing: false,
-          // task: {},
           taskLoaded: true,
           tasks: [...state.tasks, action.payload.task],
           taskCount: state.taskCount + 1,
+          taskSubtasks: isSubtask
+            ? [...state.taskSubtasks, action.payload.task]
+            : state.taskSubtasks,
         };
       else
         return {
           ...state,
           actionSuccess: true,
           processing: false,
-          // task: {},
           taskLoaded: true,
           backlogTasks: [...state.backlogTasks, action.payload.task],
           backlogTasksCount: state.backlogTasksCount + 1,
+          taskSubtasks: isSubtask
+            ? [...state.taskSubtasks, action.payload.task]
+            : state.taskSubtasks,
         };
 
     case "task/socketNew":

@@ -76,6 +76,7 @@ export default function TaskForm({
   const { user: currentUser } = useSelector(
     (state) => state.currentUserReducer
   );
+  const { taskSubtasks } = useSelector((state) => state.taskReducer);
   const { renderForm, setShowNewTaskForm, showNewTaskForm } = useCreateTask(
     task.projectId,
     task.boardId,
@@ -347,20 +348,28 @@ export default function TaskForm({
             )}
           </div>
 
-          {task?.subtasks?.length > 0 && (
+          {taskSubtasks?.length > 0 && (
             <>
               <hr />
               <div className="row mb-3">
-                <div className="col-md-12">
+                <div className="col-md-12 task-subtasks">
                   <h5 className="card-title">{i18n.t("task.subtasks")}</h5>
 
-                  {task.subtasks.map((task) => (
+                  {taskSubtasks.map((task) => (
                     <a
                       href="#"
                       onClick={(e) => history.push(createTaskRoute(task))}
-                      className="mr-2"
+                      className="mr-2 subtask-item"
+                      style={{
+                        borderLeft: 4,
+                        borderLeftColor: task.colorCode,
+                        borderLeftStyle: "solid",
+                      }}
                     >
-                      {task.name}
+                      [{task.number}] {task.name}{" "}
+                      <span className={`badge badge-prio-${task.priority}`}>
+                        <Trans>{TASK_PRIORITY[task.priority]}</Trans>
+                      </span>
                     </a>
                   ))}
                 </div>
