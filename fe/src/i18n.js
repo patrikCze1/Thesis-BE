@@ -155,7 +155,7 @@ i18n
             hours: "Hodin",
             date: "Datum",
             total: "Celkem",
-            selectDate: "Vyberte datum",
+            selectDate: "Vyberte datum od - do",
             edited: "Záznam upraven",
             created: "Záznam přidán",
             deleted: "Záznam odstraněn",
@@ -242,6 +242,7 @@ i18n
             createSubtask: "Vytvořit podúkol",
             subtasks: "Podúkoly",
             superiorTask: "Nadřazený úkol",
+            setChecklistItem: "Zadejte položku checklistu",
           },
           project: {
             projectWillBeDeleted: "Projekt {{project}} bude odstraněn",
@@ -282,6 +283,7 @@ i18n
             position: "Pozice",
             email: "E-mail",
             notifications: "Notifikace",
+            rights: "Práva",
             message: {
               deleted: "Uživatel odstraněn",
               deactivated: "Uživatel deaktivován",

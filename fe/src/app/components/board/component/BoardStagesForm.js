@@ -151,6 +151,7 @@ export default function BoardStagesForm({ boardId }) {
                   required
                   value={newPhaseTitle}
                   onChange={(e) => setNewPhaseTitle(e.target.value)}
+                  autoFocus
                 />
                 <button
                   type="submit"

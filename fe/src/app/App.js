@@ -177,7 +177,7 @@ export default function App() {
             </div>
           </div>
 
-          <ToastContainer />
+          <ToastContainer position="bottom-right" />
         </div>
       </ErrorBoundary>
     );
@@ -216,7 +216,7 @@ export default function App() {
           </div>
         </div>
 
-        <ToastContainer />
+        <ToastContainer position="bottom-right" />
       </ErrorBoundary>
     </div>
   );

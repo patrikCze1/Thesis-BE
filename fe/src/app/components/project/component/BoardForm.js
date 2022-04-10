@@ -67,6 +67,7 @@ export default function BoardForm({ projectId, isEdit, closeForm }) {
                     value={formData.name}
                     onChange={(e) => handleChange("name", e.target.value)}
                     maxLength={255}
+                    autoFocus
                   />
                 </div>
 

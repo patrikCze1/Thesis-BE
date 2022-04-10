@@ -51,6 +51,7 @@ export const ROUTE = Object.freeze({
   ADMIN_CLIENT: "/administrace/klienti",
   ADMIN_GROUP: "/administrace/skupiny",
   ADMIN_USER: "/administrace/uzivatele",
+  ADMIN: "/administrace",
 });
 
 export const TASK_COLORS = Object.freeze([

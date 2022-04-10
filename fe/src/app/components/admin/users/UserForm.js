@@ -213,7 +213,7 @@ export default function UserForm({ closeModal }) {
                 <div className="col-md-6">
                   <Form.Group>
                     <label htmlFor="">
-                      <Trans>Role</Trans>
+                      <Trans>user.rights</Trans>
                     </label>
                     <Typeahead
                       id="userRole"

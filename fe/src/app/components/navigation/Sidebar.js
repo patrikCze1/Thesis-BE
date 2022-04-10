@@ -60,7 +60,10 @@ const Sidebar = forwardRef(({}, ref) => {
       setMenuOpen({ [i]: false });
     });
 
-    const dropdownPaths = [{ path: "/administrace", state: "admin" }];
+    const dropdownPaths = [
+      { path: ROUTE.ADMIN, state: "admin" },
+      { path: ROUTE.TIME_TRACKS, state: "tracking" },
+    ];
 
     dropdownPaths.forEach((obj) => {
       if (isPathActive(obj.path)) {
@@ -133,6 +136,18 @@ const Sidebar = forwardRef(({}, ref) => {
               }
             >
               <ul className="nav flex-column sub-menu">
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(ROUTE.PROJECTS)
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={ROUTE.PROJECTS}
+                  >
+                    <span className="menu-title">{i18n.t("Projects")}</span>
+                  </NavLink>
+                </li>
                 <li className="nav-item subitem">
                   <NavLink
                     className={
@@ -220,67 +235,6 @@ const Sidebar = forwardRef(({}, ref) => {
           </>
         )}
 
-        {hasRole(ROLES.ADMIN, currentUser.roles) && (
-          <li
-            className={
-              isPathActive("/administrace") ? "nav-item active" : "nav-item"
-            }
-          >
-            <div
-              className={
-                menuOpen == "admin" ? "nav-link menu-expanded" : "nav-link"
-              }
-              onClick={() => toggleMenu("admin")}
-              data-toggle="collapse"
-            >
-              <i className="mdi mdi-security menu-icon"></i>
-              <span className="menu-title">
-                <Trans>Administration</Trans>
-              </span>
-              <i className="menu-arrow mdi mdi-security"></i>
-            </div>
-            <Collapse in={menuOpen.admin}>
-              <ul className="nav flex-column sub-menu">
-                <li className="nav-item subitem">
-                  <NavLink
-                    className={
-                      isPathActive(ROUTE.ADMIN_CLIENT)
-                        ? "nav-link active"
-                        : "nav-link"
-                    }
-                    to={ROUTE.ADMIN_CLIENT}
-                  >
-                    <Trans>Clients</Trans>
-                  </NavLink>
-                </li>
-                <li className="nav-item subitem">
-                  <NavLink
-                    className={
-                      isPathActive(ROUTE.ADMIN_USER)
-                        ? "nav-link active"
-                        : "nav-link"
-                    }
-                    to={ROUTE.ADMIN_USER}
-                  >
-                    <Trans>Users</Trans>
-                  </NavLink>
-                </li>
-                <li className="nav-item subitem">
-                  <NavLink
-                    className={
-                      isPathActive("/administrace/skupiny")
-                        ? "nav-link active"
-                        : "nav-link"
-                    }
-                    to="/administrace/skupiny"
-                  >
-                    <Trans>Groups</Trans>
-                  </NavLink>
-                </li>
-              </ul>
-            </Collapse>
-          </li>
-        )}
         <li
           className={
             isPathActive(ROUTE.TIME_TRACKS) ? "nav-item active" : "nav-item"
@@ -288,7 +242,7 @@ const Sidebar = forwardRef(({}, ref) => {
         >
           <div
             className={
-              menuOpen == "admin" ? "nav-link menu-expanded" : "nav-link"
+              menuOpen === "tracking" ? "nav-link menu-expanded" : "nav-link"
             }
             onClick={() => toggleMenu("tracking")}
             data-toggle="collapse"
@@ -356,6 +310,68 @@ const Sidebar = forwardRef(({}, ref) => {
             </span>
           </NavLink>
         </li>
+
+        {hasRole([ROLES.ADMIN, ROLES.MANAGEMENT], currentUser.roles) && (
+          <li
+            className={
+              isPathActive(ROUTE.ADMIN) ? "nav-item active" : "nav-item"
+            }
+          >
+            <div
+              className={
+                menuOpen == "admin" ? "nav-link menu-expanded" : "nav-link"
+              }
+              onClick={() => toggleMenu("admin")}
+              data-toggle="collapse"
+            >
+              <i className="mdi mdi-security menu-icon"></i>
+              <span className="menu-title">
+                <Trans>Administration</Trans>
+              </span>
+              <i className="menu-arrow mdi mdi-security"></i>
+            </div>
+            <Collapse in={menuOpen.admin}>
+              <ul className="nav flex-column sub-menu">
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(ROUTE.ADMIN_CLIENT)
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={ROUTE.ADMIN_CLIENT}
+                  >
+                    <Trans>Clients</Trans>
+                  </NavLink>
+                </li>
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive(ROUTE.ADMIN_USER)
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to={ROUTE.ADMIN_USER}
+                  >
+                    <Trans>Users</Trans>
+                  </NavLink>
+                </li>
+                <li className="nav-item subitem">
+                  <NavLink
+                    className={
+                      isPathActive("/administrace/skupiny")
+                        ? "nav-link active"
+                        : "nav-link"
+                    }
+                    to="/administrace/skupiny"
+                  >
+                    <Trans>Groups</Trans>
+                  </NavLink>
+                </li>
+              </ul>
+            </Collapse>
+          </li>
+        )}
       </ul>
     </nav>
   );

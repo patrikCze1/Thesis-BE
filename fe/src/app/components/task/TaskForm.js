@@ -246,9 +246,19 @@ export default function TaskForm({
     <div className="card-body pt-4">
       {canDelete && (
         <Dropdown className="modal-options">
-          <Dropdown.Toggle variant="btn" className="py-0">
+          <Dropdown.Toggle variant="btn" className="py-0 px-1 mr-2">
             <i className="mdi mdi-dots-horizontal fs-1-2"></i>
           </Dropdown.Toggle>
+          {/* <Dropdown.Menu className="menu-position-updated">
+            
+              <Dropdown.Item
+                className="btn"
+                onClick={}
+              >
+                <Trans>label.export</Trans>
+              </Dropdown.Item>
+            
+          </Dropdown.Menu> */}
           <Dropdown.Menu className="menu-position-updated">
             {canDelete && (
               <Dropdown.Item
@@ -409,7 +419,7 @@ export default function TaskForm({
                         type="text"
                         name="check"
                         className="form-control h-auto"
-                        placeholder={t("Set checklist")}
+                        placeholder={t("task.setChecklistItem")}
                         value={checkInput || ""}
                         onChange={handleCheckFormInput}
                         required

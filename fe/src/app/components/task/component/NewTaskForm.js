@@ -40,6 +40,7 @@ export default function NewTaskForm({
           required
           value={name}
           onChange={(e) => setName(e.target.value)}
+          autoFocus
         />
         <button
           type="submit"
