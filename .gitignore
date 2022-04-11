@@ -4,3 +4,6 @@ node_modules/
 
 be/public/uploads/
 be/dummy
+be/client
+
+fe/build

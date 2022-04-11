@@ -94,6 +94,8 @@ io.on("connection", (socket) => {
   });
 });
 
+app.use(express.static(path.resolve(__dirname, "./client")));
+
 // List of routes
 app.use("/api/projects", projectRoutes);
 app.use("/api/projects", boardRoutes);
@@ -111,6 +113,11 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/me", meRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/cron", cronRoutes);
+
+// All other GET requests not handled before will return our React app
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "client", "index.html"));
+});
 
 const port = process.env.PORT || 8080;
 server.listen(port, () => {
