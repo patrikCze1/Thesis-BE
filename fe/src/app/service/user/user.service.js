@@ -42,3 +42,11 @@ function decrypt(str) {
     CryptoJS.enc.Utf8
   );
 }
+
+export const parseRolesFromDb = (roles) => {
+  console.log("parseRolesFromDb roles", roles, typeof roles);
+  if (typeof roles === "string") {
+    return JSON.parse(roles.replace(/\\/g, ""));
+  } else if (typeof roles === "object") return roles;
+  else return roles;
+};

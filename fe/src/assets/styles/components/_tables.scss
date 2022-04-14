@@ -63,3 +63,7 @@
 .table-responsive {
   min-height: 162px;
 }
+
+.react-bootstrap-table table {
+  table-layout: auto !important;
+}

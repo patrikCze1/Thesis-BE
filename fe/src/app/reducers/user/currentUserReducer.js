@@ -19,7 +19,7 @@ export default function currentUserReducer(state = initialState, action) {
   switch (action.type) {
     case "currentuser/login":
       const data = {
-        value: encrypt(JSON.stringify(action.payload.user)),
+        value: encrypt(JSON.stringify(action.payload)),
         expiry: now.getTime() + 1000 * 60 * 60 * 12,
       };
       console.log("data", data);
@@ -29,7 +29,7 @@ export default function currentUserReducer(state = initialState, action) {
 
       return {
         ...state,
-        user: action.payload.user,
+        user: action.payload,
         actionProcessing: false,
       };
 
@@ -97,12 +97,23 @@ export const loginAction = (email, password, history) => async (dispatch) => {
         },
       }
     );
-
+    console.log("response.data.user", response.data.user);
+    console.log(
+      "typeof response.data.user.roles",
+      typeof response.data.user.roles
+    );
     await axios.get(`/api/me/csrf`);
 
-    dispatch({ type: "currentuser/login", payload: response.data });
+    const user = {
+      ...response.data.user,
+      roles: JSON.parse(response.data.user.roles.replace(/\\/g, "")),
+    };
+    console.log("user", user);
+
+    dispatch({ type: "currentuser/login", payload: user });
     history.push(ROUTE.HOME);
   } catch (e) {
+    console.error(e);
     dispatch({ type: "currentuser/actionFail" });
     toast.error(e.response?.data?.message);
   }

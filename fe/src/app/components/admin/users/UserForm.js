@@ -13,6 +13,7 @@ import { getRoles } from "../../../service/role.service";
 import UserGroups from "./UserGroups";
 import LoaderTransparent from "../../common/LoaderTransparent";
 import Loader from "../../common/Loader";
+import { parseRolesFromDb } from "../../../service/user/user.service";
 
 export default function UserForm({ closeModal }) {
   const dispatch = useDispatch();
@@ -32,7 +33,7 @@ export default function UserForm({ closeModal }) {
 
   useEffect(() => {
     if (user.id) {
-      const userRoles = user.roles.map((role) => {
+      const userRoles = parseRolesFromDb(user.roles).map((role) => {
         return { label: t(`role.${role}`), value: role };
       });
       setFormData({ ...user, roles: userRoles });

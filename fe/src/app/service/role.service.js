@@ -14,9 +14,10 @@ export const getRoles = () => {
  * @param {array} userRoles
  */
 export const hasRole = (roles, userRoles) => {
+  console.log("roles, userRoles", roles, userRoles, typeof userRoles);
   if (!userRoles || userRoles.length === 0) return false;
   else if (typeof roles === "string" && userRoles.includes(roles)) return true;
-  else if (Array.isArray(roles) && userRoles.some((r) => roles.includes(r)))
+  else if (Array.isArray(roles) && userRoles?.some((r) => roles.includes(r)))
     return true;
   return false;
 };

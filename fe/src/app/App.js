@@ -29,7 +29,6 @@ import {
   loadMyTimeTracksAction,
   socketStopTimeTrackAction,
 } from "./reducers/timeTrack/timeTrack.reducer";
-import AnonymRoutes from "./router/AnonymRoutes";
 import i18n from "../i18n";
 
 export default function App() {
@@ -209,7 +208,6 @@ export default function App() {
         <div className="container-fluid page-body-wrapper full-page-wrapper">
           <div className="main-panel">
             <div className="content-wrapper">
-              {/* <AnonymRoutes /> */}
               <AppRoutes />
             </div>
             <Footer />

@@ -124,47 +124,49 @@ export default function Projects() {
                 </div>
                 <div className="wrapper"></div>
               </div>
-              {projectsLoaded ? (
-                <table className="table table-striped">
-                  <thead>
-                    <tr>
-                      <th>
-                        <Trans>Title</Trans>
-                      </th>
-                      <th>
-                        <Trans>project.creator</Trans>
-                      </th>
-                      <th>
-                        <Trans>Client</Trans>
-                      </th>
-                      <th>
-                        <Trans>State</Trans>
-                      </th>
-                      <th>
-                        <Trans>label.deadline</Trans>
-                      </th>
-                      <th className="text-center w-100px">
-                        <Trans>Action</Trans>
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {projects.length > 0 ? (
-                      projects.map((project) => (
-                        <ProjectListItem key={project.id} project={project} />
-                      ))
-                    ) : (
+              <div className="table-responsive">
+                {projectsLoaded ? (
+                  <table className="table table-striped">
+                    <thead>
                       <tr>
-                        <td colSpan={6} className="text-center">
-                          <Trans>label.noRecords</Trans>
-                        </td>
+                        <th>
+                          <Trans>Title</Trans>
+                        </th>
+                        <th>
+                          <Trans>project.creator</Trans>
+                        </th>
+                        <th>
+                          <Trans>Client</Trans>
+                        </th>
+                        <th>
+                          <Trans>State</Trans>
+                        </th>
+                        <th>
+                          <Trans>label.deadline</Trans>
+                        </th>
+                        <th className="text-center w-100px">
+                          <Trans>Action</Trans>
+                        </th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
-              ) : (
-                <Loader />
-              )}
+                    </thead>
+                    <tbody>
+                      {projects.length > 0 ? (
+                        projects.map((project) => (
+                          <ProjectListItem key={project.id} project={project} />
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={6} className="text-center">
+                            <Trans>label.noRecords</Trans>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                ) : (
+                  <Loader />
+                )}
+              </div>
             </div>
           </div>
           {renderPagination()}

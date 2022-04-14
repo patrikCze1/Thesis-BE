@@ -18,6 +18,7 @@ import UserForm from "./UserForm";
 import Loader from "./../../common/Loader";
 import i18n from "../../../../i18n";
 import { useModuleInfoModal, useSwalAlert } from "../../../hooks/common";
+import { parseRolesFromDb } from "../../../service/user/user.service";
 
 const { SearchBar } = Search;
 
@@ -60,8 +61,12 @@ export default function Users() {
       dataField: "roles",
       text: t("user.role"),
       formatter: (cell) => {
-        console.log(cell);
-        if (cell) return cell.map((role) => t(`role.${role}`)).join(", ");
+        console.log("cell", cell);
+        console.log("parseRolesFromDb(cell.roles)", parseRolesFromDb(cell));
+        if (cell) {
+          const roles = parseRolesFromDb(cell);
+          return roles.map((role) => t(`role.${role}`)).join(", ");
+        }
         return "";
       },
     },
@@ -205,6 +210,7 @@ export default function Users() {
                               if (user.deactivated)
                                 return "table-warning line-through";
                             }}
+                            classes=""
                           />
                         </div>
                       )}

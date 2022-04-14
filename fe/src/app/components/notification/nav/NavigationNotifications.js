@@ -29,7 +29,6 @@ export default function NavigationNotifications() {
     if (!notification.seen)
       dispatch(setSeenAction(notification.id, notification));
     if (notification.TaskNotification) {
-      // window.location = `${ROUTE.PROJECTS}/${projectId}?ukol=${id}`;
       history.push(createTaskRoute(notification.TaskNotification.task));
     }
   };
