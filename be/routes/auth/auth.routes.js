@@ -37,6 +37,14 @@ router.post("/login", async (req, res) => {
         const token = generateToken(user);
         const refreshToken = generateRefreshToken(user);
 
+        const userJSON = user.toJSON();
+        console.log("typeof", userJSON);
+
+        if (typeof userJSON.roles === "string")
+          userJSON.roles = JSON.parse(userJSON.roles);
+        const userRoles =
+          userJSON.roles?.map((role) => role.replace(/\\/g, "")) || []; //JSON.parse(user.roles.replace(/\\/g, ""));
+
         return res
           .cookie("Auth-Token", token, {
             secure: process.env.NODE_ENV === "production",
@@ -46,8 +54,11 @@ router.post("/login", async (req, res) => {
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
           })
-          .send({
-            user,
+          .json({
+            user: {
+              ...userJSON,
+              roles: JSON.stringify(userRoles),
+            },
           });
       } else {
         return res.status(400).json({ message: req.t("error.badCredentials") });

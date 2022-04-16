@@ -1,10 +1,10 @@
 insert into clients (name) values ('Google');
 
-insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"admin\"]','admin', 'Petr', 'Admin', 'admin@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'CEO');
-insert into users (roles, username, firstName, lastName, email, password, sex, position,deactivated) values ('[\"user\"]','user1', 'Jana', 'Nováková', 'user1@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'F', 'Zaměstnanec',true);
-insert into users (roles, username, firstName, lastName, email, password, sex, position, deactivated) values ('[\"user\"]','user2', 'Pert', 'Nový', 'user2@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec',true);
-insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"user\"]','user3', 'Jan', 'Starý', 'user3@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec');
-insert into users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"management\"]','management', 'Petra', 'Svobodová', 'mng@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'F', 'Manažer');
+insert into Users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"admin\"]','admin', 'Petr', 'Admin', 'admin@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'CEO');
+insert into Users (roles, username, firstName, lastName, email, password, sex, position,deactivated) values ('[\"user\"]','user1', 'Jana', 'Nováková', 'user1@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'F', 'Zaměstnanec',true);
+insert into Users (roles, username, firstName, lastName, email, password, sex, position, deactivated) values ('[\"user\"]','user2', 'Pert', 'Nový', 'user2@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec',true);
+insert into Users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"user\"]','user3', 'Jan', 'Starý', 'user3@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'M', 'Zaměstnanec');
+insert into Users (roles, username, firstName, lastName, email, password, sex, position) values ('[\"management\"]','management', 'Petra', 'Svobodová', 'mng@jago.cz', '$2b$10$LUKIS8nCMsRb4oKVqa5RR.w3rZUUr7.JZ0rZaXiZOEu0r7F7v6Aku', 'F', 'Manažer');
 
 INSERT INTO `Todos`(`name`,`userId`) VALUES ('1. Přihlas se do aplikace jako administrátor a měřit si čas po dobu testování',1);
 INSERT INTO `Todos`(`name`,`userId`) VALUES ('2. Vytvoř nového uživatele se svými údaji, pozicí tester a rolí uživatel',1);

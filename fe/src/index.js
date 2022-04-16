@@ -10,6 +10,7 @@ import { createBrowserHistory } from "history";
 import App from "./app/App";
 import reducers from "./app/reducers";
 import "./i18n";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
 
 require("dotenv").config({ path: "./../.env" });
 
@@ -17,6 +18,13 @@ const composedEnhancer = composeWithDevTools(applyMiddleware(thunkMiddleware));
 
 const store = createStore(reducers, composedEnhancer);
 const history = createBrowserHistory();
+
+// remove logs
+if (process.env.NODE_ENV === "production") {
+  console.log = () => {};
+  console.debug = () => {};
+  console.info = () => {};
+}
 
 ReactDOM.render(
   <Provider store={store}>
@@ -26,3 +34,5 @@ ReactDOM.render(
   </Provider>,
   document.getElementById("root")
 );
+
+serviceWorkerRegistration.unregister();

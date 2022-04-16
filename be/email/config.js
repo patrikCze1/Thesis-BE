@@ -3,15 +3,24 @@ const Email = require("email-templates");
 const path = require("path");
 
 const APP_NAME = "Jago";
-const APP_EMAIL = "neodpovidat@jago.cz";
+const APP_EMAIL = "neodpovidat@jagoapp.cz";
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.mailtrap.io",
-  port: 2525,
-  //   secure: process.env.NODE_ENV !== "production",
+  host:
+    process.env.NODE_ENV === "production"
+      ? "smtp.rosti.cz"
+      : "smtp.mailtrap.io",
+  port: process.env.NODE_ENV === "production" ? 587 : 2525,
+  secure: process.env.NODE_ENV !== "production",
   auth: {
-    user: process.env.MAILER_USER,
-    pass: process.env.MAILER_PASS,
+    user:
+      process.env.NODE_ENV === "production"
+        ? process.env.MAILER_USER_PROD
+        : process.env.MAILER_USER,
+    pass:
+      process.env.NODE_ENV === "production"
+        ? process.env.MAILER_PASS_PROD
+        : process.env.MAILER_PASS,
   },
 });
 
