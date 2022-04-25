@@ -165,9 +165,7 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 
     if (user.id !== taskComment.userId) {
       res.status(403).json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
+        message: req.t("error.missingPermissionForAction"),
       });
       return;
     }

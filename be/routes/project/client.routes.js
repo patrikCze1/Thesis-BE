@@ -9,12 +9,13 @@ const { ROLE } = require("../../enum/enum");
 const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const currentUser = getUser(req, res);
 
-  if (!user.roles.includes(ROLE.ADMIN)) {
-    res
-      .status(403)
-      .json({ message: req.json({ message: req.t("error.accessDenied") }) });
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: req.t("error.accessDenied") });
     return;
   }
 
@@ -41,12 +42,13 @@ router.get("/", authenticateToken, async (req, res) => {
 });
 
 router.get("/:id", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const currentUser = getUser(req, res);
 
-  if (!user.roles.includes(ROLE.ADMIN)) {
-    res
-      .status(403)
-      .json({ message: req.json({ message: req.t("error.accessDenied") }) });
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
+    res.status(403).json({ message: req.t("error.accessDenied") });
     return;
   }
 
@@ -67,13 +69,14 @@ router.get("/:id", authenticateToken, async (req, res) => {
 });
 
 router.post("/", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const currentUser = getUser(req, res);
 
-  if (!user.roles.includes(ROLE.ADMIN)) {
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
     res.status(403).json({
-      message: req.json({
-        message: req.t("error.missingPermissionForAction"),
-      }),
+      message: req.t("error.missingPermissionForAction"),
     });
     return;
   }
@@ -98,13 +101,14 @@ router.post("/", authenticateToken, async (req, res) => {
 });
 
 router.patch("/:id", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const currentUser = getUser(req, res);
 
-  if (!user.roles.includes(ROLE.ADMIN)) {
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
     res.status(403).json({
-      message: req.json({
-        message: req.t("error.missingPermissionForAction"),
-      }),
+      message: req.t("error.missingPermissionForAction"),
     });
     return;
   }
@@ -125,13 +129,14 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 });
 
 router.delete("/:id", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  const currentUser = getUser(req, res);
 
-  if (!user.roles.includes(ROLE.ADMIN)) {
+  if (
+    !currentUser.roles.includes(ROLE.ADMIN) &&
+    !currentUser.roles.includes(ROLE.MANAGEMENT)
+  ) {
     res.status(403).json({
-      message: req.json({
-        message: req.t("error.missingPermissionForAction"),
-      }),
+      message: req.t("error.missingPermissionForAction"),
     });
     return;
   }

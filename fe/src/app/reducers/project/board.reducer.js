@@ -106,7 +106,10 @@ export default function boardReducer(state = initialState, action) {
       };
 
     case "stage/socketNewStage":
-      if (!state.working)
+      if (
+        !state.stages.some((stage) => stage.id == action.payload.id) &&
+        !state.working
+      )
         return {
           ...state,
           stages: [...state.stages, action.payload],

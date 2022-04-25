@@ -41,10 +41,7 @@ export default function ProjectListItem({ project }) {
       if (result.value) dispatch(deleteProjectAction(project.id));
     });
   };
-  console.log(
-    "hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles)",
-    hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles)
-  );
+
   return (
     <tr>
       <td className="py-1">
@@ -68,7 +65,7 @@ export default function ProjectListItem({ project }) {
       <td>{project.deadline ? getDayMonthShort(project.deadline) : "-"}</td>
       <td className="text-center">
         <div>
-          {hasRole([ROLES.ADMIN, ROLES.MANAGER], user.roles) && (
+          {hasRole([ROLES.ADMIN, ROLES.MANAGEMENT], user.roles) && (
             <Dropdown>
               <Dropdown.Toggle variant="btn">
                 <i className="mdi mdi-dots-vertical"></i>

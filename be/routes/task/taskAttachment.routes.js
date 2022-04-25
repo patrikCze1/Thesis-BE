@@ -40,13 +40,9 @@ router.post(
         !user.roles.includes(ROLE.MANAGEMENT) &&
         task.createdById !== user.id
       ) {
-        res
-          .status(403)
-          .json({
-            message: req.json({
-              message: req.t("error.missingPermissionForAction"),
-            }),
-          });
+        res.status(403).json({
+          message: req.t("error.missingPermissionForAction"),
+        });
         return;
       }
 
@@ -89,13 +85,9 @@ router.delete(
         !user.roles.includes(ROLE.MANAGEMENT) &&
         task.createdById !== user.id
       ) {
-        res
-          .status(403)
-          .json({
-            message: req.json({
-              message: req.t("error.missingPermissionForAction"),
-            }),
-          });
+        res.status(403).json({
+          message: req.t("error.missingPermissionForAction"),
+        });
         return;
       }
 

@@ -190,9 +190,7 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     console.log(track);
     if (track.userId != user.id) {
       res.status(403).json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
+        message: req.t("error.missingPermissionForAction"),
       });
       return;
     }
@@ -225,9 +223,7 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     if (track.userId != user.id) {
       res.status(403).json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
+        message: req.t("error.missingPermissionForAction"),
       });
       return;
     }
@@ -256,9 +252,7 @@ router.delete("/:id", authenticateToken, async (req, res) => {
 
     if (track.userId != user.id) {
       res.status(403).json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
+        message: req.t("error.missingPermissionForAction"),
       });
       return;
     }

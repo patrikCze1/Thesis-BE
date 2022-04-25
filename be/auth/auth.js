@@ -78,9 +78,7 @@ const managementAccessOnly = (req, res, next) => {
     !currentUser.roles.includes(ROLE.MANAGEMENT)
   ) {
     res.status(403).json({
-      message: req.json({
-        message: req.t("error.missingPermissionForAction"),
-      }),
+      message: req.t("error.missingPermissionForAction"),
     });
     return;
   } else next();

@@ -36,6 +36,7 @@ const { connect, disconnect } = require("./service/io");
 
 sequelize.sync();
 
+// middlewares
 i18next
   .use(Backend)
   .use(i18Middleware.LanguageDetector)
@@ -80,6 +81,7 @@ app.use(function (err, req, res, next) {
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
+  socket.emit("connected"); // something like handshake
   if (userId && userId !== undefined) {
     console.log("New client connected", socket.id);
     connect(socket.id, parseInt(userId));
@@ -93,8 +95,6 @@ io.on("connection", (socket) => {
     disconnect(socket.id);
   });
 });
-
-app.use(express.static(path.resolve(__dirname, "./client")));
 
 // List of routes
 app.use("/api/projects", projectRoutes);
@@ -114,14 +114,15 @@ app.use("/api/me", meRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/cron", cronRoutes);
 
-// All other GET requests not handled before will return our React app
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "client", "index.html"));
-});
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.resolve(__dirname, "./client")));
+  // All other GET requests not handled before will return our React app
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "index.html"));
+  });
+}
 
 const port = process.env.PORT || 8080;
 server.listen(port, () => {
   console.log(`Listening on port ${port}...`);
 });
-
-// save date as utc

@@ -73,15 +73,24 @@ export default function AppRoutes() {
         <SearchResults />
       </PrivateRoute>
 
-      <PrivateRoute path={ROUTE.ADMIN_GROUP} roles={[ROLES.ADMIN]}>
+      <PrivateRoute
+        path={ROUTE.ADMIN_GROUP}
+        roles={[ROLES.ADMIN, ROLES.MANAGEMENT]}
+      >
         <Groups />
       </PrivateRoute>
 
-      <PrivateRoute path={ROUTE.ADMIN_CLIENT} roles={[ROLES.ADMIN]}>
+      <PrivateRoute
+        path={ROUTE.ADMIN_CLIENT}
+        roles={[ROLES.ADMIN, ROLES.MANAGEMENT]}
+      >
         <Clients />
       </PrivateRoute>
 
-      <PrivateRoute path={ROUTE.ADMIN_USER} roles={[ROLES.ADMIN]}>
+      <PrivateRoute
+        path={ROUTE.ADMIN_USER}
+        roles={[ROLES.ADMIN, ROLES.MANAGEMENT]}
+      >
         <Users />
       </PrivateRoute>
 

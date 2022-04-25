@@ -326,9 +326,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             ].includes(field)
           ) {
             res.status(403).json({
-              message: req.json({
-                message: req.t("error.missingPermissionForAction"),
-              }),
+              message: req.t("error.missingPermissionForAction"),
             });
             return;
           }
@@ -770,9 +768,7 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       task.createdById !== user.id
     ) {
       res.status(403).json({
-        message: req.json({
-          message: req.t("error.missingPermissionForAction"),
-        }),
+        message: req.t("error.missingPermissionForAction"),
       });
       return;
     }
