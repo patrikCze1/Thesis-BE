@@ -19,7 +19,7 @@ router.get("/:projectId/boards", authenticateToken, async (req, res) => {
 
   try {
     const allowEntry = await isUserInProject(req.params.projectId, user.id);
-    if (!allowEntry) {
+    if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
       res.status(403).json({
         message: req.t("project.error.userHasNotAccessToThisProject"),
       });
@@ -47,7 +47,7 @@ router.get(
 
     try {
       const allowEntry = await isUserInProject(req.params.projectId, user.id);
-      if (!allowEntry) {
+      if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
         res.status(403).json({
           message: req.t("project.error.userHasNotAccessToThisProject"),
         });

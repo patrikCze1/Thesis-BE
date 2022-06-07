@@ -9,11 +9,14 @@ import {
 } from "../../../reducers/common/clientReducer";
 import ClientForm from "./ClientForm";
 import { useSwalAlert } from "../../../hooks/common";
+import { parseJsonFromDb } from "../../../service/user/user.service";
 
 export default function ClientTableRow({ client }) {
   const dispatch = useDispatch();
   const { t } = useTranslation();
   const { Swal } = useSwalAlert();
+  const emails = parseJsonFromDb(client.emails);
+  const phones = parseJsonFromDb(client.phones);
 
   const [editClient, setEditClient] = useState(null);
 
@@ -41,8 +44,8 @@ export default function ClientTableRow({ client }) {
     <tr>
       <td>{client.name}</td>
       <td>
-        {client.emails &&
-          client.emails.map((email, i) => {
+        {emails &&
+          emails.map((email, i) => {
             return (
               <span key={i}>
                 <a href={`mailto:${email}`}>{email}</a>
@@ -52,8 +55,8 @@ export default function ClientTableRow({ client }) {
           })}
       </td>
       <td>
-        {client.phones &&
-          client.phones.map((phone, i) => {
+        {phones &&
+          phones.map((phone, i) => {
             return (
               <span key={i}>
                 <a href={`tel:${phone}`}>{phone}</a>

@@ -7,6 +7,7 @@ import {
   createClientAction,
   editClientAction,
 } from "../../../reducers/common/clientReducer";
+import { parseJsonFromDb } from "../../../service/user/user.service";
 import Loader from "../../common/Loader";
 import LoaderTransparent from "../../common/LoaderTransparent";
 
@@ -31,8 +32,8 @@ export default function ClientForm({ clientId }) {
         ...prevState,
         name: client.name,
         webpage: client.webpage,
-        phones: client?.phones || [],
-        emails: client?.emails || [],
+        phones: client?.phones ? parseJsonFromDb(client.phones) : [],
+        emails: client?.emails ? parseJsonFromDb(client.emails) : [],
       }));
       console.log("formData", formData);
     }

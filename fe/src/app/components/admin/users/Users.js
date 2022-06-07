@@ -18,7 +18,7 @@ import UserForm from "./UserForm";
 import Loader from "./../../common/Loader";
 import i18n from "../../../../i18n";
 import { useModuleInfoModal, useSwalAlert } from "../../../hooks/common";
-import { parseRolesFromDb } from "../../../service/user/user.service";
+import { parseJsonFromDb } from "../../../service/user/user.service";
 
 const { SearchBar } = Search;
 
@@ -62,9 +62,9 @@ export default function Users() {
       text: t("user.role"),
       formatter: (cell) => {
         console.log("cell", cell);
-        console.log("parseRolesFromDb(cell.roles)", parseRolesFromDb(cell));
+        // console.log("parseRolesFromDb(cell.roles)", parseRolesFromDb(cell));
         if (cell) {
-          const roles = parseRolesFromDb(cell);
+          const roles = parseJsonFromDb(cell);
           return roles.map((role) => t(`role.${role}`)).join(", ");
         }
         return "";

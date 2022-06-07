@@ -2,6 +2,7 @@
   "name": "thesis-fe",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@mdi/font": "^5.9.55",
     "@reduxjs/toolkit": "^1.6.1",

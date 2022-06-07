@@ -4,7 +4,6 @@ const app = express();
 const server = require("http").createServer(app);
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-
 const csrf = require("csurf");
 const i18next = require("i18next");
 const i18Middleware = require("i18next-http-middleware");

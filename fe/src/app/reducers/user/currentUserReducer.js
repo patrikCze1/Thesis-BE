@@ -148,7 +148,11 @@ export const updateAction = (data) => async (dispatch) => {
   dispatch({ type: "currentuser/actionStart" });
   try {
     const response = await axios.patch(`/api/me/update`, data);
-    dispatch({ type: "currentuser/update", payload: response.data.user });
+    const user = {
+      ...response.data.user,
+      roles: JSON.parse(response.data.user.roles.replace(/\\/g, "")),
+    };
+    dispatch({ type: "currentuser/update", payload: user });
     toast.success(i18next.t("alert.changesSaved"));
   } catch (e) {
     dispatch({ type: "currentuser/actionFail" });

@@ -43,10 +43,10 @@ function decrypt(str) {
   );
 }
 
-export const parseRolesFromDb = (roles) => {
-  console.log("parseRolesFromDb roles", roles, typeof roles);
-  if (typeof roles === "string") {
-    return JSON.parse(roles.replace(/\\/g, ""));
-  } else if (typeof roles === "object") return roles;
-  else return roles;
+export const parseJsonFromDb = (jsonData) => {
+  console.log("parseJsonFromDb jsonData", jsonData, typeof jsonData);
+  if (typeof jsonData === "string") {
+    return JSON.parse(jsonData.replace(/\\/g, ""));
+  } else if (typeof jsonData === "object") return jsonData;
+  else return jsonData;
 };

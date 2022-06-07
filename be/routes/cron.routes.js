@@ -28,24 +28,30 @@ router.get("/daily", async (req, res) => {
       if (task.solverId) {
         const n = await createTaskNotification(
           task.id,
-          req.t("task.message.deadlineIn24Hours", {
-            name: trimString(task.name, 100),
-          }),
+          `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
+          // req.t("task.message.deadlineIn24Hours", {
+          //   name: trimString(task.name, 100),
+          // }),
           task.solverId,
           null
         );
+        n.setDataValue("createdAt", new Date());
+        n.setDataValue("TaskNotification", { task });
         io.to(task.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
           notification: n,
         });
       } else {
         const n = await createTaskNotification(
           task.id,
-          req.t("task.message.deadlineIn24Hours", {
-            name: trimString(task.name, 100),
-          }),
+          `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
+          // req.t("task.message.deadlineIn24Hours", {
+          //   name: trimString(task.name, 100),
+          // }),
           task.createdById,
           null
         );
+        n.setDataValue("createdAt", new Date());
+        n.setDataValue("TaskNotification", { task });
         io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
           notification: n,
         });

@@ -21,7 +21,7 @@ const generateRefreshToken = (user) => {
 
 const authenticateToken = function (req, res, next) {
   const token = req.cookies["Auth-Token"];
-
+  console.log("token", req.cookies);
   if (!token) return res.sendStatus(403);
 
   try {

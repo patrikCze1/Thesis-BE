@@ -11,12 +11,21 @@ const getFeUrl = () => {
 
 /**
  *
- * @param {number} projectId
- * @param {number} taskId
+ * @param {Task} task
  * @returns {string} url
  */
-const getFeTaskUrl = (projectId, taskId) => {
-  return `${getFeUrl()}/projekty/${projectId}?ukol=${taskId}`;
+const getFeTaskUrl = (task) => {
+  if (task.archived) {
+    return `${getFeUrl()}/projekty/${task.projectId}/archiv?ukol=${task.id}`;
+  } else if (!task.stageId) {
+    return `${getFeUrl()}/projekty/${task.projectId}/nevyrizene?ukol=${
+      task.id
+    }`;
+  } else {
+    return `${getFeUrl()}/projekty/${task.projectId}/nastenky/${
+      task.boardId
+    }?ukol=${task.id}`;
+  }
 };
 
 /**

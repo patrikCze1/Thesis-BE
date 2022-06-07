@@ -49,7 +49,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
     if (projectId && projectId != "-1") {
       where.ProjectId = projectId;
       const allowEntry = await isUserInProject(req.params.projectId, user.id);
-      if (!allowEntry) {
+      if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
         res.status(403).json({
           message: req.t("project.error.userHasNotAccessToThisProject"),
         });
@@ -144,7 +144,7 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
   try {
     const allowEntry = await isUserInProject(req.params.projectId, user.id);
-    if (!allowEntry) {
+    if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
       res.status(403).json({
         message: req.t("project.error.userHasNotAccessToThisProject"),
       });
@@ -361,7 +361,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 "email/task",
                 "new_assignment",
                 {
-                  taskLink: getFeTaskUrl(task.projectId, task.id),
+                  taskLink: getFeTaskUrl(task),
                   taskName: task.name,
                   username: getFullName(user),
                 }
@@ -395,7 +395,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 "email/task",
                 "removed_assignment",
                 {
-                  taskLink: getFeTaskUrl(task.projectId, task.id),
+                  taskLink: getFeTaskUrl(task),
                   taskName: task.name,
                   username: getFullName(user),
                 }
@@ -508,7 +508,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                       "email/task/",
                       "completed",
                       {
-                        taskLink: getFeTaskUrl(task.projectId, task.id),
+                        taskLink: getFeTaskUrl(task),
                         username: getFullName(user),
                         taskName,
                       }
@@ -551,7 +551,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                       "email/task/",
                       "completed",
                       {
-                        taskLink: getFeTaskUrl(task.projectId, task.id),
+                        taskLink: getFeTaskUrl(task),
                         username: getFullName(user),
                         taskName,
                       }
