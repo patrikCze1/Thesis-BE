@@ -5,7 +5,6 @@ const sequelize = new Sequelize(
     ? process.env.DB_CONNECTION_PROD
     : process.env.DB_CONNECTION,
   {
-    // host: "localhost:8889",
     dialect: "mysql",
     operatorsAliases: 0, //false
     define: {

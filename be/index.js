@@ -30,6 +30,7 @@ const {
   meRoutes,
   searchRoutes,
   cronRoutes,
+  companyRoutes,
 } = require("./src/routes");
 const { connect, disconnect } = require("./src/service/io");
 
@@ -67,6 +68,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // mount csrf ingnored routes before csrf is appended to the app stack
 app.use("/api/auth", authRoutes);
+app.use("/api/companies", companyRoutes);
 
 app.use(csrf({ cookie: true }));
 

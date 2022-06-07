@@ -16,4 +16,5 @@ module.exports = {
   meRoutes: require("./user/me.routes"),
   searchRoutes: require("./search/search.routes"),
   cronRoutes: require("./cron.routes"),
+  companyRoutes: require("./company/company.routes"),
 };
