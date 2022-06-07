@@ -5,7 +5,7 @@ const { getUser, authenticateToken } = require("../../auth/auth");
 const { projectRepo } = require("./../../repo");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
-const { ROLE } = require("../../enum/enum");
+const { ROLE } = require("../../../enum/enum");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

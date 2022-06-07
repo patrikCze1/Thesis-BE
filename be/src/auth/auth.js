@@ -1,5 +1,6 @@
 const jwt = require("jsonwebtoken");
-const { ROLE } = require("../enum/enum");
+
+const { ROLE } = require("../../enum/enum");
 
 const { TokenExpiredError } = jwt;
 

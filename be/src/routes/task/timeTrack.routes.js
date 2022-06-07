@@ -5,7 +5,7 @@ const { authenticateToken, getUser } = require("../../auth/auth");
 const ac = require("./../../security");
 const { Op } = require("sequelize");
 const { validator } = require("../../service");
-const { SOCKET_EMIT } = require("../../enum/enum");
+const { SOCKET_EMIT } = require("../../../enum/enum");
 const { getIo } = require("../../service/io");
 const { responseError } = require("../../service/utils");
 

@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const { Group, User, UserGroup } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
-const { ROLE } = require("../../enum/enum");
+const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {

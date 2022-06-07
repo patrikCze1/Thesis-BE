@@ -12,7 +12,7 @@ const {
   ProjectUser,
 } = require("../../models/modelHelper");
 const { findUsersByProject } = require("../../repo/userRepo");
-const { ROLE } = require("../../enum/enum");
+const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {

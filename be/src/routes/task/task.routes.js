@@ -21,7 +21,7 @@ const {
   ROLE,
   TASK_PRIORITY,
   STAGE_TYPE,
-} = require("../../enum/enum");
+} = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
 const sequelize = require("../../models");

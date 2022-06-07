@@ -2,9 +2,9 @@ import React from "react";
 import { Tabs, Tab } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+
 import { getFullName } from "../../service/user/user.service";
 import UserProfileTabNotification from "./UserProfileTabNotification";
-
 import UserProfileTabSettings from "./UserProfileTabSettings";
 
 export default function UserProfile() {

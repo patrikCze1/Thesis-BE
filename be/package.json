@@ -44,31 +44,5 @@
     "eslint-plugin-import": "^2.25.4",
     "prettier": "^2.6.2",
     "sequelize-cli": "^6.4.1"
-  },
-  "eslintConfig": {
-    "extends": "airbnb-base",
-    "env": {
-      "es6": true,
-      "browser": true
-    },
-    "rules": {
-      "brace-style": [
-        "error",
-        "stroustrup"
-      ],
-      "comma-dangle": [
-        "error",
-        "never"
-      ],
-      "no-unused-vars": [
-        "warn"
-      ],
-      "no-var": [
-        "off"
-      ],
-      "one-var": [
-        "off"
-      ]
-    }
   }
 }

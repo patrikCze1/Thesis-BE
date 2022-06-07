@@ -31,7 +31,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
 const {

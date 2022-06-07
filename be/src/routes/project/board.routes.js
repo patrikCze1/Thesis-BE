@@ -8,7 +8,7 @@ const {
 } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
-const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
 const { isUserInProject } = require("../../repo/project/project.repository");

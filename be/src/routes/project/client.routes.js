@@ -5,7 +5,7 @@ const { Op } = require("sequelize");
 const { Client, Project } = require("../../models/modelHelper");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
-const { ROLE } = require("../../enum/enum");
+const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
 
 router.get("/", authenticateToken, async (req, res) => {

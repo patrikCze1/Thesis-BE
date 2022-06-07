@@ -8,7 +8,7 @@ const {
   managementAccessOnly,
 } = require("../../auth/auth");
 const { validator } = require("../../service");
-const { SOCKET_EMIT, ROLE } = require("../../enum/enum");
+const { SOCKET_EMIT, ROLE } = require("../../../enum/enum");
 const { getIo } = require("../../service/io");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");

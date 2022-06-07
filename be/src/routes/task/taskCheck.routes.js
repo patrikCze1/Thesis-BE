@@ -5,7 +5,7 @@ const { Task, TaskCheck } = require("../../models/modelHelper");
 const { getUser, authenticateToken } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { responseError } = require("../../service/utils");
-const { ROLE } = require("../../enum/enum");
+const { ROLE } = require("../../../enum/enum");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

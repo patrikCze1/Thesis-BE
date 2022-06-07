@@ -1,4 +1,4 @@
-const sequelize = require("./../config/config");
+const sequelize = require("./../../config/config");
 
 const models = [
   require("./user/User"),
@@ -27,6 +27,7 @@ for (const model of models) {
 }
 
 Object.keys(sequelize.models).forEach((key) => {
+  /* eslint-disable no-prototype-builtins*/
   if (sequelize.models[key].hasOwnProperty("associate")) {
     sequelize.models[key].associate(sequelize.models);
   }

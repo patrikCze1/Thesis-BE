@@ -1,4 +1,4 @@
-const { NOTIFICATION_TYPE } = require("../../enum/enum");
+const { NOTIFICATION_TYPE } = require("../../../enum/enum");
 const { Notification, TaskNotification } = require("../../models/modelHelper");
 const { sendMail } = require("../../email/config");
 

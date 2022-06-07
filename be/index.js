@@ -10,8 +10,8 @@ const i18Middleware = require("i18next-http-middleware");
 const path = require("path");
 const Backend = require("i18next-node-fs-backend");
 
-const io = require("./service/io").init(server);
-const sequelize = require("./models/index");
+const io = require("./src/service/io").init(server);
+const sequelize = require("./src/models/index");
 const {
   projectRoutes,
   boardRoutes,
@@ -30,8 +30,8 @@ const {
   meRoutes,
   searchRoutes,
   cronRoutes,
-} = require("./routes");
-const { connect, disconnect } = require("./service/io");
+} = require("./src/routes");
+const { connect, disconnect } = require("./src/service/io");
 
 sequelize.sync();
 
@@ -42,7 +42,7 @@ i18next
   .init({
     preload: ["cs", "en"],
     backend: {
-      loadPath: path.join(__dirname + "/locales/{{lng}}/{{ns}}.json"),
+      loadPath: path.join(__dirname + "/src/locales/{{lng}}/{{ns}}.json"),
     },
     fallbackLng: "en",
   });

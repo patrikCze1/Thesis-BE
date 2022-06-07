@@ -1,5 +1,5 @@
 const express = require("express");
-const { SOCKET_EMIT } = require("../enum/enum");
+const { SOCKET_EMIT } = require("../../enum/enum");
 const router = express.Router();
 
 const { Todo } = require("../models/modelHelper");
