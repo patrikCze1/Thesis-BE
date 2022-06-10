@@ -12,7 +12,7 @@ const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
 const { isUserInProject } = require("../../repo/project/project.repository");
-const sequelize = require("../../models");
+const { sequelize } = require("../../models");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   const user = getUser(req, res);

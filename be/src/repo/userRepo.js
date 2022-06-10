@@ -1,4 +1,4 @@
-const db = require("./../models");
+const { sequelize: db } = require("./../models");
 const User = db.User;
 const Op = db.Sequelize.Op;
 const { QueryTypes } = require("sequelize");

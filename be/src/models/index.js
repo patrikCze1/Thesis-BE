@@ -1,7 +1,9 @@
 const { associateConnectionWithModels } = require("../service/db");
-const sequelize = require("./../../config/config");
+const { sequelize, sequelizeAdmin } = require("./../../config/config");
 const models = require("./models");
+const CompanyModel = require("./admin/Company.model");
 
 associateConnectionWithModels(models, sequelize);
+associateConnectionWithModels([CompanyModel], sequelizeAdmin);
 
-(module.exports = sequelize), models;
+(module.exports = { sequelize, sequelizeAdmin }), models;

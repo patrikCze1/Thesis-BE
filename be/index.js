@@ -11,7 +11,7 @@ const path = require("path");
 const Backend = require("i18next-node-fs-backend");
 
 const io = require("./src/service/io").init(server);
-const sequelize = require("./src/models/index");
+const { sequelize, sequelizeAdmin } = require("./src/models/index");
 const {
   projectRoutes,
   boardRoutes,
@@ -34,6 +34,7 @@ const {
 } = require("./src/routes");
 const { connect, disconnect } = require("./src/service/io");
 
+sequelizeAdmin.sync();
 sequelize.sync();
 
 // middlewares

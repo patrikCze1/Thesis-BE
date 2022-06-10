@@ -24,7 +24,7 @@ const {
 } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
-const sequelize = require("../../models");
+const { sequelize } = require("../../models");
 const {
   sendEmailNotification,
   createTaskNotification,

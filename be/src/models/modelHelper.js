@@ -1,3 +1,3 @@
-const sequelize = require("./index");
+const { sequelize } = require("./index");
 
 module.exports = sequelize.models;
