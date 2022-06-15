@@ -1,13 +1,11 @@
-const { Stage } = require("../../models/modelHelper");
-
 /**
  *
  * @param {number} boardId
  * @returns {Promise} Stage
  */
-exports.findFirstByBoard = (boardId) => {
+exports.findFirstByBoard = (models, boardId) => {
   console.log("findFirstByProject", boardId);
-  return Stage.findOne({
+  return models.Stage.findOne({
     where: {
       boardId,
     },

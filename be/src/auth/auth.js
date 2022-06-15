@@ -71,6 +71,18 @@ const getUser = (req, res) => {
   }
 };
 
+const getCompanyKey = (req, res) => {
+  try {
+    const token = getUserToken(req, res);
+    const { companyKey } = token;
+
+    return companyKey;
+  } catch (error) {
+    console.log("getCompanyKey", error);
+    return null;
+  }
+};
+
 const managementAccessOnly = (req, res, next) => {
   const currentUser = getUser(req, res);
 
@@ -94,6 +106,7 @@ module.exports = {
   getUser,
   getUserToken,
   managementAccessOnly,
+  getCompanyKey,
 };
 
 //FE

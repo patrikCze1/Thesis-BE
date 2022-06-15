@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
 const { User, Group } = require("../../models/modelHelper");
-const bcrypt = require("bcrypt");
 
 const { authenticateToken, getUser } = require("../../auth/auth");
+const { createHashedPassword } = require("../../service/user.service");
 
 /**
  * List of users groups
@@ -51,7 +51,7 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await createHashedPassword(req.body.password);
     const data = {
       password: hashedPassword,
     };

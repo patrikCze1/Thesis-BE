@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 
-const bcrypt = require("bcrypt");
 const { authenticateToken, getUser } = require("../../auth/auth");
 const { validator } = require("../../service");
 
@@ -14,6 +13,7 @@ const {
 const { findUsersByProject } = require("../../repo/userRepo");
 const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
+const { createHashedPassword } = require("../../service/user.service");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -97,12 +97,9 @@ router.post("/", authenticateToken, async (req, res) => {
   }
   //todo set role if role is empty
   try {
-    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+    const hashedPassword = await createHashedPassword(req.body.password);
     const data = req.body;
     data.password = hashedPassword;
-    data.shortName = `${data.lastName.charAt(0).toUpperCase()}${data.firstName
-      .charAt(0)
-      .toUpperCase()}`;
 
     const savedUser = await User.create(data);
 

@@ -1,4 +1,3 @@
-const { Project, User, Group, Client } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 
 /**
@@ -7,8 +6,8 @@ const { Op } = require("sequelize");
  * @param {Object} filter
  * @returns
  */
-exports.findByUser = async (user, filter) => {
-  return await Project.findAndCountAll({
+exports.findByUser = async (models, user, filter) => {
+  return await models.Project.findAndCountAll({
     // attributes: { exclude: ['user'] },
     subQuery: false,
     where: {
@@ -20,26 +19,26 @@ exports.findByUser = async (user, filter) => {
     },
     include: [
       {
-        model: Group,
+        model: models.Group,
         as: "groups",
         attributes: [],
         include: {
-          model: User,
+          model: models.User,
           as: "groupUsers",
           attributes: [],
         },
       },
       {
-        model: User,
+        model: models.User,
         as: "creator",
       },
       {
-        model: User,
+        model: models.User,
         as: "users",
         attributes: [],
       },
       {
-        model: Client,
+        model: models.Client,
         // as: "client",
       },
     ],

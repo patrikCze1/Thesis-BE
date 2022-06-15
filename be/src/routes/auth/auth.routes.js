@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
 
-const { User } = require("../../models/modelHelper");
 const {
   generateToken,
   generateRefreshToken,
@@ -11,13 +10,16 @@ const {
   decodeToken,
 } = require("../../auth/auth");
 const { sendMail } = require("../../email/config");
+const { createHashedPassword } = require("../../service/user.service");
+const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 
 const router = express.Router();
 
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  const ck = "KEY";
+  if (!email || !password || !ck) {
     res.status(400).json({
       message: req.t("error.badCredentials"),
     });
@@ -25,10 +27,13 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const user = await User.findOne({
+    // const db = getDatabaseConnection(ck);
+    const dbModels = getDatabaseModels(ck);
+    console.log("dbModels", dbModels);
+    const user = await dbModels.User.findOne({
       where: { [Op.or]: [{ email }, { username: email }] },
     });
-
+    console.log("user", user);
     if (user) {
       if (user.deactivated) throw new Error(req.t("error.accountDeactivated"));
       const match = await bcrypt.compare(password, user.password);
@@ -73,10 +78,11 @@ router.post("/login", async (req, res) => {
 });
 
 router.post("/forgotten-password", async (req, res) => {
-  const { email } = req.body;
+  const { email, ck } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const dbModels = getDatabaseModels(ck);
+    const user = await dbModels.User.findOne({ where: { email } });
 
     if (!user) throw new Error(req.t("error.validation.emailDoesntExist"));
     else {
@@ -110,19 +116,20 @@ router.post("/forgotten-password", async (req, res) => {
 });
 
 router.post("/reset-password", async (req, res) => {
-  const { token, password } = req.body;
+  const { token, password, ck } = req.body;
 
   try {
+    const dbModels = getDatabaseModels(ck);
     const { email } = jwt.verify(token, process.env.PASSWORD_SECRET);
     if (!email) throw new Error(req.t("error.validation.invalidLink"));
 
-    const user = await User.findOne({
+    const user = await dbModels.User.findOne({
       where: { email, passwordResetHash: token },
     });
 
     if (!user) throw new Error(req.t("error.validation.invalidLink"));
     else {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await createHashedPassword(password);
       const data = {
         password: hashedPassword,
         passwordResetHash: null,

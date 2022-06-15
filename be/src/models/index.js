@@ -1,9 +1,60 @@
 const { associateConnectionWithModels } = require("../service/db");
-const { sequelize, sequelizeAdmin } = require("./../../config/config");
+const {
+  sequelizeAdmin,
+  connections,
+  createSequelizeConnection,
+} = require("./../../config/config");
 const models = require("./models");
 const CompanyModel = require("./admin/Company.model");
 
-associateConnectionWithModels(models, sequelize);
-associateConnectionWithModels([CompanyModel], sequelizeAdmin);
+const initConnections = async () => {
+  console.log("initConnections");
+  associateConnectionWithModels([CompanyModel], sequelizeAdmin);
+  sequelizeAdmin.sync();
 
-(module.exports = { sequelize, sequelizeAdmin }), models;
+  try {
+    const companies = await sequelizeAdmin.models.Company.findAll();
+    console.log("companies", companies);
+
+    for (const company of companies) {
+      createSequelizeConnection(company.key, company.connectionString);
+    }
+
+    for (const key in connections) {
+      associateConnectionWithModels(models, connections[key]);
+      connections[key].sync();
+    }
+  } catch (error) {
+    console.error("CRITICAL ERROR ", error);
+  }
+
+  console.log("connections", connections);
+};
+
+/**
+ *
+ * @param {Sequelize} connection instance of connection
+ */
+const syncDbConnection = (connection) => {
+  associateConnectionWithModels(models, connection);
+  connection.sync();
+};
+
+const getDatabaseModels = (key) => {
+  console.log("connections", connections);
+  return connections[key].models;
+};
+
+const getDatabaseConnection = (key) => {
+  return connections[key];
+};
+
+(module.exports = {
+  connections,
+  sequelizeAdmin,
+  initConnections,
+  syncDbConnection,
+  getDatabaseModels,
+  getDatabaseConnection,
+}),
+  models;

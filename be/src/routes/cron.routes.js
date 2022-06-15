@@ -1,8 +1,9 @@
 const express = require("express");
 const { SOCKET_EMIT } = require("../../enum/enum");
+const { getCompanyKey } = require("../auth/auth");
+const { getDatabaseModels } = require("../models");
 const router = express.Router();
 
-const { Todo } = require("../models/modelHelper");
 const { getIo } = require("../service/io");
 const {
   createTaskNotification,
@@ -19,14 +20,18 @@ router.get("/daily", async (req, res) => {
   }
 
   try {
+    //todo for each company
+    const ck = getCompanyKey(req, res);
+    const dbModels = getDatabaseModels(ck);
     const io = getIo();
-    const tasks = await taskRepo.findTasksWithDeadlineIn24h();
+    const tasks = await taskRepo.findTasksWithDeadlineIn24h(dbModels);
 
     for (const task of tasks) {
       console.log(task.id);
 
       if (task.solverId) {
         const n = await createTaskNotification(
+          dbModels,
           task.id,
           `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
           // req.t("task.message.deadlineIn24Hours", {
@@ -42,6 +47,7 @@ router.get("/daily", async (req, res) => {
         });
       } else {
         const n = await createTaskNotification(
+          dbModels,
           task.id,
           `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
           // req.t("task.message.deadlineIn24Hours", {

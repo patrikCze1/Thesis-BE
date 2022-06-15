@@ -1,17 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
+const { getDatabaseModels } = require("../../models");
 const {
-  Project,
-  User,
-  Client,
-  Stage,
-  ProjectGroup,
-  ProjectUser,
-  Group,
-  Board,
-} = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 const { projectRepo } = require("./../../repo");
 const { getIo } = require("../../service/io");
@@ -22,19 +17,21 @@ const { isUserInProject } = require("../../repo/project/project.repository");
 const io = getIo();
 
 router.get("/", authenticateToken, async (req, res) => {
+  const ck = getCompanyKey(req, res);
   const user = getUser(req, res);
 
   let projects;
   try {
+    const dbModels = getDatabaseModels(ck);
     const filter = req.query;
     // only admin can see all projects
     if (user.roles.includes(ROLE.ADMIN)) {
-      projects = await Project.findAndCountAll({
+      projects = await getDatabaseModels(ck).Project.findAndCountAll({
         include: [
           {
-            model: Client,
+            model: dbModels.Client,
           },
-          { model: User, as: "creator" },
+          { model: dbModels.User, as: "creator" },
         ],
         limit: filter.limit ? parseInt(filter.limit) : null,
         offset: filter.offset ? parseInt(filter.offset) : 0,
@@ -46,7 +43,7 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       });
     } else {
-      projects = await projectRepo.findByUser(user, filter);
+      projects = await projectRepo.findByUser(dbModels, user, filter);
     }
 
     res.json({ ...projects });
@@ -70,13 +67,15 @@ router.get("/:id", authenticateToken, async (req, res) => {
         return;
       }
     }
+    const ck = getCompanyKey(req, res);
+    const dbModels = getDatabaseModels(ck);
 
-    const project = await Project.findByPk(req.params.id, {
+    const project = await dbModels.Project.findByPk(req.params.id, {
       include: [
-        { model: Client },
-        { model: User, as: "creator" },
-        { model: Group, as: "groups" },
-        { model: User, as: "users" },
+        { model: dbModels.Client },
+        { model: dbModels.User, as: "creator" },
+        { model: dbModels.Group, as: "groups" },
+        { model: dbModels.User, as: "users" },
       ],
     });
 
@@ -103,6 +102,8 @@ router.post("/", authenticateToken, async (req, res) => {
     res.status(403).json({ message: req.t("error.insufficientPermissions") });
     return;
   }
+  const ck = getCompanyKey(req, res);
+  const dbModels = getDatabaseModels(ck);
 
   const requiredAttr = ["name"];
   const result = validator.validateRequiredFields(requiredAttr, req.body);
@@ -124,27 +125,27 @@ router.post("/", authenticateToken, async (req, res) => {
   console.log("data", data);
   try {
     const io = getIo();
-    const project = await Project.create(data);
-    const board = await Board.create({
+    const project = await dbModels.Project.create(data);
+    const board = await dbModels.Board.create({
       projectId: project.id,
       name: project.name,
     });
 
-    await Stage.create({
+    await dbModels.Stage.create({
       name: req.t("stage.todo"),
       order: 1,
       projectId: project.id,
       boardId: board.id,
       type: STAGE_TYPE.WAITING,
     });
-    await Stage.create({
+    await dbModels.Stage.create({
       name: req.t("stage.workInProgress"),
       order: 2,
       projectId: project.id,
       boardId: board.id,
       type: STAGE_TYPE.IN_PROGRESS,
     });
-    await Stage.create({
+    await dbModels.Stage.create({
       name: req.t("stage.complete"),
       order: 3,
       projectId: project.id,
@@ -153,15 +154,18 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     for (let groupId of req.body.groups) {
-      await ProjectGroup.create({ projectId: project.id, groupId });
+      await dbModels.ProjectGroup.create({ projectId: project.id, groupId });
     }
 
     for (let userId of req.body.users) {
-      await ProjectUser.create({ projectId: project.id, userId });
+      await dbModels.ProjectUser.create({ projectId: project.id, userId });
     }
 
     if (data.clientId) {
-      project.setDataValue("Client", await Client.findByPk(data.clientId));
+      project.setDataValue(
+        "Client",
+        await dbModels.Client.findByPk(data.clientId)
+      );
     }
     if (data.users) project.setDataValue("users", data.users);
     if (data.groups) project.setDataValue("users", data.groups);
@@ -179,8 +183,11 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
+  const ck = getCompanyKey(req, res);
+  const dbModels = getDatabaseModels(ck);
+
   try {
-    const project = await Project.findByPk(req.params.id);
+    const project = await dbModels.Project.findByPk(req.params.id);
     if (!project) {
       res
         .status(404)
@@ -205,19 +212,22 @@ router.patch("/:id", authenticateToken, async (req, res) => {
     const updated = await project.update(data);
 
     if (data.clientId) {
-      updated.setDataValue("Client", await Client.findByPk(data.clientId));
+      updated.setDataValue(
+        "Client",
+        await dbModels.Client.findByPk(data.clientId)
+      );
     }
 
-    await ProjectGroup.destroy({ where: { projectId: project.id } });
-    await ProjectUser.destroy({ where: { projectId: project.id } });
+    await dbModels.ProjectGroup.destroy({ where: { projectId: project.id } });
+    await dbModels.ProjectUser.destroy({ where: { projectId: project.id } });
 
     for (let groupId of req.body.groups) {
-      await ProjectGroup.create({ projectId: project.id, groupId });
+      await dbModels.ProjectGroup.create({ projectId: project.id, groupId });
       //todo socket
     }
 
     for (let userId of req.body.users) {
-      await ProjectUser.create({ projectId: project.id, userId });
+      await dbModels.ProjectUser.create({ projectId: project.id, userId });
       io.to(userId).emit(SOCKET_EMIT.PROJECT_EDIT, { project: updated });
     }
 
@@ -231,9 +241,11 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
+  const ck = getCompanyKey(req, res);
+  const dbModels = getDatabaseModels(ck);
 
   try {
-    const project = await Project.findByPk(req.params.id);
+    const project = await dbModels.Project.findByPk(req.params.id);
     if (!project) {
       res
         .status(404)

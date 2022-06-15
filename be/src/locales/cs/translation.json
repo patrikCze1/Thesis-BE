@@ -65,7 +65,8 @@
   "auth": {
     "error": {
       "jwtExpired": "Byly jste odhlášeni.",
-      "userDontExist": "Uživatel neexistuje"
+      "userDontExist": "Uživatel neexistuje",
+      "companyAlreadyExists": "Společnost s tímto kódem již existuje."
     }
   },
   "notification": {

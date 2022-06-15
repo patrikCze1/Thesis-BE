@@ -1,5 +1,4 @@
 const { NOTIFICATION_TYPE } = require("../../../enum/enum");
-const { Notification, TaskNotification } = require("../../models/modelHelper");
 const { sendMail } = require("../../email/config");
 
 /**
@@ -12,6 +11,7 @@ const { sendMail } = require("../../email/config");
  * @throws {error}
  */
 const createTaskNotification = async (
+  models,
   taskId,
   message,
   receiverId,
@@ -24,7 +24,7 @@ const createTaskNotification = async (
       type: NOTIFICATION_TYPE.TYPE_TASK,
       createdById,
     });
-    await TaskNotification.create({
+    await models.TaskNotification.create({
       taskId,
       notificationId: newNotif.id,
     });

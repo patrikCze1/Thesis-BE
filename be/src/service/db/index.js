@@ -1,28 +1,36 @@
 const mysql = require("mysql2/promise");
 const { Sequelize } = require("sequelize");
+const { createSequelizeConnection } = require("../../../config/config");
 
 const models = require("../../models/models");
 const config = require("./../../../config/config.json");
 
-async function createDB(name) {
+/**
+ * Create new db, sync connection with models and create first user
+ *
+ * @param {string} name
+ * @param {User} user
+ * @returns
+ */
+async function createDB(name, user) {
   //TODO
   const { host, port, username, password, database, dialect } =
     config.development;
-  const db = {};
 
   // Open the connection to MySQL server
   const connection = await mysql.createConnection({
     host,
     user: username,
     password,
-    port: 8889,
+    port,
   });
 
   // Run create database statement
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${name}\`;`);
+  await connection.query(`CREATE DATABASE IF NOT EXISTS \`jago_${name}\`;`);
 
+  const connString = `mysql://root:root@localhost:8889/jago_${name}`;
   //connect to db
-  const sequelize = new Sequelize(`mysql://root:root@localhost:8889/${name}`);
+  const sequelize = new Sequelize(connString);
 
   // init models and add them to the exported db object
   associateConnectionWithModels(models, sequelize);
@@ -30,10 +38,12 @@ async function createDB(name) {
   // sync all models with database
   await sequelize.sync();
 
+  await sequelize.models.User.create(user);
+
   // Close the connection
   connection.end();
 
-  return db;
+  return { sequelize, connString };
 }
 
 function associateConnectionWithModels(models, sequelize) {

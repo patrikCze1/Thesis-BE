@@ -1,13 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
+const { getDatabaseModels } = require("../../models");
 const {
-  Notification,
-  TaskNotification,
-  Task,
-  User,
-} = require("../../models/modelHelper");
-const { authenticateToken, getUser } = require("../../auth/auth");
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { getIo } = require("../../service/io");
 
 router.get("/", authenticateToken, async (req, res) => {
@@ -15,6 +14,7 @@ router.get("/", authenticateToken, async (req, res) => {
   // console.log("io", io);
   try {
     const user = getUser(req, res);
+    const companyKey = getCompanyKey(req, res);
     let where = {
       userId: user.id,
     };
@@ -25,11 +25,11 @@ router.get("/", authenticateToken, async (req, res) => {
       where: where,
       include: [
         {
-          model: TaskNotification,
-          include: [{ model: Task, as: "task" }],
+          model: getDatabaseModels(companyKey).TaskNotification,
+          include: [{ model: getDatabaseModels(companyKey).Task, as: "task" }],
         },
         {
-          model: User,
+          model: getDatabaseModels(companyKey).User,
           as: "creator",
         },
       ],

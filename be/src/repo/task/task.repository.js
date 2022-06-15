@@ -1,9 +1,8 @@
-const { Task } = require("../../models/modelHelper");
 const { Op } = require("sequelize");
 const { addTimeToDate } = require("../../service/date");
 
-exports.findTasksWithDeadlineIn24h = async () => {
-  return await Task.findAll({
+exports.findTasksWithDeadlineIn24h = async (models) => {
+  return await models.Task.findAll({
     subQuery: false,
     where: {
       completedAt: { [Op.is]: null },

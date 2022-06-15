@@ -1,11 +1,32 @@
 const Sequelize = require("sequelize");
 
-const sequelize = new Sequelize(
+const connections = {};
+
+//will add new connection to db connections
+const createSequelizeConnection = (key, connString) => {
+  if (!(key in connections)) {
+    const connection = new Sequelize(connString, {
+      operatorsAliases: 0, //false
+      define: {
+        charset: "utf8mb4",
+      },
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000,
+      },
+      // force: true,
+    });
+    connections[key] = connection;
+  }
+};
+
+const sequelizeAdmin = new Sequelize(
   process.env.NODE_ENV === "production"
-    ? process.env.DB_CONNECTION_PROD
-    : process.env.DB_CONNECTION,
+    ? process.env.DB_CONNECTION_ADMIN_PROD
+    : process.env.DB_CONNECTION_ADMIN,
   {
-    dialect: "mysql",
     operatorsAliases: 0, //false
     define: {
       charset: "utf8mb4",
@@ -20,24 +41,4 @@ const sequelize = new Sequelize(
   }
 );
 
-const sequelizeAdmin = new Sequelize(
-  process.env.NODE_ENV === "production"
-    ? process.env.DB_CONNECTION_ADMIN_PROD
-    : process.env.DB_CONNECTION_ADMIN,
-  {
-    dialect: "mysql",
-    operatorsAliases: 0, //false
-    define: {
-      charset: "utf8mb4",
-    },
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000,
-    },
-    force: true,
-  }
-);
-
-module.exports = { sequelize, sequelizeAdmin };
+module.exports = { createSequelizeConnection, connections, sequelizeAdmin };
