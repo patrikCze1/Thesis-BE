@@ -358,7 +358,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               sendEmailNotification(
                 newSolver.email,
                 req.t("task.message.newAssignment"),
-                "email/task",
+                "src/email/task",
                 "new_assignment",
                 {
                   taskLink: getFeTaskUrl(task),
@@ -392,7 +392,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               sendEmailNotification(
                 oldSolver.email,
                 req.t("task.message.newAssignment"),
-                "email/task",
+                "src/email/task",
                 "removed_assignment",
                 {
                   taskLink: getFeTaskUrl(task),
@@ -505,7 +505,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                         taskName: trimString(taskName, 100),
                         userName: getFullName(user),
                       }),
-                      "email/task/",
+                      "src/email/task/",
                       "completed",
                       {
                         taskLink: getFeTaskUrl(task),
@@ -548,7 +548,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                         taskName,
                         userName: getFullName(user),
                       }),
-                      "email/task/",
+                      "src/email/task/",
                       "completed",
                       {
                         taskLink: getFeTaskUrl(task),

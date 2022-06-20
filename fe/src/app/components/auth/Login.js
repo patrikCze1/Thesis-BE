@@ -108,6 +108,12 @@ export default function Login() {
                 >
                   <Trans>Forgot password</Trans>?
                 </NavLink>
+                <br />
+                <NavLink to={ROUTE.REGISTER} className="auth-link text-black">
+                  <span className="mt-1">
+                    <Trans>auth.createAccount</Trans>
+                  </span>
+                </NavLink>
               </div>
 
               {actionProcessing && <Loader />}

@@ -15,10 +15,10 @@ const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 
 const router = express.Router();
 
+//todo check if company is verified
 router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, ck } = req.body;
 
-  const ck = "KEY";
   if (!email || !password || !ck) {
     res.status(400).json({
       message: req.t("error.badCredentials"),
@@ -27,7 +27,6 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    // const db = getDatabaseConnection(ck);
     const dbModels = getDatabaseModels(ck);
     console.log("dbModels", dbModels);
     const user = await dbModels.User.findOne({
@@ -97,7 +96,7 @@ router.post("/forgotten-password", async (req, res) => {
         await sendMail(
           user.email,
           req.t("message.forgottenPassword"),
-          "email/user/",
+          "src/email/user/",
           "reset_password",
           { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}` }
         );

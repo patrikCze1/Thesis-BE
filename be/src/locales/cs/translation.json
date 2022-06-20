@@ -8,6 +8,7 @@
     "thisFieldsAreRequired": "Tyto pole jsou povinná",
     "cantAssignToStage": "Nelze přiřadit do této fáze",
     "accountDeactivated": "Účet je deaktivován",
+    "emailIsNotValid": "E-mail není validní",
     "validation": {
       "stringTooLong": "Text pro {{field}} je příliš dlouhý",
       "emailNotValid": "E-mail není validní",
@@ -53,6 +54,8 @@
     "colorCode": "Barva",
     "lastName": "Příjmení",
     "firstName": "Jméno",
+    "phone": "Telefon",
+    "password": "Heslo",
     "task": {
       "name": "Název",
       "description": "Popis",

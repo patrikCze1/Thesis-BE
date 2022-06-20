@@ -137,6 +137,9 @@ i18n
             resetPassword: "Obnovit heslo",
             passwordsNotEqual: "Hesla nejsou stejná",
             passwordChanged: "Heslo změněno",
+            login: "Přihlásit se",
+            register: "Registrace",
+            createAccount: "Vytvořit účet",
           },
           menu: {
             timeTracks: "Záznam času",
@@ -334,6 +337,12 @@ i18n
             password: "Heslo",
             filesUploaded: "Soubory nahrány",
             fileDeleted: "Soubor odstraněn",
+            companyId: "IČO",
+            companyName: "Název společnosti",
+            phone: "Telefon",
+            register: "Registrovat",
+            firstName: "Jméno",
+            lastName: "Příjmení",
           },
           date: {
             today: "Dnes",

@@ -68,6 +68,9 @@ module.exports = (sequelize) => {
       emailVerifiedAt: {
         type: DataTypes.DATE,
       },
+      verificationCode: {
+        type: DataTypes.STRING,
+      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: sequelize.literal("CURRENT_TIMESTAMP"),

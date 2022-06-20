@@ -83,7 +83,7 @@ router.post(
               sendEmailNotification(
                 mentionUser.email,
                 "Byl/a jste označen/a v komentáři",
-                "email/task/",
+                "src/email/task/",
                 "comment_mention",
                 {
                   commentText: data.text,

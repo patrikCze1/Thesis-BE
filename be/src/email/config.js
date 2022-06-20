@@ -11,7 +11,7 @@ const transporter = nodemailer.createTransport({
       ? "smtp.rosti.cz"
       : "smtp.mailtrap.io",
   port: process.env.NODE_ENV === "production" ? 587 : 2525,
-  secure: process.env.NODE_ENV !== "production",
+  secure: process.env.NODE_ENV === "production",
   auth: {
     user:
       process.env.NODE_ENV === "production"
@@ -22,6 +22,9 @@ const transporter = nodemailer.createTransport({
         ? process.env.MAILER_PASS_PROD
         : process.env.MAILER_PASS,
   },
+  // tls: {
+  //   ciphers: "SSLv3",
+  // },
 });
 
 /**
@@ -36,6 +39,7 @@ const transporter = nodemailer.createTransport({
 const sendMail = async (to, subject, templatePath, template, locals = {}) => {
   // console.log("send mail ", to, subject, templatePath, template, locals);
   const dir = path.resolve(templatePath);
+  console.log("dir", dir);
   const emailObject = new Email({
     message: {
       to,

@@ -47,7 +47,8 @@ export default function App() {
       if (
         location.pathname === ROUTE.LOGIN ||
         location.pathname === ROUTE.FORGOTTEN_PASSWORD ||
-        location.pathname === ROUTE.RESET_PASSWORD
+        location.pathname === ROUTE.RESET_PASSWORD ||
+        location.pathname === ROUTE.REGISTER
       ) {
         setShowMenu(false);
         document
