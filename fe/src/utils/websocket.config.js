@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import { parseUserFromStorage } from "../app/service/user/user.service";
+import { parseUserFromStorage } from "../app/service/user/user.service.js";
 
 let instance = null;
 export const initIo = () => {

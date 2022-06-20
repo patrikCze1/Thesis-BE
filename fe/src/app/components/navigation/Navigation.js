@@ -1,17 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useHistory, NavLink } from "react-router-dom";
 import { Dropdown } from "react-bootstrap";
 import { Trans } from "react-i18next";
-
 import { useDispatch } from "react-redux";
 
 import logoMini from "./../../../assets/images/logo_blue_small.svg";
-import SearchBar from "../search/SearchBar";
-import { logoutAction } from "./../../reducers/user/currentUserReducer";
-import NavigationNotifications from "./../notification/nav/NavigationNotifications";
-import NavigationActiveTtrack from "../timeTrack/NavigationActiveTtrack";
-import { ROUTE } from "../../../utils/enum";
-import { useEffect } from "react";
+import SearchBar from "../search/SearchBar.js";
+import { logoutAction } from "./../../reducers/user/currentUserReducer.js";
+import NavigationNotifications from "./../notification/nav/NavigationNotifications.js";
+import NavigationActiveTtrack from "../timeTrack/NavigationActiveTtrack.js";
+import { ROUTE } from "../../../utils/enum.js";
 
 export default function Navigation() {
   const history = useHistory();

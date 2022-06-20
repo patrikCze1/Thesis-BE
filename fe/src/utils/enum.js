@@ -32,6 +32,7 @@ export const ROLES = Object.freeze({
 export const ROUTE = Object.freeze({
   HOME: "/",
   LOGIN: "/prihlasit",
+  REGISTER: "/registrovat",
   SEARCH: "/hledat",
   PROJECTS: "/projekty",
   PROJECTS_DETAIL: "/projekty/:id",

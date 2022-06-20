@@ -11,11 +11,11 @@ import {
   loadGroupDetailAction,
   clearGroupDetailAction,
   deleteGroupAction,
-} from "./../../../reducers/user/groupReducer";
-import GroupForm from "./GroupForm";
-import Loader from "../../common/Loader";
-import i18n from "../../../../i18n";
-import { useSwalAlert } from "../../../hooks/common";
+} from "./../../../reducers/user/groupReducer.js";
+import GroupForm from "./GroupForm.js";
+import Loader from "../../common/Loader.js";
+import i18n from "../../../../i18n.js";
+import { useSwalAlert } from "../../../hooks/common.js";
 
 const { SearchBar } = Search;
 

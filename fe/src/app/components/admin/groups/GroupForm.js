@@ -7,10 +7,10 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   createGroupAction,
   editGroupAction,
-} from "./../../../reducers/user/groupReducer";
-import { loadUsersAction } from "./../../../reducers/user/userReducer";
-import { getFullName } from "../../../service/user/user.service";
-import { LoaderTransparent, Loader } from "../../common";
+} from "./../../../reducers/user/groupReducer.js";
+import { loadUsersAction } from "./../../../reducers/user/userReducer.js";
+import { getFullName } from "../../../service/user/user.service.js";
+import { LoaderTransparent, Loader } from "../../common/index.js";
 
 export default function GroupForm({ closeModal }) {
   const dispatch = useDispatch();

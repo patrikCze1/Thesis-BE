@@ -3,15 +3,15 @@ import { useDispatch, useSelector } from "react-redux";
 import { Modal } from "react-bootstrap";
 import { Trans } from "react-i18next";
 
-import ClientForm from "./ClientForm";
-import ClientTableRow from "./ClientTableRow";
-import Loader from "./../../common/Loader";
+import ClientForm from "./ClientForm.js";
+import ClientTableRow from "./ClientTableRow.js";
+import Loader from "./../../common/Loader.js";
 import {
   clearClientAction,
   loadClietntsAction,
-} from "./../../../reducers/common/clientReducer";
-import { usePagination } from "../../../hooks/usePagination";
-import i18n from "../../../../i18n";
+} from "./../../../reducers/common/clientReducer.js";
+import { usePagination } from "../../../hooks/usePagination.js";
+import i18n from "../../../../i18n.js";
 
 export default function Clients() {
   const dispatch = useDispatch();

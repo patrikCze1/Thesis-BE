@@ -21,6 +21,7 @@ import TaskBacklogScreen from "../components/task/TaskBacklogScreen";
 import Login from "../components/auth/Login";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
 import ResetPassword from "../components/auth/ResetPassword";
+import { Register } from "./../screen/auth";
 
 //https://reactnavigation.org/docs/auth-flow/
 export default function AppRoutes() {
@@ -34,6 +35,9 @@ export default function AppRoutes() {
       </Route>
       <Route path={ROUTE.RESET_PASSWORD}>
         <ResetPassword />
+      </Route>
+      <Route path={ROUTE.REGISTER}>
+        <Register />
       </Route>
 
       <PrivateRoute path={ROUTE.PROJECTS_DETAIL_ARCHIVE}>

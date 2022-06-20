@@ -7,10 +7,10 @@ import { Router } from "react-router";
 import { composeWithDevTools } from "redux-devtools-extension";
 import { createBrowserHistory } from "history";
 
-import App from "./app/App";
-import reducers from "./app/reducers";
-import "./i18n";
-import * as serviceWorkerRegistration from "./serviceWorkerRegistration";
+import App from "./app/App.js";
+import reducers from "./app/reducers/index.js";
+import "./i18n.js";
+import * as serviceWorkerRegistration from "./serviceWorkerRegistration.js";
 
 require("dotenv").config({ path: "./../.env" });
 

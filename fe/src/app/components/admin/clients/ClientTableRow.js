@@ -6,10 +6,10 @@ import { Trans, useTranslation } from "react-i18next";
 import {
   clientDetailAction,
   deleteClientAction,
-} from "../../../reducers/common/clientReducer";
-import ClientForm from "./ClientForm";
-import { useSwalAlert } from "../../../hooks/common";
-import { parseJsonFromDb } from "../../../service/user/user.service";
+} from "../../../reducers/common/clientReducer.js";
+import ClientForm from "./ClientForm.js";
+import { useSwalAlert } from "../../../hooks/common.js";
+import { parseJsonFromDb } from "../../../service/user/user.service.js";
 
 export default function ClientTableRow({ client }) {
   const dispatch = useDispatch();

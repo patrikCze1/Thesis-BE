@@ -6,10 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   createClientAction,
   editClientAction,
-} from "../../../reducers/common/clientReducer";
-import { parseJsonFromDb } from "../../../service/user/user.service";
-import Loader from "../../common/Loader";
-import LoaderTransparent from "../../common/LoaderTransparent";
+} from "../../../reducers/common/clientReducer.js";
+import { parseJsonFromDb } from "../../../service/user/user.service.js";
+import Loader from "../../common/Loader.js";
+import LoaderTransparent from "../../common/LoaderTransparent.js";
 
 export default function ClientForm({ clientId }) {
   const dispatch = useDispatch();

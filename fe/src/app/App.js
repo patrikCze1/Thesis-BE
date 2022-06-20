@@ -12,24 +12,24 @@ import "react-quill/dist/quill.snow.css";
 import "./App.scss";
 
 import logo from "./../assets/images/logo_blue.svg";
-import AppRoutes from "./router/AppRoutes";
-import { Sidebar, Navigation } from "./components/navigation";
-import Footer from "./components/common/Footer";
-import InfoBar from "./components/common/InfoBar";
+import AppRoutes from "./router/AppRoutes.js";
+import { Sidebar, Navigation } from "./components/navigation/index.ts";
+import Footer from "./components/common/Footer.js";
+import InfoBar from "./components/common/InfoBar.js";
 import {
   loadFromSessionAction,
   logoutAction,
-} from "./reducers/user/currentUserReducer";
-import ErrorBoundary from "./../app/components/error/ErrorBoundary";
-import axios from "./../utils/axios.config";
-import { initIo } from "../utils/websocket.config";
-import { SOCKET, ROUTE } from "./../utils/enum";
-import { socketNewNotification } from "./reducers/notification/notification.reducer";
+} from "./reducers/user/currentUserReducer.js";
+import ErrorBoundary from "./../app/components/error/ErrorBoundary.js";
+import axios from "./../utils/axios.config.js";
+import { initIo } from "../utils/websocket.config.js";
+import { SOCKET, ROUTE } from "./../utils/enum.js";
+import { socketNewNotification } from "./reducers/notification/notification.reducer.js";
 import {
   loadMyTimeTracksAction,
   socketStopTimeTrackAction,
-} from "./reducers/timeTrack/timeTrack.reducer";
-import i18n from "../i18n";
+} from "./reducers/timeTrack/timeTrack.reducer.js";
+import i18n from "../i18n.js";
 
 export default function App() {
   const location = useLocation();

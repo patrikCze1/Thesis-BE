@@ -33,6 +33,7 @@ router.get("/", async (req, res) => {
       firstName: "Test",
       lastName: "Test",
     };
+    //todo send verification email
     const { connString } = await dbService.createDB(KEY, user);
     createSequelizeConnection(KEY, connString);
 
