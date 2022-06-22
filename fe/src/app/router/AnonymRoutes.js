@@ -1,12 +1,11 @@
 import React from "react";
-import { Switch, Route, Redirect } from "react-router-dom";
+import { Switch, Route } from "react-router-dom";
 
-import Login from "../components/auth/Login";
 import GoToLogin from "../components/auth/GoToLogin";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
 import ResetPassword from "../components/auth/ResetPassword";
 import { ROUTE } from "./../../utils/enum";
-import i18n from "../../i18n";
+import { Login } from "../screen/auth";
 
 export default function AnonymRoutes() {
   return (

@@ -13,7 +13,7 @@ module.exports = {
   // todoRoutes: require("./todo/todo.routes.js"),
   // notificationRoutes: require("./notification/notification.routes.js"),
   // clientRoutes: require("./project/client.routes"),
-  // meRoutes: require("./user/me.routes"),
+  meRoutes: require("./user/me.routes"),
   // searchRoutes: require("./search/search.routes"),
   // cronRoutes: require("./cron.routes"),
   companyRoutes: require("./admin/company.routes"),

@@ -4,18 +4,29 @@ import { Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 
-import Loader from "./../common/Loader";
-import { loginAction } from "./../../reducers/user/currentUserReducer";
-import logo from "./../../../assets/images/logo_blue.svg";
+import { loginAction } from "../../reducers/user/currentUserReducer";
 import { ROUTE } from "../../../utils/enum";
+import { Loader } from "../../components/common";
 
+import logo from "./../../../assets/images/logo_blue.svg";
+
+type FormType = {
+  email: string;
+  password: string;
+  ck: string;
+};
 export default function Login() {
   const dispatch = useDispatch();
 
   const { user, actionProcessing } = useSelector(
+    //@ts-ignore
     (state) => state.currentUserReducer
   );
-  const [formData, setFormData] = useState({});
+  const [formData, setFormData] = useState<FormType>({
+    email: "",
+    password: "",
+    ck: "",
+  });
   // const [error, setError] = useState(false);
 
   const { t } = useTranslation();
@@ -31,7 +42,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    dispatch(loginAction(formData.email, formData.password, history));
+    dispatch(loginAction(formData, history));
   };
 
   const handleInputChange = (e) => {
@@ -62,7 +73,20 @@ export default function Login() {
             </h4>
             <Form className="pt-3" method="post" onSubmit={handleSubmit}>
               {/* {error && <span className="error-message">{error}</span>} */}
-              <Form.Group className="d-flex search-field">
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  name="ck"
+                  placeholder={t("form.companyKey")}
+                  size="lg"
+                  className="h-auto"
+                  required
+                  onInput={handleInputChange}
+                  autoComplete="on"
+                />
+              </Form.Group>
+
+              <Form.Group>
                 <Form.Control
                   type="text"
                   name="email"
@@ -70,11 +94,11 @@ export default function Login() {
                   size="lg"
                   className="h-auto"
                   required
-                  onInput={(e) => handleInputChange(e)}
+                  onInput={handleInputChange}
                   autoComplete="on"
                 />
               </Form.Group>
-              <Form.Group className="d-flex search-field">
+              <Form.Group>
                 <Form.Control
                   type="password"
                   name="password"
@@ -82,7 +106,7 @@ export default function Login() {
                   size="lg"
                   className="h-auto"
                   required
-                  onInput={(e) => handleInputChange(e)}
+                  onInput={handleInputChange}
                   autoComplete="on"
                 />
               </Form.Group>
@@ -116,7 +140,7 @@ export default function Login() {
                 </NavLink>
               </div>
 
-              {actionProcessing && <Loader />}
+              {actionProcessing && <Loader cssClass={""} />}
             </Form>
           </div>
         </div>

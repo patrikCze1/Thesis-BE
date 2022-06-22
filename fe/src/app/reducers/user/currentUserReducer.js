@@ -84,16 +84,16 @@ export default function currentUserReducer(state = initialState, action) {
   }
 }
 
-export const loginAction = (email, password, history) => async (dispatch) => {
+export const loginAction = (data, history) => async (dispatch) => {
   dispatch({ type: "currentuser/actionStart" });
   try {
     const response = await axios.post(
       `/api/auth/login`,
-      { email, password },
+      { ...data },
       {
         auth: {
-          username: email,
-          password: password,
+          username: data.email,
+          password: data.password,
         },
       }
     );
@@ -102,6 +102,7 @@ export const loginAction = (email, password, history) => async (dispatch) => {
       "typeof response.data.user.roles",
       typeof response.data.user.roles
     );
+    //get csrf token
     await axios.get(`/api/me/csrf`);
 
     const user = {

@@ -27,7 +27,7 @@ const {
   // todoRoutes,
   // timeTrackRoutes,
   // notificationRoutes,
-  // meRoutes,
+  meRoutes,
   // searchRoutes,
   // cronRoutes,
   companyRoutes,
@@ -112,7 +112,7 @@ app.use("/api/projects", projectRoutes);
 // app.use("/api/todos", todoRoutes);
 // app.use("/api/tracks", timeTrackRoutes);
 // app.use("/api/notifications", notificationRoutes);
-// app.use("/api/me", meRoutes);
+app.use("/api/me", meRoutes);
 // app.use("/api/search", searchRoutes);
 // app.use("/api/cron", cronRoutes);
 

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 
 const { ROLE } = require("../../enum/enum");
+const { decrypt } = require("../service/crypto");
 
 const { TokenExpiredError } = jwt;
 
@@ -71,12 +72,9 @@ const getUser = (req, res) => {
   }
 };
 
-const getCompanyKey = (req, res) => {
+const getCompanyKey = (req) => {
   try {
-    const token = getUserToken(req, res);
-    const { companyKey } = token;
-
-    return companyKey;
+    return decrypt(req.cookies["Company-Key"]);
   } catch (error) {
     console.log("getCompanyKey", error);
     return null;

@@ -41,6 +41,7 @@ const syncDbConnection = (connection) => {
 };
 
 const getDatabaseModels = (key) => {
+  if (!(key in connections)) throw new Error("Společnost neexistuje");
   console.log("connections", connections);
   return connections[key].models;
 };

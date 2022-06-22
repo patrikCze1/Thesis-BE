@@ -11,7 +11,8 @@ const {
 } = require("../../auth/auth");
 const { sendMail } = require("../../email/config");
 const { createHashedPassword } = require("../../service/user.service");
-const { getDatabaseModels, getDatabaseConnection } = require("../../models");
+const { getDatabaseModels } = require("../../models");
+const { encrypt } = require("../../service/crypto");
 
 const router = express.Router();
 
@@ -55,6 +56,10 @@ router.post("/login", async (req, res) => {
             httpOnly: true,
           })
           .cookie("Refresh-Token", refreshToken, {
+            secure: process.env.NODE_ENV === "production",
+            httpOnly: true,
+          })
+          .cookie("Company-Key", encrypt(ck), {
             secure: process.env.NODE_ENV === "production",
             httpOnly: true,
           })

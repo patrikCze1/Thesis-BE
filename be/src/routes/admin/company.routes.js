@@ -72,13 +72,13 @@ router.post("/", async (req, res) => {
       replacement: "_",
       lower: true,
       remove: /[*+~.()'"!:@]/g,
-    });
+    }).toLowerCase();
     console.log("key", key);
     const existingCompany = await sequelizeAdmin.models.Company.findOne({
       where: { [Op.or]: [{ key }, { email: req.body.email }] },
     });
     console.log("existingCompany", existingCompany);
-    if (existingCompany) {
+    if (existingCompany || key === "admin") {
       return res
         .status(400)
         .json({ message: req.t("auth.error.companyAlreadyExists") });
@@ -105,6 +105,7 @@ router.post("/", async (req, res) => {
       verificationCode,
     });
 
+    // todo pridat prihlasovaci udaje
     await sendMail(
       req.body.email,
       "Potvrzení registrace",

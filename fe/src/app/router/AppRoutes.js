@@ -18,10 +18,9 @@ import TodoScreen from "../components/myTodo/TodoScreen";
 import { ROLES, ROUTE } from "../../utils/enum";
 import TaskArchiveScreen from "../components/task/TaskArchiveScreen";
 import TaskBacklogScreen from "../components/task/TaskBacklogScreen";
-import Login from "../components/auth/Login";
 import ForgottenPassword from "../components/auth/ForgottenPassword";
 import ResetPassword from "../components/auth/ResetPassword";
-import { Register } from "./../screen/auth";
+import { Register, Login } from "./../screen/auth";
 
 //https://reactnavigation.org/docs/auth-flow/
 export default function AppRoutes() {

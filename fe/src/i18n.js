@@ -339,6 +339,7 @@ i18n
             fileDeleted: "Soubor odstraněn",
             companyId: "IČO",
             companyName: "Název společnosti",
+            companyKey: "Společnosti",
             phone: "Telefon",
             register: "Registrovat",
             firstName: "Jméno",
