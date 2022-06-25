@@ -1,11 +1,15 @@
 const express = require("express");
 const router = express.Router();
 
-const { Task, TaskCheck } = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+const {
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 const { responseError } = require("../../service/utils");
 const { ROLE } = require("../../../enum/enum");
+const { getDatabaseModels } = require("../../models");
 
 router.post("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -22,8 +26,10 @@ router.post("/", authenticateToken, async (req, res) => {
   const data = req.body;
 
   try {
-    const newRecord = await TaskCheck.create(data);
-    res.send({ success: true, check: newRecord });
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const newRecord = await db.TaskCheck.create(data);
+    res.json({ check: newRecord });
   } catch (error) {
     responseError(req, res, error);
   }
@@ -33,7 +39,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    const check = await TaskCheck.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const check = await db.TaskCheck.findByPk(req.params.id);
 
     const data = req.body;
 
@@ -52,8 +60,10 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    const check = await TaskCheck.findByPk(req.params.id);
-    const task = await Task.findByPk(check.taskId);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const check = await db.TaskCheck.findByPk(req.params.id);
+    const task = await db.Task.findByPk(check.taskId);
     const user = getUser(req, res);
 
     if (

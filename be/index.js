@@ -14,22 +14,22 @@ const io = require("./src/service/io").init(server);
 const { initConnections } = require("./src/models/index");
 const {
   projectRoutes,
-  // boardRoutes,
-  // stageRoutes,
-  // clientRoutes,
-  // taskRoutes,
-  // taskAttachmentRoutes,
-  // taskCommentRoutes,
-  // taskCheckRoutes,
+  boardRoutes,
+  stageRoutes,
+  clientRoutes,
+  taskRoutes,
+  taskAttachmentRoutes,
+  taskCommentRoutes,
+  taskCheckRoutes,
   authRoutes,
-  // userRoutes,
-  // groupRoutes,
-  // todoRoutes,
-  // timeTrackRoutes,
-  // notificationRoutes,
+  userRoutes,
+  groupRoutes,
+  todoRoutes,
+  timeTrackRoutes,
+  notificationRoutes,
   meRoutes,
-  // searchRoutes,
-  // cronRoutes,
+  searchRoutes,
+  cronRoutes,
   companyRoutes,
 } = require("./src/routes");
 const { connect, disconnect } = require("./src/service/io");
@@ -100,21 +100,21 @@ io.on("connection", (socket) => {
 
 // List of routes
 app.use("/api/projects", projectRoutes);
-// app.use("/api/projects", boardRoutes);
-// app.use("/api/boards", stageRoutes);
-// app.use("/api/clients", clientRoutes);
-// app.use("/api/projects", taskRoutes);
-// app.use("/api/tasks", taskCommentRoutes);
-// app.use("/api/tasks", taskAttachmentRoutes);
-// app.use("/api/tasks/checks", taskCheckRoutes);
-// app.use("/api/users", userRoutes);
-// app.use("/api/groups", groupRoutes);
-// app.use("/api/todos", todoRoutes);
-// app.use("/api/tracks", timeTrackRoutes);
-// app.use("/api/notifications", notificationRoutes);
+app.use("/api/projects", boardRoutes);
+app.use("/api/boards", stageRoutes);
+app.use("/api/clients", clientRoutes);
+app.use("/api/projects", taskRoutes);
+app.use("/api/tasks", taskCommentRoutes);
+app.use("/api/tasks", taskAttachmentRoutes);
+app.use("/api/tasks/checks", taskCheckRoutes);
+app.use("/api/users", userRoutes);
+app.use("/api/groups", groupRoutes);
+app.use("/api/todos", todoRoutes);
+app.use("/api/tracks", timeTrackRoutes);
+app.use("/api/notifications", notificationRoutes);
 app.use("/api/me", meRoutes);
-// app.use("/api/search", searchRoutes);
-// app.use("/api/cron", cronRoutes);
+app.use("/api/search", searchRoutes);
+app.use("/api/cron", cronRoutes);
 
 if (process.env.NODE_ENV === "production") {
   app.use(express.static(path.resolve(__dirname, "./client")));

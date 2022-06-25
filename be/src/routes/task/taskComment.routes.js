@@ -6,12 +6,10 @@ const multer = require("multer");
 const fs = require("fs");
 
 const {
-  TaskComment,
-  TaskCommentAttachment,
-  User,
-  Task,
-} = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -39,6 +37,7 @@ const {
   createTaskNotification,
 } = require("../../service/notification/notification.service");
 const { getFeUrl, responseError } = require("../../service/utils");
+const { getDatabaseModels } = require("../../models");
 const io = getIo();
 
 router.post(
@@ -58,6 +57,8 @@ router.post(
     }
 
     try {
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
       const user = getUser(req, res);
       const data = {
         text: body.text,
@@ -65,16 +66,16 @@ router.post(
         userId: user.id,
       };
 
-      const newComment = await TaskComment.create(data);
+      const newComment = await db.TaskComment.create(data);
 
       const mentionedUsers = data.text.match(mentionRegex);
       console.log("mentionedUsers", mentionedUsers);
 
       if (Array.isArray(mentionedUsers) && mentionedUsers.length > 0) {
-        const task = await Task.findByPk(data.taskId);
+        const task = await db.Task.findByPk(data.taskId);
 
         for (const mention of mentionedUsers) {
-          const mentionUser = await User.findOne({
+          const mentionUser = await db.User.findOne({
             where: { username: mention.substring(1) },
           });
 
@@ -121,7 +122,7 @@ router.post(
         await Promise.all(
           req.files.map(async (file) => {
             try {
-              const attach = await TaskCommentAttachment.create({
+              const attach = await db.TaskCommentAttachment.create({
                 commentId: newComment.id,
                 originalName: file.originalname,
                 file: file.filename,
@@ -141,8 +142,8 @@ router.post(
       newComment.setDataValue("taskCommentUser", user);
       newComment.setDataValue("createdAt", new Date());
 
-      const task = await Task.findByPk(req.params.taskId);
-      const projectUsers = await findUsersByProject(task.projectId);
+      const task = await db.Task.findByPk(req.params.taskId);
+      const projectUsers = await findUsersByProject(db, task.projectId);
       for (const u of projectUsers) {
         console.log("socket ", u.id);
 
@@ -160,7 +161,9 @@ router.post(
 
 router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
-    let taskComment = await TaskComment.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    let taskComment = await db.TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
 
     if (user.id !== taskComment.userId) {
@@ -181,7 +184,9 @@ router.patch("/:taskId/comments/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
   try {
-    const comment = await TaskComment.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const comment = await db.TaskComment.findByPk(req.params.id);
     const user = getUser(req, res);
 
     if (comment.userId !== user.id && !user.roles.includes(ROLE.ADMIN)) {
@@ -191,14 +196,14 @@ router.delete("/:taskId/comments/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    const attachments = await TaskCommentAttachment.findAll({
+    const attachments = await db.TaskCommentAttachment.findAll({
       where: {
         commentId: req.params.id,
       },
     });
     const files = attachments.map(async (attachment) => {
       try {
-        const attach = await TaskCommentAttachment.findByPk(attachment.id);
+        const attach = await db.TaskCommentAttachment.findByPk(attachment.id);
         const path = attach.path;
         await attach.destroy();
         return path;
@@ -224,8 +229,10 @@ router.delete(
   authenticateToken,
   async (req, res) => {
     try {
-      const attachment = await TaskCommentAttachment.findByPk(req.params.id);
-      const comment = await TaskComment.findByPk(attachment.commentId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const attachment = await db.TaskCommentAttachment.findByPk(req.params.id);
+      const comment = await db.TaskComment.findByPk(attachment.commentId);
       // const task = await Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
 

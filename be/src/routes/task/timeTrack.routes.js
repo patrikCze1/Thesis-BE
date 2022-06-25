@@ -1,16 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const { TimeTrack, User, Project } = require("../../models/modelHelper");
-const { authenticateToken, getUser } = require("../../auth/auth");
-
 const { Op } = require("sequelize");
+
+const {
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
+
 const { validator } = require("../../service");
 const { SOCKET_EMIT } = require("../../../enum/enum");
 const { getIo } = require("../../service/io");
 const { responseError } = require("../../service/utils");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
-  const user = getUser(req, res);
+  // const user = getUser(req, res);
   // const permission = ac.can(user.role).readAny("timeTrack");
   // if (!permission.granted) {
   //   res.status(403).json({ success: false });
@@ -31,12 +36,14 @@ router.get("/", authenticateToken, async (req, res) => {
   if (projectId) where.projectId = parseInt(projectId);
 
   try {
-    const tracks = await TimeTrack.findAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const tracks = await db.TimeTrack.findAll({
       where: where,
       include: [
-        { model: User, as: "user" },
+        { model: db.User, as: "user" },
         {
-          model: Project,
+          model: db.Project,
           as: "project",
           attributes: ["name", "id"],
         },
@@ -78,17 +85,19 @@ router.get("/me/", authenticateToken, async (req, res) => {
   }
 
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     let tracks, activeTrack;
     if (Boolean(req.query.returnTracks) === true) {
-      tracks = await TimeTrack.findAndCountAll({
+      tracks = await db.TimeTrack.findAndCountAll({
         where,
         include: [
           {
-            model: User,
+            model: db.User,
             as: "user",
           },
           {
-            model: Project,
+            model: db.Project,
             as: "project",
             attributes: ["name", "id"],
           },
@@ -105,7 +114,7 @@ router.get("/me/", authenticateToken, async (req, res) => {
     }
 
     if (Boolean(req.query.returnActive) === true) {
-      activeTrack = await TimeTrack.findOne({
+      activeTrack = await db.TimeTrack.findOne({
         where: { userId: user.id, endAt: null },
       });
     }
@@ -139,8 +148,10 @@ router.post("/", authenticateToken, async (req, res) => {
   };
 
   try {
-    const track = await TimeTrack.create(data);
-    res.send({ track });
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const track = await db.TimeTrack.create(data);
+    res.json({ track });
   } catch (error) {
     responseError(req, res, error);
   }
@@ -150,7 +161,9 @@ router.post("/start/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    const activeTracks = await TimeTrack.findAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const activeTracks = await db.TimeTrack.findAll({
       where: {
         endAt: {
           [Op.is]: null,
@@ -174,8 +187,8 @@ router.post("/start/", authenticateToken, async (req, res) => {
       // taskId: taskId,
     };
 
-    const track = await TimeTrack.create(data);
-    res.send({ track });
+    const track = await db.TimeTrack.create(data);
+    res.json({ track });
   } catch (error) {
     responseError(req, res, error);
   }
@@ -185,8 +198,10 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const io = getIo();
-    let track = await TimeTrack.findByPk(req.params.id);
+    let track = await db.TimeTrack.findByPk(req.params.id);
     console.log(track);
     if (track.userId != user.id) {
       res.status(403).json({
@@ -203,13 +218,13 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
     if (projectId) {
       track.setDataValue(
         "project",
-        await Project.findByPk(projectId, { attributes: ["id", "name"] })
+        await db.Project.findByPk(projectId, { attributes: ["id", "name"] })
       );
     }
 
     io.to(user.id).emit(SOCKET_EMIT.TIME_TRACK_STOP, { id: req.params.id });
 
-    res.send({ track });
+    res.json({ track });
   } catch (error) {
     responseError(req, res, error);
   }
@@ -219,7 +234,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    let track = await TimeTrack.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    let track = await db.TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
       res.status(403).json({
@@ -248,7 +265,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    const track = await TimeTrack.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const track = await db.TimeTrack.findByPk(req.params.id);
 
     if (track.userId != user.id) {
       res.status(403).json({

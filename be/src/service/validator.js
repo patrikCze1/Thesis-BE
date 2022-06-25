@@ -21,12 +21,12 @@ const validateRequiredFields = (fieldsArray, object) => {
  * @param {User} user
  * @returns {boolean}
  */
-const isUserInProject = async (user, id) => {
-  const userProjects = await projectRepo.findByUser(user, {});
-  return userProjects.rows.find((project) => project.id == id);
-};
+// const isUserInProject = async (user, id) => {
+//   const userProjects = await projectRepo.findByUser(user, {});
+//   return userProjects.rows.find((project) => project.id == id);
+// };
 
 module.exports = {
   validateRequiredFields,
-  isUserInProject,
+  // isUserInProject,
 };

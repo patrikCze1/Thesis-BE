@@ -17,7 +17,7 @@ const { isUserInProject } = require("../../repo/project/project.repository");
 const io = getIo();
 
 router.get("/", authenticateToken, async (req, res) => {
-  const ck = getCompanyKey(req, res);
+  const ck = getCompanyKey(req);
   const user = getUser(req, res);
 
   let projects;
@@ -26,7 +26,7 @@ router.get("/", authenticateToken, async (req, res) => {
     const filter = req.query;
     // only admin can see all projects
     if (user.roles.includes(ROLE.ADMIN)) {
-      projects = await getDatabaseModels(ck).Project.findAndCountAll({
+      projects = await dbModels.Project.findAndCountAll({
         include: [
           {
             model: dbModels.Client,
@@ -56,9 +56,11 @@ router.get("/:id", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
+    const ck = getCompanyKey(req, res);
+    const db = getDatabaseModels(ck);
     if (!user.roles.includes(ROLE.ADMIN)) {
       // only admin can see all projects
-      const result = await isUserInProject(req.params.id, user.id);
+      const result = await isUserInProject(db, req.params.id, user.id);
 
       if (!result) {
         res.status(403).json({
@@ -67,15 +69,13 @@ router.get("/:id", authenticateToken, async (req, res) => {
         return;
       }
     }
-    const ck = getCompanyKey(req, res);
-    const dbModels = getDatabaseModels(ck);
 
-    const project = await dbModels.Project.findByPk(req.params.id, {
+    const project = await db.Project.findByPk(req.params.id, {
       include: [
-        { model: dbModels.Client },
-        { model: dbModels.User, as: "creator" },
-        { model: dbModels.Group, as: "groups" },
-        { model: dbModels.User, as: "users" },
+        { model: db.Client },
+        { model: db.User, as: "creator" },
+        { model: db.Group, as: "groups" },
+        { model: db.User, as: "users" },
       ],
     });
 

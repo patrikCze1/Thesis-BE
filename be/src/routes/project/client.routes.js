@@ -2,11 +2,15 @@ const express = require("express");
 const router = express.Router();
 const { Op } = require("sequelize");
 
-const { Client, Project } = require("../../models/modelHelper");
-const { authenticateToken, getUser } = require("../../auth/auth");
+const {
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   const currentUser = getUser(req, res);
@@ -20,7 +24,9 @@ router.get("/", authenticateToken, async (req, res) => {
   }
 
   try {
-    const clients = await Client.findAndCountAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const clients = await db.Client.findAndCountAll({
       where: {
         name: {
           [Op.like]: req.query.name ? `%${req.query.name}%` : "%",
@@ -53,8 +59,10 @@ router.get("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const client = await Client.findByPk(req.params.id, {
-      include: [{ model: Project, as: "projects" }],
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const client = await db.Client.findByPk(req.params.id, {
+      include: [{ model: db.Project, as: "projects" }],
     });
 
     if (!client) {
@@ -93,7 +101,9 @@ router.post("/", authenticateToken, async (req, res) => {
   const data = req.body;
 
   try {
-    const newRecord = await Client.create(data);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const newRecord = await db.Client.create(data);
     res.send({ success: true, client: newRecord });
   } catch (error) {
     responseError(req, res, error);
@@ -114,7 +124,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const client = await Client.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const client = await db.Client.findByPk(req.params.id);
     if (!client) {
       res.status(404).json({});
       return;
@@ -142,7 +154,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const client = await Client.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const client = await db.Client.findByPk(req.params.id);
     await client.destroy();
 
     res.json({ success: true, message: "Success" });

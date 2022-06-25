@@ -55,13 +55,14 @@ exports.findByUser = async (models, user, filter) => {
 
 /**
  *
+ * @param {DbModels} db
  * @param {Object} user
  * @param {string} query
  * @param {Object} filter
  * @returns
  */
-exports.findBySearch = async (user, query, filter) => {
-  return await Project.findAll({
+exports.findBySearch = async (db, user, query, filter) => {
+  return await db.Project.findAll({
     subQuery: false,
     where: {
       [Op.or]: [
@@ -75,17 +76,17 @@ exports.findBySearch = async (user, query, filter) => {
     },
     include: [
       {
-        model: Group,
+        model: db.Group,
         as: "groups",
         attributes: [],
         include: {
-          model: User,
+          model: db.User,
           as: "groupUsers",
           attributes: [],
         },
       },
       {
-        model: User,
+        model: db.User,
         as: "users",
         attributes: [],
       },
@@ -107,9 +108,9 @@ exports.findBySearch = async (user, query, filter) => {
  * @param {number} userId
  * @returns {boolean}
  */
-exports.isUserInProject = async (projectId, userId) => {
+exports.isUserInProject = async (db, projectId, userId) => {
   try {
-    const project = await Project.findOne({
+    const project = await db.Project.findOne({
       subQuery: false,
       where: {
         [Op.or]: [
@@ -121,17 +122,17 @@ exports.isUserInProject = async (projectId, userId) => {
       },
       include: [
         {
-          model: Group,
+          model: db.Group,
           as: "groups",
           attributes: [],
           include: {
-            model: User,
+            model: db.User,
             as: "groupUsers",
             attributes: [],
           },
         },
         {
-          model: User,
+          model: db.User,
           as: "users",
           attributes: [],
         },

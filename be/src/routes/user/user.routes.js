@@ -1,26 +1,27 @@
 const express = require("express");
 const router = express.Router();
 
-const { authenticateToken, getUser } = require("../../auth/auth");
+const {
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 
-const {
-  User,
-  TimeTrack,
-  UserGroup,
-  ProjectUser,
-} = require("../../models/modelHelper");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
 const { createHashedPassword } = require("../../service/user.service");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const where = {};
 
     if (req.query.withDeactivated !== "true") where.deactivated = false;
-    const users = await User.findAll({
+    const users = await db.User.findAll({
       where,
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.page ? parseInt(req.query.page) : 0,
@@ -43,7 +44,9 @@ router.get("/", authenticateToken, async (req, res) => {
  */
 router.get("/project/:id", authenticateToken, async (req, res) => {
   try {
-    const users = await findUsersByProject(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const users = await findUsersByProject(db, req.params.id);
 
     res.json({ users });
   } catch (error) {
@@ -53,7 +56,9 @@ router.get("/project/:id", authenticateToken, async (req, res) => {
 
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const user = await db.User.findByPk(req.params.id);
 
     res.json({ user });
   } catch (error) {
@@ -63,7 +68,9 @@ router.get("/:id", authenticateToken, async (req, res) => {
 
 router.get("/:userId/tracks", authenticateToken, async (req, res) => {
   try {
-    const items = await TimeTrack.findAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const items = await db.TimeTrack.findAll({
       where: {
         UserId: req.params.userId,
       },
@@ -97,11 +104,13 @@ router.post("/", authenticateToken, async (req, res) => {
   }
   //todo set role if role is empty
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const hashedPassword = await createHashedPassword(req.body.password);
     const data = req.body;
     data.password = hashedPassword;
 
-    const savedUser = await User.create(data);
+    const savedUser = await db.User.create(data);
 
     res.json({ user: savedUser });
   } catch (e) {
@@ -123,7 +132,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const user = await User.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const user = await db.User.findByPk(req.params.id);
     const updated = await user.update({ ...req.body });
 
     res.json({ user: updated });
@@ -146,13 +157,15 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const removedUser = await User.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const removedUser = await db.User.findByPk(req.params.id);
     console.log("removedUser", removedUser);
 
     await removedUser.destroy();
 
-    await UserGroup.destroy({ where: { userId: req.params.id } });
-    await ProjectUser.destroy({ where: { userId: req.params.id } });
+    await db.UserGroup.destroy({ where: { userId: req.params.id } });
+    await db.ProjectUser.destroy({ where: { userId: req.params.id } });
 
     res.json();
   } catch (error) {

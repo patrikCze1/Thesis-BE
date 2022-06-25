@@ -1,16 +1,17 @@
 const express = require("express");
 const router = express.Router();
+
 const {
-  TaskAttachment,
-  TaskChangeLog,
-  Task,
-} = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const crypto = require("crypto");
 var path = require("path");
 const multer = require("multer");
 const fs = require("fs");
 const { ROLE } = require("../../../enum/enum");
+const { getDatabaseModels } = require("../../models");
 var storage = multer.diskStorage({
   destination: (req, file, cb) => {
     const dir = `public/uploads/task/${req.params.taskId}/`;
@@ -32,7 +33,9 @@ router.post(
   [upload.array("files", 10), authenticateToken],
   async (req, res) => {
     try {
-      const task = await Task.findByPk(req.params.taskId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const task = await db.Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
 
       if (
@@ -48,7 +51,7 @@ router.post(
 
       let attachments = [];
       for (const file of req.files) {
-        const attachment = await TaskAttachment.create({
+        const attachment = await db.TaskAttachment.create({
           taskId: req.params.taskId,
           originalName: file.originalname,
           file: file.filename,
@@ -59,7 +62,7 @@ router.post(
         });
         attachments = [...attachments, attachment];
 
-        await TaskChangeLog.create({
+        await db.TaskChangeLog.create({
           taskId: req.params.taskId,
           userId: user.id,
           name: `Nahrání přílohy: ${file.originalname}`,
@@ -78,7 +81,9 @@ router.delete(
   authenticateToken,
   async (req, res) => {
     try {
-      const task = await Task.findByPk(req.params.taskId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const task = await db.Task.findByPk(req.params.taskId);
       const user = getUser(req, res);
       if (
         !user.roles.includes(ROLE.ADMIN) &&
@@ -91,12 +96,12 @@ router.delete(
         return;
       }
 
-      const attachment = await TaskAttachment.findByPk(req.params.id);
+      const attachment = await db.TaskAttachment.findByPk(req.params.id);
       fs.unlinkSync(attachment.path);
       const origName = attachment.originalName;
       await attachment.destroy();
 
-      await TaskChangeLog.create({
+      await db.TaskChangeLog.create({
         taskId: req.params.taskId,
         userId: user.id,
         name: `Smazání přílohy: ${origName}`,

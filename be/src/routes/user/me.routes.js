@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { User, Group } = require("../../models/modelHelper");
 
-const { authenticateToken, getUser } = require("../../auth/auth");
+const {
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
+const { getDatabaseModels } = require("../../models");
 const { createHashedPassword } = require("../../service/user.service");
 
 /**
@@ -10,15 +14,17 @@ const { createHashedPassword } = require("../../service/user.service");
  */
 router.get("/groups", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
+  const ck = getCompanyKey(req);
 
   try {
-    const groups = await Group.findAll({
+    const db = getDatabaseModels(ck);
+    const groups = await db.Group.findAll({
       where: {
         "$groupUser.id$": user.id,
       },
       include: [
         {
-          model: User,
+          model: db.User,
           as: "groupUser",
           attributes: [],
         },
@@ -31,9 +37,11 @@ router.get("/groups", authenticateToken, async (req, res) => {
 });
 
 router.patch("/change-password", authenticateToken, async (req, res) => {
+  const ck = getCompanyKey(req);
   try {
+    const db = getDatabaseModels(ck);
     const me = getUser(req, res);
-    let user = await User.findByPk(me.id);
+    let user = await db.User.findByPk(me.id);
 
     const { password, passwordAgain } = req.body;
 
@@ -68,9 +76,12 @@ router.patch("/change-password", authenticateToken, async (req, res) => {
 });
 
 router.patch("/update", authenticateToken, async (req, res) => {
+  const ck = getCompanyKey(req);
+
   try {
+    const db = getDatabaseModels(ck);
     const me = getUser(req, res);
-    const user = await User.findByPk(me.id);
+    const user = await db.User.findByPk(me.id);
 
     Object.keys(req.body).forEach((key) => {
       user[key] = req.body[key];

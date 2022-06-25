@@ -1,17 +1,18 @@
 const express = require("express");
 const router = express.Router();
 
-const { Board, Stage } = require("../../models/modelHelper");
 const {
   authenticateToken,
   getUser,
   managementAccessOnly,
+  getCompanyKey,
 } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { SOCKET_EMIT, ROLE } = require("../../../enum/enum");
 const { getIo } = require("../../service/io");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
+const { getDatabaseModels } = require("../../models");
 
 const io = getIo();
 
@@ -39,10 +40,11 @@ router.post(
     };
 
     try {
-      const stage = await Stage.create(data);
-
-      const board = await Board.findByPk(req.params.boardId);
-      const projectUsers = await findUsersByProject(board.projectId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const stage = await db.Stage.create(data);
+      const board = await db.Board.findByPk(req.params.boardId);
+      const projectUsers = await findUsersByProject(db, board.projectId);
 
       res.json({ stage });
 
@@ -60,17 +62,19 @@ router.patch(
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
     try {
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
       const { stages } = req.body;
 
       for (const stage of stages) {
         if (stage.limit < 1) stage.limit = null;
-        await Stage.update(stage, {
+        await db.Stage.update(stage, {
           where: { id: stage.id, boardId: req.params.boardId },
         });
       }
 
-      const board = await Board.findByPk(req.params.boardId);
-      const projectUsers = await findUsersByProject(board.projectId);
+      const board = await db.Board.findByPk(req.params.boardId);
+      const projectUsers = await findUsersByProject(db, board.projectId);
 
       res.json({ stages });
 
@@ -101,7 +105,9 @@ router.delete("/stages/:id", authenticateToken, async (req, res) => {
 
   const { id } = req.params;
   try {
-    await Stage.destroy({ where: { id } });
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    await db.Stage.destroy({ where: { id } });
     res.json({ success: true });
 
     io.emit(SOCKET_EMIT.BOARD_STAGE_DELETE, { id });

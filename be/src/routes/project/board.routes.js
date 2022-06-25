@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { Board, Stage } = require("../../models/modelHelper");
+
 const {
   getUser,
   authenticateToken,
   managementAccessOnly,
+  getCompanyKey,
 } = require("../../auth/auth");
 const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
@@ -12,13 +13,16 @@ const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
 const { isUserInProject } = require("../../repo/project/project.repository");
-const { sequelize } = require("../../models");
+const { sequelize, getDatabaseModels } = require("../../models");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
 
   try {
-    const allowEntry = await isUserInProject(req.params.projectId, user.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+
+    const allowEntry = await isUserInProject(db, req.params.projectId, user.id);
     if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
       res.status(403).json({
         message: req.t("project.error.userHasNotAccessToThisProject"),
@@ -26,7 +30,7 @@ router.get("/:projectId/boards", authenticateToken, async (req, res) => {
       return;
     }
 
-    const boards = await Board.findAll({
+    const boards = await db.Board.findAll({
       where: { projectId: req.params.projectId },
       order: [
         [sequelize.fn("isnull", sequelize.col("beginAt")), "DESC"],
@@ -46,7 +50,13 @@ router.get(
     const user = getUser(req, res);
 
     try {
-      const allowEntry = await isUserInProject(req.params.projectId, user.id);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const allowEntry = await isUserInProject(
+        db,
+        req.params.projectId,
+        user.id
+      );
       if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
         res.status(403).json({
           message: req.t("project.error.userHasNotAccessToThisProject"),
@@ -54,8 +64,8 @@ router.get(
         return;
       }
 
-      const board = await Board.findByPk(req.params.boardId);
-      const stages = await Stage.findAll({
+      const board = await db.Board.findByPk(req.params.boardId);
+      const stages = await db.Stage.findAll({
         where: { boardId: req.params.boardId },
         order: [["order", "ASC"]],
       });
@@ -98,24 +108,27 @@ router.post(
     }
 
     try {
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+
       const socket = getIo();
-      const board = await Board.create(data);
+      const board = await db.Board.create(data);
       console.log("board", board);
-      Stage.create({
+      db.Stage.create({
         name: req.t("stage.todo"),
         order: 1,
         projectId,
         boardId: board.id,
         type: STAGE_TYPE.WAITING,
       });
-      Stage.create({
+      db.Stage.create({
         name: req.t("stage.workInProgress"),
         order: 2,
         projectId,
         boardId: board.id,
         type: STAGE_TYPE.IN_PROGRESS,
       });
-      Stage.create({
+      db.Stage.create({
         name: req.t("stage.complete"),
         order: 3,
         projectId,
@@ -123,7 +136,7 @@ router.post(
         type: STAGE_TYPE.COMPLETED,
       });
 
-      const projectUsers = await findUsersByProject(projectId);
+      const projectUsers = await findUsersByProject(db, projectId);
 
       res.json({ board });
 
@@ -149,7 +162,9 @@ router.patch(
     }
 
     try {
-      const b = await Board.findByPk(req.params.boardId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const b = await db.Board.findByPk(req.params.boardId);
 
       const board = await b.update(data);
 
@@ -165,7 +180,9 @@ router.delete(
   [authenticateToken, managementAccessOnly],
   async (req, res) => {
     try {
-      const board = await Board.findByPk(req.params.boardId);
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const board = await db.Board.findByPk(req.params.boardId);
       if (!board) {
         res
           .status(404)

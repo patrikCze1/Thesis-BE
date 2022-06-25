@@ -1,60 +1,58 @@
-const { sequelize: db } = require("./../models");
-const User = db.User;
-const Op = db.Sequelize.Op;
 const { QueryTypes } = require("sequelize");
-const generateAccessToken = require("./../auth/auth");
 
-exports.create = async (req, res) => {
-  // Validate request
-  if (!req.body.username) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-      data: req.body,
-    });
-    return;
-  }
+// const generateAccessToken = require("./../auth/auth");
 
-  const user = {
-    username: req.body.username,
-    password: req.body.password,
-  };
+// exports.create = async (req, res) => {
+//   // Validate request
+//   if (!req.body.username) {
+//     res.status(400).send({
+//       message: "Content can not be empty!",
+//       data: req.body,
+//     });
+//     return;
+//   }
 
-  User.create(user)
-    .then((data) => {
-      console.log(data);
-      // res.send(data);
-      const token = generateAccessToken({ userId: data.id });
-      res.send(token);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating the user.",
-      });
-    });
-};
+//   const user = {
+//     username: req.body.username,
+//     password: req.body.password,
+//   };
 
-// Retrieve all Tutorials from the database.
-exports.findAll = (req, res) => {
-  User.findAll()
-    .then((data) => {
-      res.send(data);
-    })
-    .catch((err) => {
-      res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users.",
-      });
-    });
-};
+//   User.create(user)
+//     .then((data) => {
+//       console.log(data);
+//       // res.send(data);
+//       const token = generateAccessToken({ userId: data.id });
+//       res.send(token);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: err.message || "Some error occurred while creating the user.",
+//       });
+//     });
+// };
 
-exports.findByEmailAndPassword = async (email, password) => {
-  const user = await User.findOne({
-    where: { email: email, password: password },
-  });
+// Retrieve all users from the database.
+// exports.findAll = (req, res) => {
+//   User.findAll()
+//     .then((data) => {
+//       res.send(data);
+//     })
+//     .catch((err) => {
+//       res.status(500).send({
+//         message: err.message || "Some error occurred while retrieving users.",
+//       });
+//     });
+// };
 
-  return user;
-};
+// exports.findByEmailAndPassword = async (email, password) => {
+//   const user = await User.findOne({
+//     where: { email: email, password: password },
+//   });
 
-exports.findUsersByProject = async (id) => {
+//   return user;
+// };
+
+exports.findUsersByProject = async (db, id) => {
   try {
     return await db.query(
       `

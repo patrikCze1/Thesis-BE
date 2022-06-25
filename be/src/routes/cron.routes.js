@@ -22,16 +22,16 @@ router.get("/daily", async (req, res) => {
   try {
     //todo for each company
     const ck = getCompanyKey(req, res);
-    const dbModels = getDatabaseModels(ck);
+    const db = getDatabaseModels(ck);
     const io = getIo();
-    const tasks = await taskRepo.findTasksWithDeadlineIn24h(dbModels);
+    const tasks = await taskRepo.findTasksWithDeadlineIn24h(db);
 
     for (const task of tasks) {
       console.log(task.id);
 
       if (task.solverId) {
         const n = await createTaskNotification(
-          dbModels,
+          db,
           task.id,
           `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
           // req.t("task.message.deadlineIn24Hours", {
@@ -47,7 +47,7 @@ router.get("/daily", async (req, res) => {
         });
       } else {
         const n = await createTaskNotification(
-          dbModels,
+          db,
           task.id,
           `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
           // req.t("task.message.deadlineIn24Hours", {

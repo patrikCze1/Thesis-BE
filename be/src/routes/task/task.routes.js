@@ -3,17 +3,10 @@ const router = express.Router();
 const { Op } = require("sequelize");
 
 const {
-  Task,
-  TaskAttachment,
-  User,
-  TaskComment,
-  TaskCommentAttachment,
-  TaskCheck,
-  TaskChangeLog,
-  Project,
-  Stage,
-} = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { validator } = require("../../service");
 const { getIo } = require("../../service/io");
 const {
@@ -24,12 +17,11 @@ const {
 } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
-const { sequelize } = require("../../models");
+const { sequelize, getDatabaseModels } = require("../../models");
 const {
   sendEmailNotification,
   createTaskNotification,
 } = require("../../service/notification/notification.service");
-const { findOneById } = require("../../repo/user/user.repository");
 const { stageRepo } = require("../../repo");
 const {
   getFeTaskUrl,
@@ -42,13 +34,19 @@ const { isUserInProject } = require("../../repo/project/project.repository");
 router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const where = {};
     const { projectId } = req.params;
     const skipParams = ["offset", "limit", "orderBy", "sort"];
 
     if (projectId && projectId != "-1") {
       where.ProjectId = projectId;
-      const allowEntry = await isUserInProject(req.params.projectId, user.id);
+      const allowEntry = await isUserInProject(
+        db,
+        req.params.projectId,
+        user.id
+      );
       if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
         res.status(403).json({
           message: req.t("project.error.userHasNotAccessToThisProject"),
@@ -69,7 +67,7 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
     }
 
     console.log("where", where);
-    const tasks = await Task.findAndCountAll({
+    const tasks = await db.Task.findAndCountAll({
       subQuery: false,
       attributes: {
         include: [
@@ -86,17 +84,17 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
       where,
       include: [
         {
-          model: User,
+          model: db.User,
           as: "creator",
         },
-        { model: User, as: "solver" },
-        { model: Project, as: "project" },
+        { model: db.User, as: "solver" },
+        { model: db.Project, as: "project" },
         {
-          model: TaskAttachment,
+          model: db.TaskAttachment,
           as: "attachments",
           attributes: [],
         },
-        { model: TaskComment, as: "taskComments", attributes: [] },
+        { model: db.TaskComment, as: "taskComments", attributes: [] },
       ],
       limit: req.query.limit ? parseInt(req.query.limit) : null,
       offset: req.query.offset ? parseInt(req.query.offset) : 0,
@@ -143,7 +141,9 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   // }
 
   try {
-    const allowEntry = await isUserInProject(req.params.projectId, user.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const allowEntry = await isUserInProject(db, req.params.projectId, user.id);
     if (!allowEntry && !user.roles.includes(ROLE.ADMIN)) {
       res.status(403).json({
         message: req.t("project.error.userHasNotAccessToThisProject"),
@@ -151,32 +151,32 @@ router.get("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       return;
     }
 
-    const task = await Task.findOne({
+    const task = await db.Task.findOne({
       where: {
         id: req.params.id,
       },
       include: [
-        { model: TaskAttachment, as: "attachments" },
-        { model: Task, as: "parent" },
-        { model: User, as: "creator" },
+        { model: db.TaskAttachment, as: "attachments" },
+        { model: db.Task, as: "parent" },
+        { model: db.User, as: "creator" },
         // { model: User, as: "solver" },
         {
-          model: TaskComment,
+          model: db.TaskComment,
           as: "taskComments",
           include: [
-            { model: User, as: "taskCommentUser", required: true },
-            { model: TaskCommentAttachment, as: "commentAttachments" },
+            { model: db.User, as: "taskCommentUser", required: true },
+            { model: db.TaskCommentAttachment, as: "commentAttachments" },
           ],
         },
-        { model: TaskCheck, as: "checks" },
+        { model: db.TaskCheck, as: "checks" },
       ],
       order: [
-        [{ model: TaskComment, as: "taskComments" }, "createdAt", "DESC"],
+        [{ model: db.TaskComment, as: "taskComments" }, "createdAt", "DESC"],
       ],
     });
 
     if (task) {
-      const subtasks = await Task.findAll({
+      const subtasks = await db.Task.findAll({
         where: {
           parentId: req.params.id,
         },
@@ -198,11 +198,13 @@ router.get(
   authenticateToken,
   async (req, res) => {
     try {
-      const logs = await TaskChangeLog.findAll({
+      const ck = getCompanyKey(req);
+      const db = getDatabaseModels(ck);
+      const logs = await db.TaskChangeLog.findAll({
         where: {
           taskId: req.params.taskId,
         },
-        include: [{ model: User, as: "user" }],
+        include: [{ model: db.User, as: "user" }],
       });
       res.json({ logs });
     } catch (error) {
@@ -229,16 +231,19 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     return;
   }
 
-  const task = Task.build({
-    ...req.body,
-    projectId: parseInt(projectId) || projectId,
-    createdById: user.id,
-  });
-  console.log("task", task);
-
-  // if (task.boardId === "null") task.boardId = null;
-
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+
+    const task = db.Task.build({
+      ...req.body,
+      projectId: parseInt(projectId) || projectId,
+      createdById: user.id,
+    });
+    console.log("task", task);
+
+    // if (task.boardId === "null") task.boardId = null;
+
     if (task.boardId) {
       let firstStage = null;
       try {
@@ -250,7 +255,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
       }
     }
 
-    const projectTasksCount = await Task.count({
+    const projectTasksCount = await db.Task.count({
       where: { projectId: projectId },
       paranoid: false,
     });
@@ -264,14 +269,14 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     newTask.setDataValue("createdAt", new Date());
     newTask.setDataValue("updatedAt", new Date());
 
-    TaskChangeLog.create({
+    db.TaskChangeLog.create({
       taskId: newTask.id,
       userId: user.id,
       name: req.t("task.message.created"),
     });
 
     // if (newTask.boardId) {
-    const projectUsers = await findUsersByProject(projectId);
+    const projectUsers = await findUsersByProject(db, projectId);
     console.log("findUsersByProject", projectUsers);
 
     for (const u of projectUsers) {
@@ -293,7 +298,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   let prevWasArchived = false;
 
   try {
-    let task = await Task.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    let task = await db.Task.findByPk(req.params.id);
     const taskSolverId = task.solverId;
     const user = getUser(req, res);
     prevBoardId = task.boardId;
@@ -337,10 +344,10 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         console.log("changedFields", changedFields);
         console.log("task", task);
         if (field === "solverId") {
-          const oldSolver = await User.findByPk(taskSolverId);
-          const newSolver = await User.findByPk(task.solverId);
+          const oldSolver = await db.User.findByPk(taskSolverId);
+          const newSolver = await db.User.findByPk(task.solverId);
 
-          await TaskChangeLog.create({
+          await db.TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: `Změnil řešitele z ${
@@ -353,7 +360,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             task.solverId != null &&
             user.id != task.solverId
           ) {
-            const newSolver = await User.findByPk(task.solverId);
+            const newSolver = await db.User.findByPk(task.solverId);
             if (newSolver?.allowEmailNotification) {
               sendEmailNotification(
                 newSolver.email,
@@ -419,7 +426,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             });
           }
         } else if (field === "priority") {
-          await TaskChangeLog.create({
+          await db.TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: `Změnil prioritu na ${TASK_PRIORITY[task.priority]}`,
@@ -446,7 +453,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           try {
             const s = await stageRepo.findFirstByBoard(task.boardId);
             task.stageId = s.id;
-            await TaskChangeLog.create({
+            await db.TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Změna nástěnky na ${s.name}`,
@@ -456,7 +463,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           }
         } else if (field === "stageId" && task.stageId) {
           if (task.stageId === task.previous("stageId")) continue;
-          const stage = await Stage.findOne({
+          const stage = await db.Stage.findOne({
             subQuery: false,
             attributes: {
               include: [
@@ -466,7 +473,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 ],
               ],
             },
-            include: [{ model: Task, as: "tasks", attributes: [] }],
+            include: [{ model: db.Task, as: "tasks", attributes: [] }],
             where: {
               id: task.stageId,
             },
@@ -477,7 +484,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             throw new ResponseError(400, req.t("error.cantAssignToStage"));
           }
 
-          await TaskChangeLog.create({
+          await db.TaskChangeLog.create({
             taskId: req.params.id,
             userId: user.id,
             name: req.t(`task.message.stageChangedTo`, {
@@ -496,7 +503,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 const taskName = `[${task.number}] ${task.name}`;
 
                 if (task.createdById !== user.id) {
-                  const creator = await findOneById(task.createdById);
+                  const creator = await db.User.findByPk(task.createdById);
 
                   if (creator && creator?.allowEmailNotification) {
                     sendEmailNotification(
@@ -539,7 +546,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                   task.solverId !== user.id &&
                   task.solverId !== task.createdById
                 ) {
-                  const solver = await findOneById(task.solverId);
+                  const solver = await db.User.findByPk(task.solverId);
 
                   if (solver && solver?.allowEmailNotification) {
                     sendEmailNotification(
@@ -600,33 +607,33 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 
           if (field === "archived") {
             if (task[field] == true)
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Přesunul úkol do archivu`,
               });
           } else if (field === "stageId") {
-            TaskChangeLog.create({
+            db.TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Přesunul úkol do nevyřízených`,
             });
           } else if (field === "parentId") {
             if (task[field])
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Změnil úkol na podúkol`,
               });
             else
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Změnil podúkol na úkol`,
               });
           } else if (field === "deadline") {
             if (task[field])
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Změnil ${
@@ -640,27 +647,27 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                 }).format(task[field])}`,
               });
             else
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Odebral ${transFields[field]} úkolu`,
               });
           } else if (field === "deletedAt") {
-            TaskChangeLog.create({
+            db.TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Smazal úkol`,
             });
           } else if (field === "colorCode") {
-            TaskChangeLog.create({
+            db.TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Změnil ${transFields[field]} na <span style="color: ${task[field]}">${transFields[field]}</span>`,
             });
           } else if (field === "createdById") {
-            const newOwner = await User.findByPk(task.field);
+            const newOwner = await db.User.findByPk(task.field);
             if (newOwner)
-              TaskChangeLog.create({
+              db.TaskChangeLog.create({
                 taskId: req.params.id,
                 userId: user.id,
                 name: `Změnil ${transFields[field]} na ${getFullName(
@@ -669,7 +676,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
               });
             else if (field === "boardId") continue;
           } else if (!["boardId", "stageId"].includes(field)) {
-            await TaskChangeLog.create({
+            await db.TaskChangeLog.create({
               taskId: req.params.id,
               userId: user.id,
               name: `Změnil ${transFields[field]} na ${trimString(
@@ -685,11 +692,11 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     }
 
     if (task.solverId) {
-      const solver = await User.findByPk(parseInt(task.solverId));
+      const solver = await db.User.findByPk(parseInt(task.solverId));
       task.setDataValue("solver", solver);
     }
     console.log("task prev vals", task.previous("stageId"));
-    const projectUsers = await findUsersByProject(projectId);
+    const projectUsers = await findUsersByProject(db, projectId);
 
     console.log("prevWasArchived", prevWasArchived);
     if (changedFields.includes("boardId")) {
@@ -759,7 +766,9 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
 router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
   const io = getIo();
   try {
-    const task = await Task.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const task = await db.Task.findByPk(req.params.id);
     const user = getUser(req, res);
 
     if (
@@ -776,7 +785,7 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     await task.destroy();
     res.json({ message: req.t("task.message.deleted") });
 
-    const projectUsers = await findUsersByProject(task.projectId);
+    const projectUsers = await findUsersByProject(db, task.projectId);
     for (const u of projectUsers) {
       io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
         id: task.id,

@@ -1,16 +1,18 @@
 const express = require("express");
 const router = express.Router();
 
-const { Todo } = require("../../models/modelHelper");
-const { getUser } = require("../../auth/auth");
+const { getUser, getCompanyKey } = require("../../auth/auth");
 const { authenticateToken } = require("../../auth/auth");
 const { responseError } = require("../../service/utils");
 const { validator } = require("../../service");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
   try {
-    const todos = await Todo.findAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const todos = await db.Todo.findAll({
       where: {
         UserId: user.id,
       },
@@ -42,7 +44,9 @@ router.post("/", authenticateToken, async (req, res) => {
   };
 
   try {
-    const todo = await Todo.create(data);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const todo = await db.Todo.create(data);
     res.json({ todo });
   } catch (error) {
     responseError(req, res, error);
@@ -51,7 +55,9 @@ router.post("/", authenticateToken, async (req, res) => {
 
 router.patch("/:id", authenticateToken, async (req, res) => {
   try {
-    let todo = await Todo.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    let todo = await db.Todo.findByPk(req.params.id);
     console.log(req.body);
     // todo.name = req.body.name;
     todo.completed = req.body.completed;
@@ -65,7 +71,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
 router.delete("/:id", authenticateToken, async (req, res) => {
   try {
-    await Todo.destroy({ where: { id: req.params.id } });
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    await db.Todo.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -13,23 +13,25 @@ router.get("/", authenticateToken, async (req, res) => {
   // const io = getIo();
   // console.log("io", io);
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const user = getUser(req, res);
-    const companyKey = getCompanyKey(req, res);
+
     let where = {
       userId: user.id,
     };
     if (req.query.seen != null) {
       where.seen = req.query.seen;
     }
-    const records = await Notification.findAndCountAll({
+    const records = await db.Notification.findAndCountAll({
       where: where,
       include: [
         {
-          model: getDatabaseModels(companyKey).TaskNotification,
-          include: [{ model: getDatabaseModels(companyKey).Task, as: "task" }],
+          model: db.TaskNotification,
+          include: [{ model: db.Task, as: "task" }],
         },
         {
-          model: getDatabaseModels(companyKey).User,
+          model: db.User,
           as: "creator",
         },
       ],
@@ -57,7 +59,9 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.patch("/:id/seen", authenticateToken, async (req, res) => {
   try {
-    const notification = await Notification.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const notification = await db.Notification.findByPk(req.params.id);
 
     if (!notification.seen) notification.seen = true;
     else notification.seen = false;
@@ -72,8 +76,13 @@ router.patch("/:id/seen", authenticateToken, async (req, res) => {
 
 router.patch("/see-all", authenticateToken, async (req, res) => {
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const user = getUser(req, res);
-    await Notification.update({ seen: true }, { where: { userId: user.id } });
+    await db.Notification.update(
+      { seen: true },
+      { where: { userId: user.id } }
+    );
 
     res.json();
   } catch (error) {
@@ -83,7 +92,9 @@ router.patch("/see-all", authenticateToken, async (req, res) => {
 
 // router.delete("/users/:userId/notifications/:id", async (req, res) => {
 //   try {
-//     const removedRecord = await Notification.remove({ id: req.params.id });
+//     const ck = getCompanyKey(req);
+//     const db = getDatabaseModels(ck);
+//     const removedRecord = await db.Notification.remove({ id: req.params.id });
 //     res.json(removedRecord);
 //   } catch (error) {
 //     res.status(500).json({ message: error.message });

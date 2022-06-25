@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
-const { Group, User, UserGroup } = require("../../models/modelHelper");
-const { authenticateToken, getUser } = require("../../auth/auth");
+
+const {
+  authenticateToken,
+  getUser,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   const where = {};
@@ -15,11 +20,13 @@ router.get("/", authenticateToken, async (req, res) => {
   // }
 
   try {
-    const groups = await Group.findAll({
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const groups = await db.Group.findAll({
       where,
       include: [
         {
-          model: User,
+          model: db.User,
           as: "groupUsers",
           attributes: [],
         },
@@ -33,10 +40,12 @@ router.get("/", authenticateToken, async (req, res) => {
 
 router.get("/:id", authenticateToken, async (req, res) => {
   try {
-    const group = await Group.findByPk(req.params.id, {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const group = await db.Group.findByPk(req.params.id, {
       include: [
         {
-          model: User,
+          model: db.User,
           as: "groupUsers",
         },
       ],
@@ -62,7 +71,9 @@ router.post("/", authenticateToken, async (req, res) => {
 
   if (!req.body.name) {
     res.status(400).json({
-      message: "name is required",
+      message:
+        `${req.t("error.thisFieldsAreRequired")}: ` +
+        ["name"].map((field) => req.t(`field.${field}`)).join(", "),
     });
     return;
   }
@@ -72,7 +83,10 @@ router.post("/", authenticateToken, async (req, res) => {
   };
 
   try {
-    const newGroup = await Group.create(data);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+
+    const newGroup = await db.Group.create(data);
     newGroup.setDataValue("groupUsers", []);
     newGroup.setDataValue("createdAt", new Date());
     res.json({ group: newGroup });
@@ -95,7 +109,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    const group = await Group.findByPk(req.params.id);
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    const group = await db.Group.findByPk(req.params.id);
 
     const data = {
       ...req.body,
@@ -103,9 +119,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     const updated = await group.update(data);
 
-    await UserGroup.destroy({ where: { groupId: req.params.id } });
+    await db.UserGroup.destroy({ where: { groupId: req.params.id } });
     for (const userId of data.users) {
-      await UserGroup.create({ groupId: req.params.id, userId });
+      await db.UserGroup.create({ groupId: req.params.id, userId });
     }
 
     res.json({ group: updated });
@@ -128,7 +144,9 @@ router.delete("/:id", authenticateToken, async (req, res) => {
   }
 
   try {
-    await Group.destroy({ where: { id: req.params.id } });
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
+    await db.Group.destroy({ where: { id: req.params.id } });
     res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });

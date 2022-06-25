@@ -1,11 +1,16 @@
 const express = require("express");
 const router = express.Router();
-const { Project, Task, User, Group } = require("../../models/modelHelper");
-const { getUser, authenticateToken } = require("../../auth/auth");
+const { Op } = require("sequelize");
+
+const {
+  getUser,
+  authenticateToken,
+  getCompanyKey,
+} = require("../../auth/auth");
 const { projectRepo } = require("./../../repo");
 
-const { Op } = require("sequelize");
 const { ROLE } = require("../../../enum/enum");
+const { getDatabaseModels } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -13,10 +18,12 @@ router.get("/", authenticateToken, async (req, res) => {
   let projects = [];
   let tasks = [];
   try {
+    const ck = getCompanyKey(req);
+    const db = getDatabaseModels(ck);
     const { query } = req.query;
     // todo test
     if (user.roles.includes(ROLE.ADMIN)) {
-      projects = await Project.findAll({
+      projects = await db.Project.findAll({
         where: {
           name: {
             [Op.like]: `%${query}%`,
@@ -24,7 +31,7 @@ router.get("/", authenticateToken, async (req, res) => {
         },
       });
     } else {
-      projects = await projectRepo.findBySearch(user, query, {
+      projects = await projectRepo.findBySearch(db, user, query, {
         limit: 10000,
         offset: 0,
       });
@@ -45,26 +52,26 @@ router.get("/", authenticateToken, async (req, res) => {
         ],
       };
     }
-    tasks = await Task.findAll({
+    tasks = await db.Task.findAll({
       where: tasksWhere,
       include: [
         {
-          model: Project,
+          model: db.Project,
           as: "project",
           attributes: [],
           include: [
             {
-              model: Group,
+              model: db.Group,
               as: "groups",
               attributes: [],
               include: {
-                model: User,
+                model: db.User,
                 as: "groupUsers",
                 attributes: [],
               },
             },
             {
-              model: User,
+              model: db.User,
               as: "users",
               attributes: [],
             },
