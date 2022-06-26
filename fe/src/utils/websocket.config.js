@@ -17,6 +17,7 @@ export const initIo = () => {
       {
         query: {
           userId: user?.id || null,
+          ck: user.ck || null,
         },
         // withCredentials: true,
         // extraHeaders: {

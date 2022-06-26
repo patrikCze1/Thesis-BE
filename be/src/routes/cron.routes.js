@@ -1,7 +1,7 @@
 const express = require("express");
 const { SOCKET_EMIT } = require("../../enum/enum");
 const { getCompanyKey } = require("../auth/auth");
-const { getDatabaseModels } = require("../models");
+const { getDatabaseModels, connections } = require("../models");
 const router = express.Router();
 
 const { getIo } = require("../service/io");
@@ -20,48 +20,51 @@ router.get("/daily", async (req, res) => {
   }
 
   try {
-    //todo for each company
-    const ck = getCompanyKey(req, res);
-    const db = getDatabaseModels(ck);
-    const io = getIo();
-    const tasks = await taskRepo.findTasksWithDeadlineIn24h(db);
+    for (const ck in connections) {
+      const db = getDatabaseModels(ck);
+      const io = getIo();
+      const tasks = await taskRepo.findTasksWithDeadlineIn24h(db);
 
-    for (const task of tasks) {
-      console.log(task.id);
+      for (const task of tasks) {
+        console.log(task.id);
 
-      if (task.solverId) {
-        const n = await createTaskNotification(
-          db,
-          task.id,
-          `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
-          // req.t("task.message.deadlineIn24Hours", {
-          //   name: trimString(task.name, 100),
-          // }),
-          task.solverId,
-          null
-        );
-        n.setDataValue("createdAt", new Date());
-        n.setDataValue("TaskNotification", { task });
-        io.to(task.solverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-          notification: n,
-        });
-      } else {
-        const n = await createTaskNotification(
-          db,
-          task.id,
-          `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
-          // req.t("task.message.deadlineIn24Hours", {
-          //   name: trimString(task.name, 100),
-          // }),
-          task.createdById,
-          null
-        );
-        n.setDataValue("createdAt", new Date());
-        n.setDataValue("TaskNotification", { task });
-        io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-          notification: n,
-        });
-        console.log("task.createdById", task.createdById);
+        if (task.solverId) {
+          const n = await createTaskNotification(
+            db,
+            task.id,
+            `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
+            // req.t("task.message.deadlineIn24Hours", {
+            //   name: trimString(task.name, 100),
+            // }),
+            task.solverId,
+            null
+          );
+          n.setDataValue("createdAt", new Date());
+          n.setDataValue("TaskNotification", { task });
+          io.to(`${ck}_${task.solverId}`).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            notification: n,
+          });
+        } else {
+          const n = await createTaskNotification(
+            db,
+            task.id,
+            `Úkol ${trimString(task.name, 100)} má být brzy dokončen`,
+            // req.t("task.message.deadlineIn24Hours", {
+            //   name: trimString(task.name, 100),
+            // }),
+            task.createdById,
+            null
+          );
+          n.setDataValue("createdAt", new Date());
+          n.setDataValue("TaskNotification", { task });
+          io.to(`${ck}_${task.createdById}`).emit(
+            SOCKET_EMIT.NOTIFICATION_NEW,
+            {
+              notification: n,
+            }
+          );
+          console.log("task.createdById", task.createdById);
+        }
       }
     }
 

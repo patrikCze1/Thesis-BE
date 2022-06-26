@@ -50,7 +50,7 @@ router.post(
       res.json({ stage });
 
       for (const u of projectUsers) {
-        io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });
+        io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.BOARD_STAGE_NEW, { stage });
       }
     } catch (error) {
       responseError(req, res, error);
@@ -81,7 +81,7 @@ router.patch(
       res.json({ stages });
 
       for (const u of projectUsers) {
-        io.to(u.id).emit(SOCKET_EMIT.BOARD_STAGE_EDIT, {
+        io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.BOARD_STAGE_EDIT, {
           boardId: req.params.boardId,
           stages,
         });

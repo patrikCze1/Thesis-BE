@@ -174,7 +174,7 @@ router.post("/", authenticateToken, async (req, res) => {
     res.json({ project });
 
     for (let userId of req.body.users) {
-      io.to(userId).emit(SOCKET_EMIT.PROJECT_NEW, { project });
+      io.to(`${ck}_${userId}`).emit(SOCKET_EMIT.PROJECT_NEW, { project });
     }
   } catch (error) {
     responseError(req, res, error);
@@ -228,7 +228,9 @@ router.patch("/:id", authenticateToken, async (req, res) => {
 
     for (let userId of req.body.users) {
       await dbModels.ProjectUser.create({ projectId: project.id, userId });
-      io.to(userId).emit(SOCKET_EMIT.PROJECT_EDIT, { project: updated });
+      io.to(`${ck}_${userId}`).emit(SOCKET_EMIT.PROJECT_EDIT, {
+        project: updated,
+      });
     }
 
     //todo notifikace, prirazeni/obrani projektu

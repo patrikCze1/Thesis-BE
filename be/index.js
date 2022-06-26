@@ -82,12 +82,12 @@ app.use(function (err, req, res, next) {
 });
 
 io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
+  const { userId, ck } = socket.handshake.query;
   socket.emit("connected"); // something like handshake
-  if (userId && userId !== undefined) {
-    console.log("New client connected", socket.id);
-    connect(socket.id, parseInt(userId));
-    socket.join(parseInt(userId));
+  if (userId && ck && userId !== undefined) {
+    // console.log("New client connected", socket.id);
+    connect(socket.id, `${ck}_${userId}`);
+    socket.join(`${ck}_${userId}`);
 
     console.log("userId", typeof userId, userId);
   } else disconnect(socket.id);

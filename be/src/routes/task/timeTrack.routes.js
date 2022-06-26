@@ -222,7 +222,9 @@ router.post("/stop/:id", authenticateToken, async (req, res) => {
       );
     }
 
-    io.to(user.id).emit(SOCKET_EMIT.TIME_TRACK_STOP, { id: req.params.id });
+    io.to(`${ck}_${user.id}`).emit(SOCKET_EMIT.TIME_TRACK_STOP, {
+      id: req.params.id,
+    });
 
     res.json({ track });
   } catch (error) {

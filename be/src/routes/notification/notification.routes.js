@@ -49,7 +49,6 @@ router.get("/", authenticateToken, async (req, res) => {
     //   console.log("socket", socket);
     //   // socket.broadcast.to(socketid).emit('message', 'for your eyes only');
     // }
-    // io.to(1).emit("test", "test");
 
     res.json(records);
   } catch (error) {

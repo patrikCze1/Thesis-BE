@@ -28,9 +28,9 @@ router.post("/login", async (req, res) => {
   }
 
   try {
-    const dbModels = getDatabaseModels(ck);
-    console.log("dbModels", dbModels);
-    const user = await dbModels.User.findOne({
+    const db = getDatabaseModels(ck);
+
+    const user = await db.User.findOne({
       where: { [Op.or]: [{ email }, { username: email }] },
     });
     console.log("user", user);
@@ -67,6 +67,7 @@ router.post("/login", async (req, res) => {
             user: {
               ...userJSON,
               roles: JSON.stringify(userRoles),
+              ck,
             },
           });
       } else {

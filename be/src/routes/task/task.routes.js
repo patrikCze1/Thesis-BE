@@ -276,7 +276,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
 
     for (const u of projectUsers) {
       console.log("send io ", SOCKET_EMIT.TASK_NEW, u.id);
-      io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
+      io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_NEW, { task: newTask });
     }
     // }
     res.json({ task: newTask });
@@ -416,7 +416,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             newNotification.setDataValue("creator", user);
             newNotification.setDataValue("createdAt", new Date());
             newNotification.setDataValue("TaskNotification", { task });
-            io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            io.to(`${ck}_${taskSolverId}`).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
               notification: newNotification,
             });
           }
@@ -440,7 +440,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
             newNotification.setDataValue("creator", user);
             newNotification.setDataValue("createdAt", new Date());
             newNotification.setDataValue("TaskNotification", { task });
-            io.to(taskSolverId).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
+            io.to(`${ck}_${taskSolverId}`).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
               notification: newNotification,
             });
           }
@@ -526,9 +526,12 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
                   newNotification.setDataValue("createdAt", new Date());
                   newNotification.setDataValue("TaskNotification", { task });
 
-                  io.to(task.createdById).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-                    notification: newNotification,
-                  });
+                  io.to(`${ck}_${task.createdById}`).emit(
+                    SOCKET_EMIT.NOTIFICATION_NEW,
+                    {
+                      notification: newNotification,
+                    }
+                  );
                 }
 
                 if (
@@ -695,29 +698,29 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
         if (prevBoardId == task.boardId) {
           console.log("prevBoardId === task.boardId", prevBoardId);
           for (const u of projectUsers) {
-            io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+            io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_EDIT, { task });
           }
         } else if (task.archived !== prevWasArchived) {
           // move from archive to kanban
           for (const u of projectUsers) {
-            io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+            io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_NEW, { task });
           }
         } else {
           // move from backlog to kanban
           console.log("else");
           for (const u of projectUsers) {
-            io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+            io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_DELETE, {
               id: task.id,
               type: "rmFromBacklog",
             });
-            io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+            io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_NEW, { task });
           }
         }
       } else {
         console.log("!task.boardId");
         // hide task in kanban, move them to backlog
         for (const u of projectUsers) {
-          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+          io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_DELETE, {
             id: task.id,
             type: "rmFromKanban",
           });
@@ -728,12 +731,12 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       if (prevWasArchived && task.boardId) {
         // move from archive to kanban
         for (const u of projectUsers) {
-          io.to(u.id).emit(SOCKET_EMIT.TASK_NEW, { task });
+          io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_NEW, { task });
         }
         //  } else if (prevWasArchived && !task.boardId) {// move from archive to backlog
       } else {
         for (const u of projectUsers) {
-          io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+          io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_DELETE, {
             id: task.id,
             type: "rmFromKanban",
           });
@@ -742,8 +745,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     } else {
       console.log("SOCKET_EMIT.TASK_EDIT");
       for (const u of projectUsers) {
-        console.log("SOCKET_EMIT.TASK_EDIT ", u.id);
-        io.to(u.id).emit(SOCKET_EMIT.TASK_EDIT, { task });
+        io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_EDIT, { task });
       }
     }
 
@@ -779,7 +781,7 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     const conn = getDatabaseConnection(ck);
     const projectUsers = await findUsersByProject(conn, task.projectId);
     for (const u of projectUsers) {
-      io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
+      io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_DELETE, {
         id: task.id,
         type: "rmFromAll",
       });

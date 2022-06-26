@@ -108,9 +108,12 @@ router.post(
             newNotification.setDataValue("createdAt", new Date());
             newNotification.setDataValue("TaskNotification", { task });
 
-            io.to(mentionUser.id).emit(SOCKET_EMIT.NOTIFICATION_NEW, {
-              notification: newNotification,
-            });
+            io.to(`${ck}_${mentionUser.id}`).emit(
+              SOCKET_EMIT.NOTIFICATION_NEW,
+              {
+                notification: newNotification,
+              }
+            );
           }
         }
       }
@@ -146,9 +149,7 @@ router.post(
       const conn = getDatabaseConnection(ck);
       const projectUsers = await findUsersByProject(conn, task.projectId);
       for (const u of projectUsers) {
-        console.log("socket ", u.id);
-
-        io.to(u.id).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
+        io.to(`${ck}_${u.id}`).emit(SOCKET_EMIT.TASK_COMMENT_NEW, {
           comment: newComment,
         });
       }
