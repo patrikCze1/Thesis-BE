@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { Op } = require("sequelize");
+const { Op, literal, fn, col } = require("sequelize");
 
 const {
   getUser,
@@ -17,7 +17,7 @@ const {
 } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { getFullName } = require("../../service/user.service");
-const { sequelize, getDatabaseModels } = require("../../models");
+const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 const {
   sendEmailNotification,
   createTaskNotification,
@@ -71,14 +71,8 @@ router.get("/:projectId/tasks/", authenticateToken, async (req, res) => {
       subQuery: false,
       attributes: {
         include: [
-          [
-            sequelize.literal("COUNT(DISTINCT attachments.id)"),
-            "attachmentsCount",
-          ],
-          [
-            sequelize.literal("COUNT(DISTINCT taskComments.id)"),
-            "commentsCount",
-          ],
+          [literal("COUNT(DISTINCT attachments.id)"), "attachmentsCount"],
+          [literal("COUNT(DISTINCT taskComments.id)"), "commentsCount"],
         ],
       },
       where,
@@ -247,7 +241,7 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     if (task.boardId) {
       let firstStage = null;
       try {
-        firstStage = await stageRepo.findFirstByBoard(task.boardId);
+        firstStage = await stageRepo.findFirstByBoard(db, task.boardId);
         console.log("firstStage", firstStage);
         task.stageId = firstStage?.id;
       } catch (error) {
@@ -276,7 +270,8 @@ router.post("/:projectId/tasks/", authenticateToken, async (req, res) => {
     });
 
     // if (newTask.boardId) {
-    const projectUsers = await findUsersByProject(db, projectId);
+    const conn = getDatabaseConnection(ck);
+    const projectUsers = await findUsersByProject(conn, projectId);
     console.log("findUsersByProject", projectUsers);
 
     for (const u of projectUsers) {
@@ -451,7 +446,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           }
         } else if (field === "boardId" && task.boardId && !task.stageId) {
           try {
-            const s = await stageRepo.findFirstByBoard(task.boardId);
+            const s = await stageRepo.findFirstByBoard(db, task.boardId);
             task.stageId = s.id;
             await db.TaskChangeLog.create({
               taskId: req.params.id,
@@ -466,12 +461,7 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
           const stage = await db.Stage.findOne({
             subQuery: false,
             attributes: {
-              include: [
-                [
-                  sequelize.fn("COUNT", sequelize.col("tasks.id")),
-                  "tasksCount",
-                ],
-              ],
+              include: [[fn("COUNT", col("tasks.id")), "tasksCount"]],
             },
             include: [{ model: db.Task, as: "tasks", attributes: [] }],
             where: {
@@ -696,7 +686,8 @@ router.patch("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
       task.setDataValue("solver", solver);
     }
     console.log("task prev vals", task.previous("stageId"));
-    const projectUsers = await findUsersByProject(db, projectId);
+    const conn = getDatabaseConnection(ck);
+    const projectUsers = await findUsersByProject(conn, projectId);
 
     console.log("prevWasArchived", prevWasArchived);
     if (changedFields.includes("boardId")) {
@@ -785,7 +776,8 @@ router.delete("/:projectId/tasks/:id", authenticateToken, async (req, res) => {
     await task.destroy();
     res.json({ message: req.t("task.message.deleted") });
 
-    const projectUsers = await findUsersByProject(db, task.projectId);
+    const conn = getDatabaseConnection(ck);
+    const projectUsers = await findUsersByProject(conn, task.projectId);
     for (const u of projectUsers) {
       io.to(u.id).emit(SOCKET_EMIT.TASK_DELETE, {
         id: task.id,

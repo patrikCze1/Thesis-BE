@@ -12,7 +12,7 @@ const { findUsersByProject } = require("../../repo/userRepo");
 const { ROLE } = require("../../../enum/enum");
 const { responseError } = require("../../service/utils");
 const { createHashedPassword } = require("../../service/user.service");
-const { getDatabaseModels } = require("../../models");
+const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 
 router.get("/", authenticateToken, async (req, res) => {
   try {
@@ -45,8 +45,8 @@ router.get("/", authenticateToken, async (req, res) => {
 router.get("/project/:id", authenticateToken, async (req, res) => {
   try {
     const ck = getCompanyKey(req);
-    const db = getDatabaseModels(ck);
-    const users = await findUsersByProject(db, req.params.id);
+    const conn = getDatabaseConnection(ck);
+    const users = await findUsersByProject(conn, req.params.id);
 
     res.json({ users });
   } catch (error) {

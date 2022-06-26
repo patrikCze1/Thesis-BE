@@ -27,6 +27,7 @@ router.get("/:id", async (req, res) => {
       res.setHeader("Content-Type", "text/html");
       res.send(`
   <h1>Účet úspěšně ověřen</h1>
+  <a href="${process.env.FE_URI}">Přejít do aplikace</a>
   `);
     } else {
       res.setHeader("Content-Type", "text/html");
@@ -111,7 +112,7 @@ router.post("/", async (req, res) => {
       "src/email/user/",
       "registration",
       {
-        link: `${process.env.FE_URI}/api/companies/${verificationCode}`,
+        link: `${process.env.FE_URI}/overeni-uctu/${verificationCode}`,
         key,
         email: req.body.email,
       }

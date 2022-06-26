@@ -143,6 +143,7 @@ i18n
             registrationSuccess: "Registrace proběhla v pořádku",
             registrationSuccessMsg:
               "Byl Vám odeslán potvrzovací e-mail s přístupy do aplikace.",
+            accountVerification: "Ověřuji účet",
           },
           menu: {
             timeTracks: "Záznam času",

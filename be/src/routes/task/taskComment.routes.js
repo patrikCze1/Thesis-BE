@@ -37,7 +37,7 @@ const {
   createTaskNotification,
 } = require("../../service/notification/notification.service");
 const { getFeUrl, responseError } = require("../../service/utils");
-const { getDatabaseModels } = require("../../models");
+const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 const io = getIo();
 
 router.post(
@@ -143,7 +143,8 @@ router.post(
       newComment.setDataValue("createdAt", new Date());
 
       const task = await db.Task.findByPk(req.params.taskId);
-      const projectUsers = await findUsersByProject(db, task.projectId);
+      const conn = getDatabaseConnection(ck);
+      const projectUsers = await findUsersByProject(conn, task.projectId);
       for (const u of projectUsers) {
         console.log("socket ", u.id);
 

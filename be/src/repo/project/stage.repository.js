@@ -3,9 +3,9 @@
  * @param {number} boardId
  * @returns {Promise} Stage
  */
-exports.findFirstByBoard = (models, boardId) => {
+exports.findFirstByBoard = (db, boardId) => {
   console.log("findFirstByProject", boardId);
-  return models.Stage.findOne({
+  return db.Stage.findOne({
     where: {
       boardId,
     },

@@ -52,9 +52,9 @@ const { QueryTypes } = require("sequelize");
 //   return user;
 // };
 
-exports.findUsersByProject = async (db, id) => {
+exports.findUsersByProject = async (sequelize, id) => {
   try {
-    return await db.query(
+    return await sequelize.query(
       `
     SELECT DISTINCT User.* FROM Users AS User 
     LEFT JOIN ProjectUsers AS pu ON User.id = pu.userId 
@@ -66,7 +66,7 @@ exports.findUsersByProject = async (db, id) => {
     ORDER BY User.lastName ASC
     `,
       {
-        model: db.User,
+        model: sequelize.models.User,
         replacements: { projectId: id },
         type: QueryTypes.SELECT,
       }

@@ -12,7 +12,7 @@ const { SOCKET_EMIT, ROLE } = require("../../../enum/enum");
 const { getIo } = require("../../service/io");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
-const { getDatabaseModels } = require("../../models");
+const { getDatabaseModels, getDatabaseConnection } = require("../../models");
 
 const io = getIo();
 
@@ -44,7 +44,8 @@ router.post(
       const db = getDatabaseModels(ck);
       const stage = await db.Stage.create(data);
       const board = await db.Board.findByPk(req.params.boardId);
-      const projectUsers = await findUsersByProject(db, board.projectId);
+      const conn = getDatabaseConnection(ck);
+      const projectUsers = await findUsersByProject(conn, board.projectId);
 
       res.json({ stage });
 
@@ -74,7 +75,8 @@ router.patch(
       }
 
       const board = await db.Board.findByPk(req.params.boardId);
-      const projectUsers = await findUsersByProject(db, board.projectId);
+      const conn = getDatabaseConnection(ck);
+      const projectUsers = await findUsersByProject(conn, board.projectId);
 
       res.json({ stages });
 

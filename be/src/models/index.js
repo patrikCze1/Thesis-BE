@@ -28,7 +28,7 @@ const initConnections = async () => {
     console.error("CRITICAL ERROR ", error);
   }
 
-  console.log("connections", connections);
+  // console.log("connections", connections);
 };
 
 /**
@@ -42,11 +42,12 @@ const syncDbConnection = (connection) => {
 
 const getDatabaseModels = (key) => {
   if (!(key in connections)) throw new Error("Společnost neexistuje");
-  console.log("connections", connections);
+
   return connections[key].models;
 };
 
 const getDatabaseConnection = (key) => {
+  console.log("getDatabaseConnection", connections[key]);
   return connections[key];
 };
 

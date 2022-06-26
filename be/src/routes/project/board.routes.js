@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const { fn, col } = require("sequelize");
 
 const {
   getUser,
@@ -13,7 +14,11 @@ const { SOCKET_EMIT, ROLE, STAGE_TYPE } = require("../../../enum/enum");
 const { findUsersByProject } = require("../../repo/userRepo");
 const { responseError } = require("../../service/utils");
 const { isUserInProject } = require("../../repo/project/project.repository");
-const { sequelize, getDatabaseModels } = require("../../models");
+const {
+  sequelize,
+  getDatabaseModels,
+  getDatabaseConnection,
+} = require("../../models");
 
 router.get("/:projectId/boards", authenticateToken, async (req, res) => {
   const user = getUser(req, res);
@@ -33,7 +38,7 @@ router.get("/:projectId/boards", authenticateToken, async (req, res) => {
     const boards = await db.Board.findAll({
       where: { projectId: req.params.projectId },
       order: [
-        [sequelize.fn("isnull", sequelize.col("beginAt")), "DESC"],
+        [fn("isnull", col("beginAt")), "DESC"],
         ["beginAt", "DESC"],
       ],
     });
@@ -136,7 +141,8 @@ router.post(
         type: STAGE_TYPE.COMPLETED,
       });
 
-      const projectUsers = await findUsersByProject(db, projectId);
+      const conn = getDatabaseConnection(ck);
+      const projectUsers = await findUsersByProject(conn, projectId);
 
       res.json({ board });
 
