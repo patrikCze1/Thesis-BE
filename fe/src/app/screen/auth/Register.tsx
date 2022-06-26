@@ -3,13 +3,13 @@ import { NavLink, useHistory } from "react-router-dom";
 import { Form } from "react-bootstrap";
 import { Trans, useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
 
 import axios from "./../../../utils/axios.config";
 import { ROUTE } from "../../../utils/enum.js";
 import { Loader } from "../../components/common";
 
 import logo from "./../../../assets/images/logo_blue.svg";
-import { toast } from "react-toastify";
 
 type FormData = {
   firstName: string;
@@ -27,6 +27,7 @@ const initState = {
   password: "",
   name: "",
 };
+
 export default function Register() {
   const { user } = useSelector(
     //@ts-ignore
@@ -35,6 +36,7 @@ export default function Register() {
   const [formData, setFormData] = useState<FormData>(initState);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
   const { t } = useTranslation();
   const history = useHistory();
@@ -45,8 +47,9 @@ export default function Register() {
 
     try {
       await axios.post("api/companies", formData);
-      toast.success("Registrace proběhla v pořádku");
+      toast.success(t("auth.registrationSuccess") as string);
       setFormData(initState);
+      setRegistrationSuccess(true);
     } catch (error) {
       console.error("error", error);
       setErrorMessage(error.response?.data?.message);
@@ -78,93 +81,96 @@ export default function Register() {
             <div className="brand-logo text-center">
               <img src={logo} alt="logo" />
             </div>
-            <h4>
-              <Trans>auth.register</Trans>
-            </h4>
-            <Form className="pt-3" method="post" onSubmit={handleSubmit}>
-              {errorMessage && (
-                <span className="error-message">{errorMessage}</span>
-              )}
-              <div className="row">
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="text"
-                    name="firstName"
-                    placeholder={t("form.firstName")}
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    autoComplete="on"
-                    value={formData.firstName || ""}
-                  />
-                </Form.Group>
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="text"
-                    name="lastName"
-                    placeholder={t("form.lastName")}
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    autoComplete="on"
-                    value={formData.lastName || ""}
-                  />
-                </Form.Group>
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="text"
-                    name="email"
-                    placeholder="E-mail"
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    autoComplete="on"
-                    value={formData.email || ""}
-                  />
-                </Form.Group>
+            {!registrationSuccess ? (
+              <>
+                <h4>
+                  <Trans>auth.register</Trans>
+                </h4>
 
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="text"
-                    name="phone"
-                    placeholder={t("form.phone")}
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    autoComplete="on"
-                    value={formData.phone || ""}
-                  />
-                </Form.Group>
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="password"
-                    name="password"
-                    placeholder={t("form.password")}
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    value={formData.password || ""}
-                  />
-                </Form.Group>
-                <Form.Group className="col-md-6">
-                  <Form.Control
-                    type="text"
-                    name="name"
-                    placeholder={t("form.companyName")}
-                    size="lg"
-                    className="h-auto"
-                    required
-                    onInput={handleInputChange}
-                    autoComplete="on"
-                    value={formData.name || ""}
-                  />
-                </Form.Group>
-                {/* <Form.Group className="col-md-6">
+                <Form className="pt-3" method="post" onSubmit={handleSubmit}>
+                  {errorMessage && (
+                    <span className="error-message">{errorMessage}</span>
+                  )}
+                  <div className="row">
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="text"
+                        name="firstName"
+                        placeholder={t("form.firstName")}
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        autoComplete="on"
+                        value={formData.firstName || ""}
+                      />
+                    </Form.Group>
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="text"
+                        name="lastName"
+                        placeholder={t("form.lastName")}
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        autoComplete="on"
+                        value={formData.lastName || ""}
+                      />
+                    </Form.Group>
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="text"
+                        name="email"
+                        placeholder="E-mail"
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        autoComplete="on"
+                        value={formData.email || ""}
+                      />
+                    </Form.Group>
+
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="text"
+                        name="phone"
+                        placeholder={t("form.phone")}
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        autoComplete="on"
+                        value={formData.phone || ""}
+                      />
+                    </Form.Group>
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="password"
+                        name="password"
+                        placeholder={t("form.password")}
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        value={formData.password || ""}
+                      />
+                    </Form.Group>
+                    <Form.Group className="col-md-6">
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        placeholder={t("form.companyName")}
+                        size="lg"
+                        className="h-auto"
+                        required
+                        onInput={handleInputChange}
+                        autoComplete="on"
+                        value={formData.name || ""}
+                      />
+                    </Form.Group>
+                    {/* <Form.Group className="col-md-6">
                   <Form.Control
                     type="text"
                     name="companyId"
@@ -177,28 +183,39 @@ export default function Register() {
                   />
                 </Form.Group> */}
 
-                <div className="col-12">
-                  <div className="mt-3">
-                    <button
-                      className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
-                      type="submit"
-                      disabled={loading}
-                    >
-                      <Trans>form.register</Trans>
-                    </button>
+                    <div className="col-12">
+                      <div className="mt-3">
+                        <button
+                          className="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn"
+                          type="submit"
+                          disabled={loading}
+                        >
+                          <Trans>form.register</Trans>
+                        </button>
+                      </div>
+                      <div className="my-2 d-flex justify-content-between align-items-center">
+                        <NavLink
+                          to={ROUTE.LOGIN}
+                          className="auth-link text-black text-center"
+                        >
+                          <Trans>auth.login</Trans>
+                        </NavLink>
+                      </div>
+                    </div>
                   </div>
-                  <div className="my-2 d-flex justify-content-between align-items-center">
-                    <NavLink
-                      to={ROUTE.LOGIN}
-                      className="auth-link text-black text-center"
-                    >
-                      <Trans>auth.login</Trans>
-                    </NavLink>
-                  </div>
-                </div>
+                  {loading && <Loader cssClass={""} />}
+                </Form>
+              </>
+            ) : (
+              <div>
+                <h4 className="text-center">
+                  <Trans>auth.registrationSuccess</Trans>
+                </h4>
+                <p className="text-center">
+                  <Trans>auth.registrationSuccessMsg</Trans>
+                </p>
               </div>
-              {loading && <Loader cssClass={""} />}
-            </Form>
+            )}
           </div>
         </div>
       </div>

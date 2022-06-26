@@ -140,6 +140,9 @@ i18n
             login: "Přihlásit se",
             register: "Registrace",
             createAccount: "Vytvořit účet",
+            registrationSuccess: "Registrace proběhla v pořádku",
+            registrationSuccessMsg:
+              "Byl Vám odeslán potvrzovací e-mail s přístupy do aplikace.",
           },
           menu: {
             timeTracks: "Záznam času",
@@ -339,7 +342,7 @@ i18n
             fileDeleted: "Soubor odstraněn",
             companyId: "IČO",
             companyName: "Název společnosti",
-            companyKey: "Společnosti",
+            company: "Společnost",
             phone: "Telefon",
             register: "Registrovat",
             firstName: "Jméno",

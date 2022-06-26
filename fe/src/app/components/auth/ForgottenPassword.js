@@ -10,7 +10,7 @@ import { ROUTE } from "../../../utils/enum";
 import axios from "./../../../utils/axios.config";
 
 export default function ForgottenPassword() {
-  const [email, setEmail] = useState("");
+  const [formData, setFormData] = useState({ email: "", ck: "" });
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
   const { t } = useTranslation();
@@ -22,7 +22,7 @@ export default function ForgottenPassword() {
 
     try {
       await axios.post("/api/auth/forgotten-password", {
-        email,
+        ...formData,
       });
       toast.success(t("auth.emailSent"));
     } catch (error) {
@@ -30,6 +30,10 @@ export default function ForgottenPassword() {
     }
 
     setLoading(false);
+  };
+
+  const handleChnage = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   return (
@@ -45,7 +49,18 @@ export default function ForgottenPassword() {
             </h4>
             <Form className="pt-3" method="post" onSubmit={handleSubmit}>
               {error && <span className="error-message">{error}</span>}
-              <Form.Group className="d-flex search-field">
+              <Form.Group>
+                <Form.Control
+                  type="text"
+                  name="ck"
+                  placeholder={t("form.company")}
+                  size="lg"
+                  className="h-auto"
+                  required
+                  onInput={handleChnage}
+                />
+              </Form.Group>
+              <Form.Group>
                 <Form.Control
                   type="email"
                   name="email"
@@ -53,7 +68,7 @@ export default function ForgottenPassword() {
                   size="lg"
                   className="h-auto"
                   required
-                  onInput={(e) => setEmail(e.target.value)}
+                  onInput={handleChnage}
                 />
               </Form.Group>
 

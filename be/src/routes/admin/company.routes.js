@@ -105,13 +105,16 @@ router.post("/", async (req, res) => {
       verificationCode,
     });
 
-    // todo pridat prihlasovaci udaje
     await sendMail(
       req.body.email,
       "Potvrzení registrace",
       "src/email/user/",
       "registration",
-      { link: `${process.env.FE_URI}/api/companies/${verificationCode}` }
+      {
+        link: `${process.env.FE_URI}/api/companies/${verificationCode}`,
+        key,
+        email: req.body.email,
+      }
     );
 
     res.json({ success: true, company });

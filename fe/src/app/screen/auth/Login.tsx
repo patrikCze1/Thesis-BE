@@ -77,7 +77,7 @@ export default function Login() {
                 <Form.Control
                   type="text"
                   name="ck"
-                  placeholder={t("form.companyKey")}
+                  placeholder={t("form.company")}
                   size="lg"
                   className="h-auto"
                   required

@@ -69,7 +69,7 @@
     "error": {
       "jwtExpired": "Byly jste odhlášeni.",
       "userDontExist": "Uživatel neexistuje",
-      "companyAlreadyExists": "Společnost s tímto kódem již existuje."
+      "companyAlreadyExists": "Společnost s tímto kódem nebo e-mailovou adresou již existuje."
     }
   },
   "notification": {
