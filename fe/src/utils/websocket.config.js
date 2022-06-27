@@ -10,27 +10,22 @@ export const initIo = () => {
       throw new Error("User not loged in");
     }
 
-    instance = io(
-      process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_BASE_API_URL_PROD
-        : process.env.REACT_APP_BASE_API_URL,
-      {
-        query: {
-          userId: user?.id || null,
-          ck: user.ck || null,
-        },
-        // withCredentials: true,
-        // extraHeaders: {
-        //   "my-custom-header": "abcd"
-        // }
-        reconnection: true,
-        // reconnectionDelay: 1000,
-        // reconnectionDelayMax: 5000,
-        // reconnectionAttempts: Infinity,
-        forceNew: true,
-        // secure: true,
-      }
-    );
+    instance = io(process.env.REACT_APP_BASE_API_URL, {
+      query: {
+        userId: user?.id || null,
+        ck: user.ck || null,
+      },
+      // withCredentials: true,
+      // extraHeaders: {
+      //   "my-custom-header": "abcd"
+      // }
+      reconnection: true,
+      // reconnectionDelay: 1000,
+      // reconnectionDelayMax: 5000,
+      // reconnectionAttempts: Infinity,
+      forceNew: true,
+      // secure: true,
+    });
 
     return instance;
   } catch (error) {

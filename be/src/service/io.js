@@ -16,6 +16,7 @@ const init = (server) => {
 const connect = (socketId, userId) => {
   connections = [...connections, { socketId, userId }];
   console.log("socket connections", connections);
+  console.log(" process.env", process.env);
 };
 
 const disconnect = (socketId) => {

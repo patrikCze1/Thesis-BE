@@ -13,14 +13,8 @@ const transporter = nodemailer.createTransport({
   port: process.env.NODE_ENV === "production" ? 587 : 2525,
   secure: process.env.NODE_ENV === "production",
   auth: {
-    user:
-      process.env.NODE_ENV === "production"
-        ? process.env.MAILER_USER_PROD
-        : process.env.MAILER_USER,
-    pass:
-      process.env.NODE_ENV === "production"
-        ? process.env.MAILER_PASS_PROD
-        : process.env.MAILER_PASS,
+    user: process.env.MAILER_USER,
+    pass: process.env.MAILER_PASS,
   },
   // tls: {
   //   ciphers: "SSLv3",
