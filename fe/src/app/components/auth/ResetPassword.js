@@ -38,12 +38,14 @@ export default function ResetPassword() {
     const search = window.location.search;
     const params = new URLSearchParams(search);
     const token = params.get("token");
+    const ck = params.get("ck");
 
     try {
       await axios.post("/api/auth/reset-password", {
         password: formData.password,
         passwordAgain: formData.passwordAgain,
         token,
+        ck,
       });
       toast.success(t("auth.passwordChanged"));
       history.push(ROUTE.LOGIN);

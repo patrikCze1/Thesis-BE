@@ -90,31 +90,30 @@ router.post("/forgotten-password", async (req, res) => {
     const user = await dbModels.User.findOne({ where: { email } });
 
     if (!user) throw new Error(req.t("error.validation.emailDoesntExist"));
-    else {
-      const token = jwt.sign({ email }, process.env.PASSWORD_SECRET, {
-        expiresIn: parseInt(process.env.PASSWORD_SECRET_EXPIRATION),
-      });
 
-      user.passwordResetHash = token;
-      await user.save();
+    const token = jwt.sign({ email }, process.env.PASSWORD_SECRET, {
+      expiresIn: parseInt(process.env.PASSWORD_SECRET_EXPIRATION),
+    });
 
-      try {
-        await sendMail(
-          user.email,
-          req.t("message.forgottenPassword"),
-          "src/email/user/",
-          "reset_password",
-          { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}` }
-        );
-      } catch (error) {
-        throw new Error(error.message);
-      }
+    user.passwordResetHash = token;
+    await user.save();
 
-      res.json({
-        message: req.t("message.forgottenPassword"),
-        success: true,
-      });
+    try {
+      await sendMail(
+        user.email,
+        req.t("message.forgottenPassword"),
+        "src/email/user/",
+        "reset_password",
+        { link: `${process.env.FE_URI}/obnovit-heslo/?token=${token}&ck=${ck}` }
+      );
+    } catch (error) {
+      throw new Error(error.message);
     }
+
+    res.json({
+      message: req.t("message.forgottenPassword"),
+      success: true,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

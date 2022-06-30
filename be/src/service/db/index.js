@@ -1,6 +1,5 @@
 const mysql = require("mysql2/promise");
 const { Sequelize } = require("sequelize");
-const { createSequelizeConnection } = require("../../../config/config");
 
 const models = require("../../models/models");
 const config = require("./../../../config/config.json");
@@ -28,7 +27,7 @@ async function createDB(name, user) {
   // Run create database statement
   await connection.query(`CREATE DATABASE IF NOT EXISTS \`jago_${name}\`;`);
 
-  const connString = `mysql://root:root@localhost:8889/jago_${name}`;
+  const connString = `${process.env.DB_CONNECTION}jago_${name}`;
   //connect to db
   const sequelize = new Sequelize(connString);
 

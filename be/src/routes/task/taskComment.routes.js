@@ -90,7 +90,7 @@ router.post(
                   commentText: data.text,
                   username: getFullName(user),
                   taskName: task.name,
-                  taskLink: `${getFeUrl()}/projekty/${task.projectId}?ukol=${
+                  taskLink: `${getFeUrl()}/projekty/${task.projectId}?id=${
                     task.id
                   }`,
                 }

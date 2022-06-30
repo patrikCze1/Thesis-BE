@@ -66,10 +66,15 @@ export default function projectReducer(state = initialState, action) {
     //   };
 
     case "project/socketNew":
-      return {
-        ...state,
-        projects: [...state.projects, action.payload],
-      };
+      if (
+        !state.projects.some((project) => project.id == action.payload.id) &&
+        !state.savingProject
+      ) {
+        return {
+          ...state,
+          projects: [...state.projects, action.payload],
+        };
+      } else return state;
 
     case "project/edit":
       toast.success(i18next.t("Project updated"));

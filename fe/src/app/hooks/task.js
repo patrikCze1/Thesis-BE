@@ -19,18 +19,18 @@ export function useTaskDetail(projectId, taskType) {
 
   const search = window.location.search;
   const params = new URLSearchParams(search);
-  const selectedTask = params.get("ukol");
+  const selectedTaskId = params.get("id");
 
   useEffect(() => {
-    console.log("useTaskDetail useEffect", selectedTask);
-    if (selectedTask) {
-      dispatch(loadTaskDetailAction(projectId, selectedTask));
+    console.log("useTaskDetail useEffect", selectedTaskId);
+    if (selectedTaskId) {
+      dispatch(loadTaskDetailAction(projectId, selectedTaskId));
       setShowTaskDetail(true);
     }
-  }, [selectedTask]);
+  }, [selectedTaskId]);
 
   // useEffect(() => {
-  //   if (taskLoaded && selectedTask) {
+  //   if (taskLoaded && selectedTaskId) {
   //     setShowTaskDetail(true);
   //   }
   // }, [taskLoaded]);
@@ -39,8 +39,8 @@ export function useTaskDetail(projectId, taskType) {
     setShowTaskDetail(false);
     const queryParams = new URLSearchParams(window.location.search);
     console.log("handleHideTaskDetail");
-    if (queryParams.has("ukol")) {
-      queryParams.delete("ukol");
+    if (queryParams.has("id")) {
+      queryParams.delete("id");
       history.replace({
         search: queryParams.toString(),
       });
@@ -82,7 +82,7 @@ export function useTaskDetail(projectId, taskType) {
 
   return {
     showTaskDetail,
-    selectedTask,
+    selectedTaskId,
     handleHideTaskDetail,
     renderModal,
     setShowTaskDetail,
@@ -100,12 +100,12 @@ export const useInitShowTask = () => {
         createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
           ":id": task.projectId,
           ":boardId": task.boardId,
-        }) + `?ukol=${task.id}`
+        }) + `?id=${task.id}`
       );
-    else history.push(`?ukol=${task.id}`);
+    else history.push(`?id=${task.id}`);
     //   createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
     //     ":id": task.projectId,
-    //   }) + `?ukol=${task.id}`
+    //   }) + `?id=${task.id}`
     // );
   };
 

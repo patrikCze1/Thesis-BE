@@ -55,13 +55,13 @@ export default function SearchBar() {
       //     createRouteWithParams(ROUTE.PROJECTS_BOARDS_DETAIL, {
       //       ":id": suggestion.projectId,
       //       ":boardId": suggestion.boardId,
-      //     }) + `?ukol=${suggestion.id}`
+      //     }) + `?id=${suggestion.id}`
       //   );
       // else
       //   history.push(
       //     createRouteWithParams(ROUTE.PROJECTS_DETAIL_BACKLOG, {
       //       ":id": suggestion.projectId,
-      //     }) + `?ukol=${suggestion.id}`
+      //     }) + `?id=${suggestion.id}`
       //   );
     }
     setValue("");

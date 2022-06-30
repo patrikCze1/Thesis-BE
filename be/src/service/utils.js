@@ -16,15 +16,13 @@ const getFeUrl = () => {
  */
 const getFeTaskUrl = (task) => {
   if (task.archived) {
-    return `${getFeUrl()}/projekty/${task.projectId}/archiv?ukol=${task.id}`;
+    return `${getFeUrl()}/projekty/${task.projectId}/archiv?id=${task.id}`;
   } else if (!task.stageId) {
-    return `${getFeUrl()}/projekty/${task.projectId}/nevyrizene?ukol=${
-      task.id
-    }`;
+    return `${getFeUrl()}/projekty/${task.projectId}/nevyrizene?id=${task.id}`;
   } else {
     return `${getFeUrl()}/projekty/${task.projectId}/nastenky/${
       task.boardId
-    }?ukol=${task.id}`;
+    }?id=${task.id}`;
   }
 };
 

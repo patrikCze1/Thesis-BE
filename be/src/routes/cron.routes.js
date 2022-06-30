@@ -1,6 +1,5 @@
 const express = require("express");
 const { SOCKET_EMIT } = require("../../enum/enum");
-const { getCompanyKey } = require("../auth/auth");
 const { getDatabaseModels, connections } = require("../models");
 const router = express.Router();
 
